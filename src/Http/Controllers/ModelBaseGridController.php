@@ -107,7 +107,6 @@ class ModelBaseGridController extends BaseController
      */
     public function sync($model, $scope = null)
     {
-        dd(2);
         /** @var Model $modelName */
         $modelName = config('amigridview.namespace') . str_singular(ucfirst($model));
         $query = $modelName::query();

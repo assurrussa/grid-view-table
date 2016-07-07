@@ -52,20 +52,20 @@ var gridList = new Vue({
         if ((history.state == null) || (history.state.data == undefined)) {
             this.fetchListAll();
         } else {
-            this.$set('gridColumns', history.state.headers);
-            this.$set('gridData', history.state.data.data);
-            this.$set('gridPagination', history.state.pagination);
-            this.$set('gridFrom', history.state.data.from);
-            this.$set('gridTo', history.state.data.to);
-            this.$set('gridTotal', history.state.data.total);
-            this.$set('createButton', history.state.createButton);
-            this.$set('customButton', history.state.customButton);
-            this.$set('gridCurrentPage', history.state.page);
-            this.$set('orderBy', history.state.orderBy);
-            this.$set('sortName', history.state.sortName);
-            // this.$set('filter', history.state.filter);
-            // this.$set('searchQuery', history.state.search);
-            // this.$set('gridCountPage', history.state.count);
+            this.$set('gridColumns', history.state.data.headers);
+            this.$set('gridData', history.state.data.data.data);
+            this.$set('gridPagination', history.state.data.pagination);
+            this.$set('gridFrom', history.state.data.data.from);
+            this.$set('gridTo', history.state.data.data.to);
+            this.$set('gridTotal', history.state.data.data.total);
+            this.$set('createButton', history.state.data.createButton);
+            this.$set('customButton', history.state.data.customButton);
+            this.$set('gridCurrentPage', history.state.data.page);
+            this.$set('orderBy', history.state.data.orderBy);
+            this.$set('sortName', history.state.data.sortName);
+            // this.$set('filter', history.state.data.filter);
+            // this.$set('searchQuery', history.state.data.search);
+            // this.$set('gridCountPage', history.state.data.count);
             this.loadIcon = false;
         }
     },
@@ -165,28 +165,33 @@ var gridList = new Vue({
                 history.pushState(null, null, currentPage + str);
             }
 
-            this.$http.get(currentPage + '/sync' + urlSearch, object, function (response) {
-                if (!history.state) {
-                    history.pushState(response, null);
-                } else {
-                    history.replaceState(response, null);
-                }
-                this.$set('gridColumns', response.headers);
-                this.$set('gridData', response.data.data);
-                this.$set('gridPagination', response.pagination);
-                this.$set('gridFrom', response.data.from);
-                this.$set('gridTo', response.data.to);
-                this.$set('gridTotal', response.data.total);
-                this.$set('createButton', response.createButton);
-                this.$set('customButton', response.customButton);
-                this.$set('gridCurrentPage', response.page);
-                this.$set('orderBy', response.orderBy);
-                this.$set('sortName', response.sortName);
-                // this.$set('filter', response.filter);
-                // this.$set('searchQuery', response.search);
-                // this.$set('gridCountPage', response.count);
-                this.loadIcon = false;
-            });
+            this.$http
+                .get(currentPage + '/sync' + urlSearch, object)
+                .then(function (response) {
+                    console.log(2);
+                    if (!history.state) {
+                        history.pushState(response, null);
+                    } else {
+                        history.replaceState(response, null);
+                    }
+                    this.$set('gridColumns', response.data.headers);
+                    this.$set('gridData', response.data.data.data);
+                    this.$set('gridPagination', response.pagination);
+                    this.$set('gridFrom', response.data.data.from);
+                    this.$set('gridTo', response.data.data.to);
+                    this.$set('gridTotal', response.data.data.total);
+                    this.$set('createButton', response.data.createButton);
+                    this.$set('customButton', response.data.customButton);
+                    this.$set('gridCurrentPage', response.data.page);
+                    this.$set('orderBy', response.data.orderBy);
+                    this.$set('sortName', response.data.sortName);
+                    // this.$set('filter', response.data.filter);
+                    // this.$set('searchQuery', response.data.search);
+                    // this.$set('gridCountPage', response.data.count);
+                    this.loadIcon = false;
+                }, function ($errors) {
+                    console.log('errors' + $errors);
+                });
         },
         onPage: function (value, e) {
             e.preventDefault();
