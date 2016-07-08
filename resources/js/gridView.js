@@ -164,11 +164,14 @@ var gridList = new Vue({
                 str = (str.substr(1) != '') ? '?' + str.substr(1) : '';
                 history.pushState(null, null, currentPage + str);
             }
+            for (key in object) {
+                urlSearch += '&' + key + '=' + object[key];
+            }
+            urlSearch = (urlSearch.substr(1) != '') ? '?' + urlSearch.substr(1) : '';
 
             this.$http
-                .get(currentPage + '/sync' + urlSearch, object)
+                .get(currentPage + '/sync' + urlSearch)
                 .then(function (response) {
-                    console.log(2);
                     if (!history.state) {
                         history.pushState(response, null);
                     } else {
@@ -190,7 +193,7 @@ var gridList = new Vue({
                     // this.$set('gridCountPage', response.data.count);
                     this.loadIcon = false;
                 }, function ($errors) {
-                    console.log('errors' + $errors);
+                    // console.log('errors' + $errors);
                 });
         },
         onPage: function (value, e) {
