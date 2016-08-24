@@ -57,7 +57,7 @@ Mini gridView for laravel feat Vue.js.
     public function sync()
     {
         $query = new Product();
-        $query->with(Product::REL_CATALOG, Product::REL_BRAND);
+        $query = $query->newQuery()->with(Product::REL_CATALOG, Product::REL_BRAND);
         $columns = AmiGridView::columns(function ($grid) {
             /** @var \Assurrussa\GridView\Support\GridColumns $grid */
             $catalogs = Catalog::pluck('title', 'id');
