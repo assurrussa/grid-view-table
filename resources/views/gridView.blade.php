@@ -3,7 +3,8 @@
     <table class="table table-stripped table-hover table-condensed">
         <thead>
         <tr>
-            <th v-for="column in columns"
+            <th
+                    v-for="column in columns"
             @click="sortBy(column.key, column.sortBool)"
             :class="{active: sort == column.key}">
             <span v-if="column.screening && (column.key == 'checkbox')">
@@ -18,24 +19,41 @@
         </tr>
         </thead>
         <tbody>
-        <tr v-for="entry in data | filterBy | sortKey sortOrders[sortKey]">
-            <td v-for="column in columns">
-                <span v-if="column.screening">
-                    @{{{ entry[column.key] }}}
-                </span>
-                <span v-else>@{{ entry[column.key] }}</span>
-            </td>
-        </tr>
         <tr>
-            <td v-for="column in columns">
+            <td v-for="column in columns" track-by="$index">
+            <span v-if="column.filter.data == ''">
+                <div class="js-textFilter input-group date">
+                    <input type="text"
+                           v-model="selected[column.filter.name]"
+                           value="@{{ selected[column.filter.name] }}"
+                           class="js-textFilter_@{{ column.filter.name }} form-control"
+                           data-name="@{{ column.filter.name }}"
+                           data-mode="@{{ column.filter.mode }}"
+                    @change="selectedSelect(column.filter.name, selected[column.filter.name])">
+                    <span class="input-group-addon">
+                        <span class="glyphicon glyphicon-time"></span>
+                    </span>
+                </div>
+            </span>
+                <span v-else>
                 <select v-if="column.filter.data" v-model="selected[column.filter.name]"
-                @change="selectedSelect(column.filter.name, selected[column.filter.name])"
-                class="form-control js-selectFilter"
+                    @change="selectedSelect(column.filter.name, selected[column.filter.name])"
+                class="form-control js-selectFilter js-selectFilter_@{{ column.filter.name }}"
+                data-mode="@{{ column.filter.mode }}"
                 data-name="@{{ column.filter.name }}">
                 <option disabled>{{ trans(Assurrussa\GridView\GridView::NAME.'::grid.selectFilter') }}</option>
                 <option value=""></option>
                 <option v-for="(id, name) in column.filter.data" value="@{{ id }}"> @{{ name }}</option>
-                </select>
+                    </select>
+            </span>
+            </td>
+        </tr>
+        <tr v-for="entry in data | filterBy | sortKey sortOrders[sortKey]" track-by="$index">
+            <td v-for="column in columns" track-by="$index">
+                <span v-if="column.screening">
+                    @{{{ entry[column.key] }}}
+                </span>
+                <span v-else>@{{ entry[column.key] }}</span>
             </td>
         </tr>
         </tbody>
@@ -111,7 +129,7 @@
     }
 
     .content-box {
-        overflow: auto;
+        *overflow: auto;
     }
 
     .table > thead > tr > th {

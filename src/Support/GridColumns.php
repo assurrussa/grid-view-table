@@ -75,7 +75,7 @@ class GridColumns implements GridColumnsInterface
     /**
      * Получение необходимых полей для Grid
      *
-     * @return ButtonItem[]|null
+     * @return ButtonItem[]|[]
      */
     public function getActions()
     {
@@ -84,7 +84,7 @@ class GridColumns implements GridColumnsInterface
                 return $column->getActions();
             }
         }
-        return null;
+        return [];
     }
 
     /**

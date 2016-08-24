@@ -47,7 +47,6 @@ Vue.filter('timeAgo', function(value) {
 // gridList
 var gridList = new Vue({
     el: '#gridList',
-
     ready: function () {
         if ((history.state == null) || (history.state.data == undefined)) {
             this.fetchListAll();
@@ -105,7 +104,6 @@ var gridList = new Vue({
             this.fetchListAll();
         }
     },
-
     methods: {
         fetchListAll: function () {
             this.loadIcon = true;
@@ -147,6 +145,7 @@ var gridList = new Vue({
             currentPage = currentPage.replace(urlSearch, '');
             currentPage = currentPage.replace(/\/create$/, '');
             currentPage = currentPage.replace(/\/([0-9]+)\/edit/, '');
+            currentPage = currentPage.replace(/\/$/, '');
             if(urlSearch != '') {
                 // для изменения урла.
                 var key;
@@ -156,6 +155,7 @@ var gridList = new Vue({
                     listSearch[tmp2[0]] = tmp2[1];       // пары ключ(имя переменной)->значение
                 }
                 for (key in object) {
+                    console.log(object);
                     delete listSearch[key];
                 }
                 for (key in listSearch) {
@@ -167,6 +167,7 @@ var gridList = new Vue({
             for (key in object) {
                 urlSearch += '&' + key + '=' + object[key];
             }
+
             urlSearch = (urlSearch.substr(1) != '') ? '?' + urlSearch.substr(1) : '';
 
             this.$http
@@ -179,7 +180,7 @@ var gridList = new Vue({
                     }
                     this.$set('gridColumns', response.data.headers);
                     this.$set('gridData', response.data.data.data);
-                    this.$set('gridPagination', response.pagination);
+                    this.$set('gridPagination', response.data.pagination);
                     this.$set('gridFrom', response.data.data.from);
                     this.$set('gridTo', response.data.data.to);
                     this.$set('gridTotal', response.data.data.total);
@@ -188,9 +189,9 @@ var gridList = new Vue({
                     this.$set('gridCurrentPage', response.data.page);
                     this.$set('orderBy', response.data.orderBy);
                     this.$set('sortName', response.data.sortName);
-                    // this.$set('filter', response.data.filter);
-                    // this.$set('searchQuery', response.data.search);
-                    // this.$set('gridCountPage', response.data.count);
+                    // this.$set('filter', _response.data.filter);
+                    // this.$set('searchQuery', _response.data.search);
+                    // this.$set('gridCountPage', _response.data.count);
                     this.loadIcon = false;
                 }, function ($errors) {
                     // console.log('errors' + $errors);
@@ -210,6 +211,7 @@ var gridList = new Vue({
             this.fetchListAll();
         },
         selectedSelect: function (key, value) {
+            console.log(key, value);
             if(value == '') {
                 delete this.filter[key];
             } else {

@@ -160,7 +160,7 @@ class GridView implements GridInterface
      * @param  array  $mergeData
      * @return \Illuminate\View\View|\Illuminate\Contracts\View\Factory
      */
-    function view($view = null, $data = [], $mergeData = [])
+    public function view($view = null, $data = [], $mergeData = [])
     {
         return view(self::NAME . '::' . $view, $data, $mergeData);
     }
@@ -174,7 +174,7 @@ class GridView implements GridInterface
      * @param  string $locale
      * @return \Symfony\Component\Translation\TranslatorInterface|string
      */
-    function trans($id = null, $parameters = [], $domain = 'messages', $locale = null)
+    public function trans($id = null, $parameters = [], $domain = 'messages', $locale = null)
     {
         return trans(self::NAME . '::' . $id, $parameters, $domain, $locale);
     }
@@ -239,7 +239,10 @@ class GridView implements GridInterface
                 $_listRow[$column->getKey()] = $column->getValues($instance);
             }
             $buttons = $this->filterAction($instance);
-            $data->offsetSet($key, array_merge($_listRow, [GridColumn::ACTION_NAME => implode('', $buttons)]));
+            if(count($buttons)) {
+                $_listRow = array_merge($_listRow, [GridColumn::ACTION_NAME => implode('', $buttons)]);
+            }
+            $data->offsetSet($key, $_listRow);
         }
         return new \Illuminate\Pagination\LengthAwarePaginator($data, $countTotal, $limit, $page, [
             'path'     => \Illuminate\Pagination\Paginator::resolveCurrentPath(),
@@ -255,12 +258,14 @@ class GridView implements GridInterface
      */
     protected function filterAction($instance)
     {
-        $buttons = $this->columns->getActions();
         $listButtons = [];
-        foreach($buttons as &$button) {
-            if($button->getValues($instance)) {
-                $listButtons[] = $button->render();
-                unset($button);
+        if($this->columns->count()) {
+            $buttons = $this->columns->getActions();
+            foreach($buttons as &$button) {
+                if($button->getValues($instance)) {
+                    $listButtons[] = $button->render();
+                    unset($button);
+                }
             }
         }
         return $listButtons;
@@ -285,7 +290,13 @@ class GridView implements GridInterface
                     if(method_exists($this->_query->getModel(), 'scope'.camel_case($scope))) {
                         $this->_query->{camel_case($scope)}($value);
                     } else {
-                        $this->filterSearch($scope, $value);
+                        $values = explode(',', $value);
+                        if(count($values) > 1) {
+                                $this->filterSearch($scope, $values[0], '>');
+                                $this->filterSearch($scope, $values[1], '<');
+                        } else {
+                            $this->filterSearch($scope, $value, 'like', '%', '%');
+                        }
                     }
                 }
             }
@@ -306,6 +317,8 @@ class GridView implements GridInterface
     protected function filterSearch($search, $value = null, $delimiter = '=', $beforeValue = '', $afterValue = '')
     {
         if($search) {
+            $value = trim($value);
+            $search = trim($search);
             /** @var Model $model */
             $model = $this->_query->getModel();
             // поиск по словам

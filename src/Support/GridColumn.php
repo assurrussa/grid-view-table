@@ -160,7 +160,7 @@ class GridColumn implements GridColumnInterface
     }
 
     /**
-     * Filter принимает в себя 2 параметра
+     * Filter for select
      *
      * @param string                               $field Имя поля которое будет фильтроваться
      * @param array|\Illuminate\Support\Collection $array Массив вида [1 => 'name', ...], для селекта
@@ -174,6 +174,41 @@ class GridColumn implements GridColumnInterface
         $this->_filter = [
             'name' => $field,
             'data' => $array,
+            'mode' => '',
+        ];
+        return $this;
+    }
+
+    /**
+     * Filter for text input
+     *
+     * @param string $field Имя поля которое будет фильтроваться
+     * @param string $string
+     * @return $this
+     */
+    public function setFilterText($field, $string = '')
+    {
+        $this->_filter = [
+            'name' => $field,
+            'data' => $string,
+            'mode' => '',
+        ];
+        return $this;
+    }
+
+    /**
+     * Filter for text input
+     *
+     * @param string $field Имя поля которое будет фильтроваться
+     * @param string $string
+     * @return $this
+     */
+    public function setFilterDate($field, $string = '')
+    {
+        $this->_filter = [
+            'name' => $field,
+            'data' => $string,
+            'mode' => 'date',
         ];
         return $this;
     }

@@ -26,7 +26,7 @@ class FilterEnum
      * @return array
      */
     public static function getFilterExecuteForCyrillicColumn() {
-        return self::$filterExecuteForCyrillicColumn;
+        return static::$filterExecuteForCyrillicColumn;
     }
 
     /**
