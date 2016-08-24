@@ -155,7 +155,6 @@ var gridList = new Vue({
                     listSearch[tmp2[0]] = tmp2[1];       // пары ключ(имя переменной)->значение
                 }
                 for (key in object) {
-                    console.log(object);
                     delete listSearch[key];
                 }
                 for (key in listSearch) {
