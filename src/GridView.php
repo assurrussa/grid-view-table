@@ -59,6 +59,17 @@ class GridView implements GridInterface
     }
 
     /**
+     * @param string $path
+     * @param array  $data
+     * @param array  $mergeData
+     * @return mixed
+     */
+    public function render($path = 'gridView', $data = [], $mergeData = [])
+    {
+        return $this->view($path, $data, $mergeData);
+    }
+
+    /**
      * Добавление необходимых полей для Grid
      *
      * @see GridViewTest::testColumns

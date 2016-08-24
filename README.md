@@ -40,6 +40,12 @@ Mini gridView for laravel feat Vue.js.
 
 * Если вам не нужны пути роутов, то в конфиге `config/amigridview.php` просто укажите `FALSE`, для `routes`
 
+### Использование ###
+
+```
+{!! \AmiGridView::render() !!}
+```
+
 ### Готово! ###
 
 ### Example ###
