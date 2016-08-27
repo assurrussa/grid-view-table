@@ -2,7 +2,7 @@
 
 namespace Assurrussa\GridView\Providers;
 
-use Illuminate\Routing\Router;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
 
 class RouteServiceProvider extends ServiceProvider
@@ -22,10 +22,10 @@ class RouteServiceProvider extends ServiceProvider
      * @param  \Illuminate\Routing\Router  $router
      * @return void
      */
-    public function boot(Router $router)
+    public function boot()
     {
-        $this->registerPatterns($router);
-        parent::boot($router);
+        $this->registerPatterns();
+        parent::boot();
     }
 
     /**
@@ -34,9 +34,9 @@ class RouteServiceProvider extends ServiceProvider
      * @param  \Illuminate\Routing\Router  $router
      * @return void
      */
-    public function map(Router $router)
+    public function map()
     {
-        $this->mapWebRoutes($router);
+        $this->mapWebRoutes();
     }
 
     /**
@@ -45,9 +45,9 @@ class RouteServiceProvider extends ServiceProvider
      * @param  \Illuminate\Routing\Router  $router
      * @return void
      */
-    protected function mapWebRoutes(Router $router)
+    protected function mapWebRoutes()
     {
-        $router->group([
+        Route::group([
             'namespace' => $this->namespace,
             'middleware' => config('amigridview.middleware'),
             'prefix' => config('amigridview.prefix')
@@ -63,10 +63,10 @@ class RouteServiceProvider extends ServiceProvider
     /**
      * All patterns url
      */
-    protected function registerPatterns(Router $router)
+    protected function registerPatterns()
     {
-        $router->pattern('id', '[0-9]+');
-        $router->pattern('scope', '[A-za-z0-9-]+');
-        $router->pattern('model', '[A-za-z0-9-]+');
+        Route::pattern('id', '[0-9]+');
+        Route::pattern('scope', '[A-za-z0-9-]+');
+        Route::pattern('model', '[A-za-z0-9-]+');
     }
 }
