@@ -212,11 +212,12 @@ class GridView implements GridInterface
         $this->filterSearch($search);
         $this->filterOrderBy($sortName, $orderBy);
         $data = $this->pagination($page, $limit);
-        $pagination = $data->render(new \Assurrussa\GridView\Presenters\PaginateListLinkPresenter($data));
+        /** @var \Illuminate\Support\HtmlString $pagination */
+        //        $pagination = $data->links(self::NAME . '::pagination.grid-pagination');
 
         return [
             'data'         => $data,
-            'pagination'   => $pagination,
+            'pagination'   => $this->getPaginationToArray($data),
             'headers'      => $this->columns->toArray(),
             'createButton' => $this->getCreateButton()->render(),
             'customButton' => $this->getCustomButtons(),
@@ -262,6 +263,48 @@ class GridView implements GridInterface
     }
 
     /**
+     * @param \Illuminate\Pagination\LengthAwarePaginator $data
+     * @return array
+     */
+    public function getPaginationToArray($data)
+    {
+        $list = [];
+        if($data->lastPage() > 1) {
+            $window = \Illuminate\Pagination\UrlWindow::make($data);
+
+            $elements = [
+                $window['first'],
+                is_array($window['slider']) ? '...' : null,
+                $window['slider'],
+                is_array($window['last']) ? '...' : null,
+                $window['last'],
+            ];
+
+            if($url = $data->previousPageUrl() ?: '') {
+                $list[] = $this->getItemForPagination('', '&laquo;', $url, 'prev', $data->currentPage() - 1);
+            };
+            foreach($elements as $item) {
+                if(is_string($item)) {
+                    $list[] = $this->getItemForPagination('disabled', $item);
+                }
+                if(is_array($item)) {
+                    foreach($item as $page => $url) {
+                        if($page == $data->currentPage()) {
+                            $list[] = $this->getItemForPagination('active', $page);
+                        } else {
+                            $list[] = $this->getItemForPagination('', '', $url, '', $page);
+                        }
+                    }
+                }
+            }
+            if($data->hasMorePages()) {
+                $list[] = $this->getItemForPagination('', '&raquo;', $data->nextPageUrl(), 'next', $data->currentPage() + 1);
+            };
+        }
+        return $list;
+    }
+
+    /**
      * Метод получает кнопки для грид таблицы
      *
      * @param Model|static $instance
@@ -298,13 +341,13 @@ class GridView implements GridInterface
             foreach($this->_request as $scope => $value) {
                 if(!empty($value)) {
                     //checked scope method for model
-                    if(method_exists($this->_query->getModel(), 'scope'.camel_case($scope))) {
+                    if(method_exists($this->_query->getModel(), 'scope' . camel_case($scope))) {
                         $this->_query->{camel_case($scope)}($value);
                     } else {
                         $values = explode(',', $value);
                         if(count($values) > 1) {
-                                $this->filterSearch($scope, $values[0], '>');
-                                $this->filterSearch($scope, $values[1], '<');
+                            $this->filterSearch($scope, $values[0], '>');
+                            $this->filterSearch($scope, $values[1], '<');
                         } else {
                             $this->filterSearch($scope, $value, 'like', '%', '%');
                         }
@@ -378,6 +421,25 @@ class GridView implements GridInterface
         if($sortName) {
             $this->_query->orderBy($this->_query->getModel()->getTable() . '.' . $sortName, $orderBy);
         }
+    }
+
+    /**
+     * @param string $status
+     * @param string $text
+     * @param string $url
+     * @param string $rel
+     * @param string $page
+     * @return array
+     */
+    protected function getItemForPagination($status = '', $text = '', $url = '', $rel = '', $page = '')
+    {
+        return [
+            'status' => $status,
+            'text'   => $text,
+            'url'    => $url,
+            'rel'    => $rel,
+            'page'   => $page,
+        ];
     }
 
     /**

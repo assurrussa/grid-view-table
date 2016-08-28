@@ -2,14 +2,12 @@
 
 namespace Assurrussa\GridView\Presenters;
 
-use Illuminate\Pagination\BootstrapThreePresenter;
-
 /**
  * Class PaginateListLinkPresenter
  *
  * @package Assurrussa\AmiCMS\Presenters
  */
-class PaginateListLinkPresenter extends BootstrapThreePresenter
+class PaginateListLinkPresenter
 {
     /**
      * @var array

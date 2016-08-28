@@ -109,8 +109,8 @@
                 <ul class="pagination pagination-sm pull-right">
 
                     <li :class="link.status" v-for="link in gridPagination">
-                        <a @click="onPage(link.page, $event)" v-href="link.url">
-                        @{{{ link.page }}} @{{{ link.text }}}
+                        <a @click="onPage(link.page, $event)" v-href="link.url" rel="@{{ link.rel }}">
+                        @{{{ (link.text) ?link.text : link.page }}}
                         </a>
                     </li>
 
