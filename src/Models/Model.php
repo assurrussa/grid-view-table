@@ -7,17 +7,18 @@ namespace Assurrussa\GridView\Models;
  *
  * @package Assurrussa\GridView\Models
  */
-class Model extends \Eloquent
+class Model extends \Illuminate\Database\Eloquent\Model
 {
     /**
      * Check if model's table has column
      *
+     * @param \Eloquent $model
      * @param string $column
      * @return bool
      */
-    public function hasColumn($column)
+    public static function hasColumn($model, $column)
     {
-        $table = $this->getTable();
+        $table = $model->getTable();
         $columns = \Cache::remember('amigridview.columns.' . $table, 60, function () use ($table) {
             return \Schema::getColumnListing($table);
         });

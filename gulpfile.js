@@ -1,5 +1,7 @@
 var elixir = require('laravel-elixir');
 
+require('laravel-elixir-vue');
+
 /*
  |--------------------------------------------------------------------------
  | Elixir Asset Management
@@ -12,19 +14,5 @@ var elixir = require('laravel-elixir');
  */
 
 elixir(function (mix) {
-
-    // ============================= JS
-    // mix.scripts([
-    //    'vue/vue.min.js',
-    //    'vue/vue-resource.min.js'
-    // ], 'public/js/vendor.js');
-    //
-    // mix.scripts([
-    //    'gridView.js'
-    // ], 'public/js/gridView.js');
-
-    // ============================= CSS
-    // mix.less([
-    //     'frontend/style.less'
-    // ], 'public/css/app.css');
+    mix.webpack('gridView.js', 'public/vendor/grid-view/js/gridView.js');
 });

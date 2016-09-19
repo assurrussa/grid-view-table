@@ -64,6 +64,11 @@ Mini gridView for laravel feat Vue.js.
             $brands = Brand::pluck('name', 'id');
             $columns = [];
             $columns[] = $grid->column()->setKey('id')->setValue(trans('adminCms.label.id'))->setSort(true);
+            $columns[] = $grid->column()->setKey('checkbox')->setValue('<input type="checkbox" class="js-adminSelectAll">')
+                            ->setSort(false)->setScreening(true)->setHandler(function ($data) {
+                                /** @var Product $data */
+                                return '<input type="checkbox" class="js-adminCheckboxRow" value="' . $data->id . '">';
+                            });
             $columns[] = $grid->column()->setKey('catalogs.title')->setValue(trans('adminCms.menu.catalog'))
                 ->setSort(false)->setScreening(true)->setFilter('catalog_id', $catalogs)->setHandler(function ($data) {
                     /** @var Product $data */

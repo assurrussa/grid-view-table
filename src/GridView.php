@@ -388,7 +388,7 @@ class GridView implements GridInterface
                     /** @var \Illuminate\Database\Eloquent\Builder $query */
                     $tableName = $model->getTable();
                     if($value) {
-                        if($model->hasColumn($search)) {
+                        if(Model::hasColumn($model, $search)) {
                             $query->orWhere($tableName . '.' . $search, $delimiter,
                                 $beforeValue . $value . $afterValue);
                         }
@@ -400,7 +400,7 @@ class GridView implements GridInterface
                                     continue;
                                 }
                             }
-                            if($model->hasColumn($column)) {
+                            if(Model::hasColumn($model, $column)) {
                                 $query->orWhere($tableName . '.' . $column, 'like', '%' . $search . '%');
                             }
                         }

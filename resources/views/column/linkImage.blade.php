@@ -1,3 +1,4 @@
+
 <?php
 /**
  * @var string $link
@@ -6,6 +7,6 @@
  */
 $class = isset($class) ? $class : '';
 ?>
-<a href="{{ $link }}" data-lightbox="{{ $title }}" data-title="{{ $title }}">
-    <img class="thumbnail {{ $class }}" title="{{ $title }}" src="{{ $link }}" width="80px">
+<a href="{{ $link }}" data-lightbox="{{ $title }}" data-title="{{ $title }}" class="thumbnail {{ $class }}">
+    <img title="{{ $title }}" src="{{ $link }}" width="80px">
 </a>

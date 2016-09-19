@@ -1,3 +1,6 @@
+window.Vue = require('vue');
+Vue.use(require('vue-resource'));
+
 Vue.http.headers.common['X-CSRF-TOKEN'] = document.querySelector('#token').getAttribute('value');
 
 // register the grid component
@@ -6,11 +9,15 @@ Vue.component('grid-view', {
     props: {
         data: [],
         columns: [],
-        sort: ''
+        sortName: ''
     },
-    data: {
-        sortKey: '',
-        sortOrders: []
+    data: function () {
+        this.sortList();
+        return {
+            sortKey: '',
+            selected: {},
+            sortOrders: null
+        }
     },
     methods: {
         sortList: function () {
@@ -26,7 +33,7 @@ Vue.component('grid-view', {
         },
         sortBy: function (key, bool) {
             if (!bool) {
-                return false;
+                // return false;
             }
             this.sortList();
             this.sortKey = key;
@@ -35,6 +42,7 @@ Vue.component('grid-view', {
             this.$parent.sortBy(key, orderBy);
         },
         selectedSelect: function (key, value) {
+            console.log(key, value);
             this.$parent.selectedSelect(key, value);
         }
     }
@@ -70,6 +78,7 @@ var gridList = new Vue({
     },
 
     data: {
+        searchQueries: '', // метод для ввода тестка в поиск
         searchQuery: '', // поиск по слову
         createButton: '', // кнопка создания страницы
         customButton: '', // кнопка кастомная
@@ -83,9 +92,11 @@ var gridList = new Vue({
         gridFrom: 0, // от
         gridTo: 0, // до
         gridTotal: 0, // Общее количество
-        orderBy: 'dsc', // сортировка - порядок
+        orderBy: 'desc', // сортировка - порядок
         filter: {}, // массив для фильтрации
-        resultFilter: '' // результат фильтрации массивов
+        resultFilter: '', // результат фильтрации массивов
+        gridColumns: '',
+        gridData: ''
     },
 
     watch: {
@@ -108,6 +119,7 @@ var gridList = new Vue({
         fetchListAll: function () {
             this.loadIcon = true;
             var currentPage = window.location.href,
+                objects,
                 object,
                 urlSearch = window.location.search,
                 listSearch = {},
@@ -146,9 +158,9 @@ var gridList = new Vue({
             currentPage = currentPage.replace(/\/create$/, '');
             currentPage = currentPage.replace(/\/([0-9]+)\/edit/, '');
             currentPage = currentPage.replace(/\/$/, '');
+            // для изменения урла.
+            var key, tmp, tmp2;
             if(urlSearch != '') {
-                // для изменения урла.
-                var key;
                 tmp = decodeURIComponent(urlSearch.substr(1)).split('&');   // разделяем переменные
                 for(var i=0; i < tmp.length; i++) {
                     tmp2 = tmp[i].split('=');     // массив param будет содержать
@@ -210,7 +222,6 @@ var gridList = new Vue({
             this.fetchListAll();
         },
         selectedSelect: function (key, value) {
-            console.log(key, value);
             if(value == '') {
                 delete this.filter[key];
             } else {
