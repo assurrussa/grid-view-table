@@ -183,6 +183,12 @@
     #search {
         margin-bottom: 10px;
     }
+
+    @media (max-width: 640px) {
+        .content-box {
+            overflow: auto;
+        }
+    }
 </style>
 @push('scripts')
 <script src="{{ asset('vendor/grid-view/js/gridView.js') }}"></script>
