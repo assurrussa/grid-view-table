@@ -48,7 +48,7 @@ Vue.component('grid-view', {
     }
 });
 
-Vue.filter('timeAgo', function(value) {
+Vue.filter('timeAgo', function (value) {
     return moment.utc(value).local().fromNow();
 });
 
@@ -160,9 +160,9 @@ var gridList = new Vue({
             currentPage = currentPage.replace(/\/$/, '');
             // для изменения урла.
             var key, tmp, tmp2;
-            if(urlSearch != '') {
+            if (urlSearch != '') {
                 tmp = decodeURIComponent(urlSearch.substr(1)).split('&');   // разделяем переменные
-                for(var i=0; i < tmp.length; i++) {
+                for (var i = 0; i < tmp.length; i++) {
                     tmp2 = tmp[i].split('=');     // массив param будет содержать
                     listSearch[tmp2[0]] = tmp2[1];       // пары ключ(имя переменной)->значение
                 }
@@ -222,7 +222,7 @@ var gridList = new Vue({
             this.fetchListAll();
         },
         selectedSelect: function (key, value) {
-            if(value == '') {
+            if (value == '') {
                 delete this.filter[key];
             } else {
                 this.filter[key] = value;

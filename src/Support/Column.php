@@ -2,14 +2,14 @@
 
 namespace Assurrussa\GridView\Support;
 
-use Assurrussa\GridView\Interfaces\GridColumnInterface;
+use Assurrussa\GridView\Interfaces\ColumnInterface;
 
 /**
  * Class GridColumn
  *
  * @package Assurrussa\AmiCMS\Components\Support
  */
-class GridColumn implements GridColumnInterface
+class Column implements ColumnInterface
 {
 
     /**
@@ -29,12 +29,12 @@ class GridColumn implements GridColumnInterface
     /**
      * @var string
      */
-    private $_key;
+    private $_key = '';
 
     /**
      * @var string
      */
-    private $_value;
+    private $_value = '';
 
     /**
      * @var bool
@@ -47,28 +47,23 @@ class GridColumn implements GridColumnInterface
     private $_screening = false;
 
     /**
-     * @var \Closure
-     */
-    private $_handler;
-
-    /**
      * @var array
      */
     private $_filter = [];
 
     /**
-     * Формат даты
+     * Format Date
      *
      * @var string
      */
-    private $_format = self::DEFAULT_TO_STRING_FORMAT;
+    private $_dateFormat = self::DEFAULT_TO_STRING_FORMAT;
 
     /**
-     * Формат даты
+     * Active date column
      *
-     * @var string
+     * @var bool
      */
-    private $_date = false;
+    private $_dateActive = false;
 
     /**
      * @var \Eloquent|null
@@ -76,9 +71,19 @@ class GridColumn implements GridColumnInterface
     private $_instance = null;
 
     /**
-     * @var ButtonItem[]|\Closure|null
+     * @var Button[]|\Closure|null
      */
     private $_actions = null;
+
+    /**
+     * @var \Closure
+     */
+    private $_handler = null;
+
+    public function __construct()
+    {
+        $this->setDateFormat(config('amigrid.format'));
+    }
 
     /**
      * Какое поле из таблицы вытащить
@@ -164,9 +169,10 @@ class GridColumn implements GridColumnInterface
      *
      * @param string                               $field Имя поля которое будет фильтроваться
      * @param array|\Illuminate\Support\Collection $array Массив вида [1 => 'name', ...], для селекта
+     * @param string                               $mode  Режим
      * @return $this
      */
-    public function setFilter($field, $array)
+    public function setFilter($field, $array, $mode = '')
     {
         if($array instanceof \Illuminate\Support\Collection) {
             $array = $array->toArray();
@@ -174,53 +180,101 @@ class GridColumn implements GridColumnInterface
         $this->_filter = [
             'name' => $field,
             'data' => $array,
-            'mode' => '',
+            'mode' => $mode,
         ];
         return $this;
     }
 
     /**
-     * Filter for text input
-     *
-     * @param string $field Имя поля которое будет фильтроваться
+     * @param string $field
      * @param string $string
+     * @return Column
+     */
+    public function setFilterString($field, $string = '')
+    {
+        return $this->setFilter($field, $string, 'string');
+    }
+
+    /**
+     * @param string $field
+     * @param string $string
+     * @param bool   $active
+     * @param string $format
+     * @return Column
+     */
+    public function setFilterDate($field, $string = '', $active = true, $format = null)
+    {
+        $this->setDateActive($active);
+        if($format) {
+            $this->setDateFormat($format);
+        }
+        return $this->setFilter($field, $string, 'date');
+    }
+
+    /**
+     * @param $format
      * @return $this
      */
-    public function setFilterText($field, $string = '')
+    public function setDateFormat($format)
     {
-        $this->_filter = [
-            'name' => $field,
-            'data' => $string,
-            'mode' => '',
-        ];
+        $this->_dateFormat = $format;
         return $this;
     }
 
     /**
-     * Filter for text input
-     *
-     * @param string $field Имя поля которое будет фильтроваться
-     * @param string $string
+     * @param bool $date
      * @return $this
      */
-    public function setFilterDate($field, $string = '')
+    public function setDateActive($bool = false)
     {
-        $this->_filter = [
-            'name' => $field,
-            'data' => $string,
-            'mode' => 'date',
-        ];
+        $this->_dateActive = $bool;
         return $this;
     }
 
     /**
-     * Необходимо устанавливать только в момент когда приходит инстанс модели!
-     *
-     * @param \Eloquent|null $instance
+     * @param Button[]|\Closure $action
+     * @return Column
      */
-    private function _setInstance($instance)
+    public function setActions($action)
     {
-        $this->_instance = $instance;
+        $this->setKeyAction();
+        $this->_actions = $action;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function isKeyAction()
+    {
+        return $this->_key == self::ACTION_NAME;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isSort()
+    {
+        return $this->_sort;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isScreening()
+    {
+        return $this->_screening;
+    }
+
+    /**
+     * Проверяет является ли свойство Closure
+     *
+     * @return bool
+     * @see \Closure
+     */
+    public function isHandler()
+    {
+        return is_callable($this->_handler);
     }
 
     /**
@@ -242,68 +296,35 @@ class GridColumn implements GridColumnInterface
     /**
      * @return string
      */
-    public function isKeyAction()
-    {
-        return $this->_key == self::ACTION_NAME;
-    }
-
-    /**
-     * @return string
-     */
     public function getValue()
     {
         return $this->_value;
     }
 
     /**
-     * @return bool
-     */
-    public function isSort()
-    {
-        return $this->_sort;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isScreening()
-    {
-        return $this->_screening;
-    }
-
-    /**
-     * @return bool
+     * @return mixed|null
      */
     public function getHandler()
     {
         if(is_callable($this->_handler) && $this->getInstance()) {
             return call_user_func($this->_handler, $this->getInstance());
         }
-        return true;
-    }
-
-    /**
-     * Проверяет является ли свойство Closure
-     *
-     * @return bool
-     * @see \Closure
-     */
-    public function hasHandler()
-    {
-        return is_callable($this->_handler);
+        return null;
     }
 
     /**
      * Взависимости от того какое поле пришло и присутствует ли Closure
      *
-     * @param $instance
+     * @param object|null $instance
      * @return bool|mixed
      * @see \Closure
      */
-    public function getValues($instance)
+    public function getValues($instance = null)
     {
-        $this->_setInstance($instance);
-        if($this->hasHandler()) {
+        if($instance) {
+            $this->setInstance($instance);
+        }
+        if($this->isHandler()) {
             return $this->getHandler();
         }
         return $this->getValueColumn($this->_instance, $this->_key);
@@ -318,6 +339,9 @@ class GridColumn implements GridColumnInterface
      */
     public function getValueColumn($instance, $name)
     {
+        if(!$instance) {
+            return null;
+        }
         $parts = explode('.', $name);
         $part = array_shift($parts);
 
@@ -331,7 +355,7 @@ class GridColumn implements GridColumnInterface
         }
 
         if($instance instanceof \DateTimeInterface) {
-            $instance = $this->getDate() ? $instance->format($this->getFormat()) : $instance;
+            $instance = $this->getDateActive() ? $instance->format($this->getDateFormat()) : $instance;
         }
         return $instance;
     }
@@ -339,36 +363,17 @@ class GridColumn implements GridColumnInterface
     /**
      * @return array
      */
-    public function setFormat($format)
+    public function getDateFormat()
     {
-        $this->_format = $format;
-        return $this;
-    }
-
-    /**
-     * @return array
-     */
-    public function getFormat()
-    {
-        return $this->_format;
-    }
-
-    /**
-     * @param bool $date
-     * @return $this
-     */
-    public function setDate($bool = false)
-    {
-        $this->_date = $bool;
-        return $this;
+        return $this->_dateFormat;
     }
 
     /**
      * @return string
      */
-    public function getDate()
+    public function getDateActive()
     {
-        return $this->_date;
+        return $this->_dateActive;
     }
 
     /**
@@ -380,17 +385,7 @@ class GridColumn implements GridColumnInterface
     }
 
     /**
-     * @param ButtonItem []\Closure $action
-     * @return GridColumn
-     */
-    public function setActions($action)
-    {
-        $this->_actions = $action;
-        return $this;
-    }
-
-    /**
-     * @return ButtonItem[]|null
+     * @return Button[]|null
      */
     public function getActions()
     {
@@ -398,6 +393,32 @@ class GridColumn implements GridColumnInterface
             return call_user_func($this->_actions, $this->getInstance());
         }
         return $this->_actions;
+    }
+
+    /**
+     * Необходимо устанавливать только в момент когда приходит инстанс модели!
+     *
+     * @param \Eloquent|null $instance
+     */
+    public function setInstance($instance)
+    {
+        $this->_instance = $instance;
+    }
+
+    /**
+     * шаблон для чекбокса
+     *
+     * @return $this
+     */
+    public function setCheckbox()
+    {
+        return $this->setKey('checkbox')
+            ->setValue('<input type="checkbox" class="js-adminSelectAll">')
+            ->setSort(false)
+            ->setScreening(true)
+            ->setHandler(function ($data) {
+                return '<input type="checkbox" class="js-adminCheckboxRow" value="' . $data->id . '">';
+            });
     }
 
     /**
@@ -412,8 +433,8 @@ class GridColumn implements GridColumnInterface
             'screening'       => $this->isScreening(),
             'filter'          => $this->getFilter(),
             'handler'         => $this->getHandler(),
-            'date'            => $this->getDate(),
-            'format'          => $this->getFormat(),
+            'date'            => $this->getDateActive(),
+            'format'          => $this->getDateFormat(),
             self::ACTION_NAME => $this->getActions(),
         ];
     }

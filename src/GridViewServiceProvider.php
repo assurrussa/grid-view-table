@@ -17,7 +17,7 @@ class GridViewServiceProvider extends ServiceProvider
      *
      * @var bool
      */
-    protected $defer = false;
+    protected $defer = true;
 
     /**
      * The providers package
@@ -27,27 +27,17 @@ class GridViewServiceProvider extends ServiceProvider
     ];
 
     /**
-     * Register the providers.
-     */
-    public function registerProviders()
-    {
-        foreach ($this->providers as $provider) {
-            $this->app->register($provider);
-        }
-    }
-
-    /**
      * Bootstrap the application services.
      *
      * @return void
      */
     public function boot()
     {
-        $this->mergeConfigFrom(__DIR__ . '/../config/amigridview.php', GridView::NAME);
+        $this->mergeConfigFrom(__DIR__ . '/../config/amigrid.php', GridView::NAME);
         $this->loadTranslationsFrom(__DIR__ . '/../resources/lang', GridView::NAME);
         $this->loadViewsFrom(__DIR__ . '/../resources/views', GridView::NAME);
         $this->publishes([
-            __DIR__ . '/../config/amigridview.php' => config_path('amigridview.php'),
+            __DIR__ . '/../config/amigrid.php' => config_path('amigrid.php'),
         ], 'configs');
         $this->publishes([
             __DIR__ . '/../public/js' => base_path('public/vendor/grid-view/js'),
@@ -64,10 +54,11 @@ class GridViewServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->bind(GridView::NAME, function ($app) {
-            return new GridView();
+        $this->app->bind(\Assurrussa\GridView\Interfaces\GridInterface::class, function ($app) {
+            return new GridView($app);
         });
-        $this->app->alias(GridView::NAME, \Assurrussa\GridView\GridView::class);
+        $this->app->alias(\Assurrussa\GridView\GridView::class, GridView::NAME);
+        $this->app->alias(\Assurrussa\GridView\GridView::class, \Assurrussa\GridView\Interfaces\GridInterface::class);
     }
 
     /**
@@ -76,5 +67,15 @@ class GridViewServiceProvider extends ServiceProvider
     public function provides()
     {
         return [GridView::NAME];
+    }
+
+    /**
+     * Register the providers.
+     */
+    protected function registerProviders()
+    {
+        foreach($this->providers as $provider) {
+            $this->app->register($provider);
+        }
     }
 }

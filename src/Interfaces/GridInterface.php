@@ -18,12 +18,13 @@ interface GridInterface
     public function query($query);
 
     /**
-     * Добавление необходимых полей для Grid
+     * Added required column for grid
+     * Добавление необходимой колонки для сетки
      *
      * @param \Closure $callback
      * @return $this
      */
-    public function columns($columns);
+    public function column();
 
     /**
      * Получение необходимых данных для пагинации

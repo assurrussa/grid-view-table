@@ -5,7 +5,7 @@
  * @var \Illuminate\Routing\Router $router
  */
 
-if(config('amigridview.routes')) {
+if(config('amigrid.routes')) {
     $router->get('{model}/create', ['as' => 'create', 'uses' => 'ModelBaseGridController@create']);
     $router->get('{model}/{id}', ['as' => 'show', 'uses' => 'ModelBaseGridController@show']);
     $router->get('{model}/{id}/edit', ['as' => 'edit', 'uses' => 'ModelBaseGridController@edit']);

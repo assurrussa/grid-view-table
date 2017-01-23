@@ -3,255 +3,181 @@
 namespace Assurrussa\GridView\Support;
 
 use Assurrussa\GridView\GridView;
-use Illuminate\Contracts\Support\Renderable;
-use Illuminate\View\View;
 
 /**
- * Class ButtonItem
+ * Class Button
  *
- * @property string $action
- * @property string $icon
- * @property string $label
- * @property string $url
- * @property bool   $visibility
- *
- * @package Assurrussa\AmiCMS\Support
+ * @package Assurrussa\GridView\Support
  */
-class ButtonItem implements Renderable
+class ButtonItem extends Button
 {
-    /**
-     * Menu item label
-     *
-     * @var string
-     */
-    protected $action;
-    /**
-     * Menu item label
-     *
-     * @var string
-     */
-    protected $label;
-    /**
-     * Menu item icon
-     *
-     * @var string
-     */
-    protected $icon;
-    /**
-     * Menu item url
-     *
-     * @var string
-     */
-    protected $url;
-    /**
-     * Menu item visibility
-     *
-     * @var bool
-     */
-    protected $visibility = true;
-    /**
-     * @var \Closure
-     */
-    private $_handler;
+    const TYPE_BUTTON_DEFAULT = 'default';
+    const TYPE_BUTTON_CREATE = 'create';
+    const TYPE_BUTTON_EXPORT = 'export';
 
-    /**
-     * @var object|null
-     */
-    private $_instance = null;
+    /** @var \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder|static */
+    private $_query;
 
-    /**
-     * Get or set menu item action
-     *
-     * @param string|null $action
-     * @return $this|string
-     */
-    public function setAction($action = '')
+    public function __construct()
     {
-        if($this->visibility) {
-            $this->action = $action;
-        }
+        $this->setTypeDefault();
+    }
 
+    /**
+     * @param \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder|static $query
+     * @return ButtonItem
+     */
+    public function setQuery(&$query)
+    {
+        $this->_query = $query;
         return $this;
     }
 
     /**
-     * Get or set menu item label
-     *
-     * @param string|null $label
-     * @return $this|string
+     * @param mixed $type
      */
-    public function setLabel($label = null)
+    public function setTypeCreate()
     {
-        if($this->visibility) {
-            $this->label = $label;
-        }
-
+        $this->setType(self::TYPE_BUTTON_CREATE);
         return $this;
     }
 
     /**
-     * Get or set menu item icon
-     *
-     * @param string|null $icon
-     * @return $this|string
+     * @param mixed $type
      */
-    public function setIcon($icon = null)
+    public function setTypeExport()
     {
-        if($this->visibility) {
-            if(is_null($icon)) {
-                return $this->icon;
+        $this->setType(self::TYPE_BUTTON_EXPORT);
+        return $this;
+    }
+
+    /**
+     * @param mixed $type
+     */
+    public function setTypeDefault()
+    {
+        $this->setType(self::TYPE_BUTTON_DEFAULT);
+        return $this;
+    }
+
+    /**
+     * @param \Illuminate\Contracts\View\Factory|\Illuminate\View\View|bool $button
+     * @return bool|string
+     */
+    public function setButtonCreate($button = true)
+    {
+        return $this->setTypeCreate()
+            ->setClass('btn btn-primary')
+            ->setTitle(GridView::trans('grid.create'))
+            ->setLabel(GridView::trans('grid.create'))
+            ->setIcon('fa fa-plus')
+            ->setButtonCustom($button, '/create');
+    }
+
+    /**
+     * @param \Illuminate\Contracts\View\Factory|\Illuminate\View\View|bool $button
+     * @return bool|string
+     */
+    public function setButtonExport($button = true)
+    {
+        return $this->setTypeExport()
+            ->setClass('btn btn-default')
+            ->setTitle(GridView::trans('grid.export'))
+            ->setLabel(GridView::trans('grid.export'))
+            ->setIcon('fa fa-upload')
+            ->setButtonCustom($button, '/export');
+    }
+
+    /**
+     * Создание view кнопки "Новая запись"
+     *
+     * Example:
+     * * 1) $this->setButtonCreate(true)
+     * * 2) $this->setButtonCreate(false)
+     * * 3) $this->setButtonCreate(view('column.createButton', ['url' => route('entity.create')]))
+     * * 4) $this->setButtonCreate(route('entity.create'))
+     *
+     * @param \Illuminate\Contracts\View\Factory|\Illuminate\View\View|bool $buttonView
+     * @param string                                                        $postfix
+     * @return bool|string
+     */
+    public function setButtonCustom($buttonView = true, $postfix = '')
+    {
+        if($buttonView === true) {
+            if($this->_query) {
+                $button = $this->setUrl($this->_query->getModel()->getTable() . $postfix)->renderGridView();
+            } else {
+                $button = $this->setUrl($buttonView)->renderGridView();
             }
-            $this->icon = $icon;
+        } elseif($buttonView === false) {
+            $button = $this->renderGridView();
+        } elseif(is_string($buttonView)) {
+            $button = $this->setUrl($buttonView)->renderGridView();
+        } else {
+            $button = $buttonView;
         }
-        return $this;
+        return $button;
     }
 
     /**
-     * Get or set menu item url
-     *
-     * @param string|null $url
-     * @return $this|string
-     */
-    public function setUrl($url = null)
-    {
-        if($this->visibility) {
-            if(is_null($url)) {
-                if(!is_null($this->url)) {
-                    if(strpos($this->url, '://') !== false) {
-                        return $this;
-                    }
-                    return route('admin.dashboard', $this->url);
-                }
-                return '#';
-            }
-            $this->url = $url;
-        }
-        return $this;
-    }
-
-    /**
-     * Get or set menu item route
+     * Кастомная кнопка для удаления
      *
      * @param string|null $route
-     * @return $this|string
-     */
-    public function setRoute($route = null, $params = [])
-    {
-        if($this->visibility) {
-            if(is_null($route)) {
-                $route = route('admin.dashboard');
-            } else {
-                $route = route($route, $params);
-            }
-            $this->url = $route;
-        }
-        return $this;
-    }
-
-    /**
-     * Если необходим свой обработчик для каждого поля колонки.
-     *
-     * @param \Closure $handler  функция замыкания для своего условия
-     * @param object   $instance Примается модель которая будет обрабатыватся в Closure
-     * @return $this
-     */
-    public function setHandler($handler)
-    {
-        $this->_handler = $handler;
-        return $this;
-    }
-
-    /**
-     * @param bool $var
-     * @return $this
-     */
-    public function setVisible($var = true)
-    {
-        if(!$var) {
-            $this->visibility = false;
-        }
-        return $this;
-    }
-
-    /**
-     * @return bool
-     */
-    public function getHandler()
-    {
-        if(is_callable($this->_handler) && $this->getInstance()) {
-            return call_user_func($this->_handler, $this->getInstance());
-        }
-        return true;
-    }
-
-    /**
-     * Взависимости от того какое поле пришло и присутствует ли Closure
-     *
-     * @param object $instance
-     * @return bool|mixed
-     */
-    public function getValues($instance)
-    {
-        $this->_setInstance($instance);
-        if($this->hasHandler()) {
-            return $this->getHandler();
-        }
-        return true;
-    }
-
-    /**
-     * Необходимо устанавливать только в момент когда приходит инстанс модели!
-     *
-     * @param null|object $instance
-     */
-    private function _setInstance($instance)
-    {
-        $this->_instance = $instance;
-    }
-
-    /**
-     * @return null|object
-     */
-    public function getInstance()
-    {
-        return $this->_instance;
-    }
-
-    /**
-     * Проверяет является ли свойство Closure
-     *
-     * @return bool
-     * @see \Closure
-     */
-    public function hasHandler()
-    {
-        return is_callable($this->_handler);
-    }
-
-    /**
-     * @return View
-     */
-    public function render()
-    {
-        $params = [
-            'action' => $this->action,
-            'icon'   => $this->icon,
-            'label'  => $this->label,
-            'url'    => $this->url,
-        ];
-        return view(GridView::NAME . '::column.treeControl', $params);
-    }
-
-
-    /**
+     * @param string|null $params
+     * @param string|null $text
+     * @param string|null $confirmText
+     * @param string|null $class
+     * @param string|null $icon
      * @return string
      */
-    public function __toString()
-    {
-        if($this->visibility) {
-            return (string)$this->render();
-        }
-        return '';
+    public function setButtonCheckboxAction(
+        $view = null,
+        $route = null,
+        $params = null,
+        $text = null,
+        $confirmText = null,
+        $class = null,
+        $icon = null
+    ) {
+        $route = $route ?: 'admin.coupon.customDeleted';
+        $params = $params ?: ['deleted='];
+        $class = $class ?: 'btn btn-default js-btnCustomAction js-linkDelete';
+        $icon = $icon ?: '';
+        $text = $text ?: GridView::trans('grid.selectDelete');
+        $confirmText = $confirmText ?: GridView::trans('grid.clickDelete');
+        $this->setRoute($route, $params)
+            ->setClass($class)
+            ->setIcon($icon)
+            ->setLabel($text)
+            ->setConfirmText($confirmText)
+            ->setOptions([
+                'data-href'            => $this->getUrl(),
+                'data-confirm-deleted' => $confirmText,
+            ]);
+        return $this->renderGridView($view);
     }
 
+    /**
+     * @param string|null $view
+     * @param array       $params
+     * @return string
+     */
+    protected function renderGridView($view = null, $params = [])
+    {
+        $view = $view ? $view : 'column.treeControl';
+        $view = GridView::NAME . '::' . $view;
+        return $this->render($view, $params);
+    }
+
+    /**
+     * @param string|null $view
+     * @param array       $params
+     * @return string
+     */
+    public function render($view = null, $params = [])
+    {
+        $view = $view ?: GridView::NAME . '::' . 'column.treeControl';
+        $params = count($params) ? $params : $this->toArray();
+        return (string)view($view, $params);
+    }
 }

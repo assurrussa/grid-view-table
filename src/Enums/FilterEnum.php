@@ -23,9 +23,11 @@ class FilterEnum
 
     /**
      * Получение полей исключения в случаи кирилицы
+     *
      * @return array
      */
-    public static function getFilterExecuteForCyrillicColumn() {
+    public static function getFilterExecuteForCyrillicColumn()
+    {
         return static::$filterExecuteForCyrillicColumn;
     }
 
@@ -35,7 +37,8 @@ class FilterEnum
      * @param string $column
      * @return bool
      */
-    public static function hasFilterExecuteForCyrillicColumn($column) {
-        return in_array($column, FilterEnum::getFilterExecuteForCyrillicColumn());
+    public static function hasFilterExecuteForCyrillicColumn($column)
+    {
+        return in_array($column, static::getFilterExecuteForCyrillicColumn());
     }
 }

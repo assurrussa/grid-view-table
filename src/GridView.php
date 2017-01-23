@@ -2,13 +2,14 @@
 
 namespace Assurrussa\GridView;
 
-use Assurrussa\GridView\Enums\FilterEnum;
-use Assurrussa\GridView\Interfaces\GridColumnsInterface;
 use Assurrussa\GridView\Interfaces\GridInterface;
 use Assurrussa\GridView\Models\Model;
-use Assurrussa\GridView\Support\GridColumn;
-use Assurrussa\GridView\Support\GridColumns;
-use Request;
+use Assurrussa\GridView\Support\ButtonItem;
+use Assurrussa\GridView\Support\Button;
+use Assurrussa\GridView\Support\Buttons;
+use Assurrussa\GridView\Support\Column;
+use Assurrussa\GridView\Support\Columns;
+use Assurrussa\GridView\Support\Pagination;
 
 /**
  * Class GridView
@@ -18,25 +19,36 @@ use Request;
 class GridView implements GridInterface
 {
 
-    const NAME = 'amigridview';
+    const NAME = 'amiGrid';
+    /**
+     * @var bool
+     */
+    public $visibleColumn;
 
-    /** @var \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder|static */
-    private $_query;
+    /** @var Columns */
+    public $columns;
 
-    /** @var GridColumns */
-    protected $columns;
-
-    /** @var \Illuminate\Contracts\View\Factory|\Illuminate\View\View */
-    private $_createButton = null;
-
-    /** @var \Illuminate\Contracts\View\Factory[]|\Illuminate\View\View[] */
-    private $_customButtons = [];
+    /** @var Buttons */
+    public $buttons;
 
     /** @var \Illuminate\Support\Collection $_request */
     private $_request;
 
+    /** @var \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder|static */
+    private $_query;
+
     /**
-     * Добавление нужного Builder`а модели
+     * GridView constructor.
+     */
+    public function __construct()
+    {
+        $this->columns = new Columns();
+        $this->buttons = new Buttons();
+        $this->setVisibleColumn(config('amigrid.visibleColumn', true));
+    }
+
+    /**
+     * Added Builder Query
      *
      * @param \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder|\Eloquent $query
      * @return $this
@@ -48,14 +60,41 @@ class GridView implements GridInterface
     }
 
     /**
-     * Получение GridColumns
-     *
-     * @param \Closure $callback
-     * @return GridColumns
+     * @return ButtonItem
      */
-    public function grid($callback)
+    public function button()
     {
-        return new GridColumns($callback);
+        $button = new ButtonItem();
+        $button->setQuery($this->_query);
+        $this->buttons->setButton($button);
+        return $button;
+    }
+
+    /**
+     * @return Column
+     */
+    public function column()
+    {
+        $column = new Column();
+        $this->columns->setColumn($column);
+        return $column;
+    }
+
+    /**
+     * @param Button[]|\Closure $action
+     * @return Column
+     */
+    public function columnButtons($action)
+    {
+        return $this->column()->setActions($action);
+    }
+
+    /**
+     * @return Button
+     */
+    public function columnButton()
+    {
+        return new Button();
     }
 
     /**
@@ -66,101 +105,7 @@ class GridView implements GridInterface
      */
     public function render($path = 'gridView', $data = [], $mergeData = [])
     {
-        return $this->view($path, $data, $mergeData);
-    }
-
-    /**
-     * Добавление необходимых полей для Grid
-     *
-     * @see GridViewTest::testColumns
-     * @param \Closure|GridColumnsInterface $callback
-     * @return $this
-     */
-    public function columns($callback)
-    {
-        if(is_callable($callback)) {
-            $this->columns = call_user_func($callback, new GridColumns());
-        } elseif($callback instanceof GridColumnsInterface) {
-            $this->columns = $callback;
-        }
-        return $this;
-    }
-
-    /**
-     * @return $this
-     */
-    public function setRequest()
-    {
-        if(!$this->_request) {
-            $this->_request = collect(Request::all());
-        }
-        return $this;
-    }
-
-    /**
-     * Получение view кнопки "Новая запись"
-     *
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
-     */
-    public function getCreateButton()
-    {
-        if(is_null($this->_createButton)) {
-            $this->setCreateButton();
-        }
-        return $this->_createButton;
-    }
-
-    /**
-     * Создание view кнопки "Новая запись"
-     *
-     * @param \Illuminate\Contracts\View\Factory|\Illuminate\View\View|bool $createButton
-     * @return $this
-     */
-    public function setCreateButton($createButton = true)
-    {
-        if($createButton === true) {
-            $button = $this->view('column.createButton',
-                ['url' => $this->_query->getModel()->getTable() . '/create']);
-        } elseif($createButton === false) {
-            $button = $this->view('column.createButton', []);
-        } else {
-            $button = $createButton;
-        }
-        $this->_createButton = $button;
-        return $this;
-    }
-
-    /**
-     * Получение своих кнопок
-     *
-     * @return string
-     */
-    public function getCustomButtons()
-    {
-        if(count($this->_customButtons) == 0) {
-            $this->setCustomButtons();
-        }
-        $buttons = '';
-        foreach($this->_customButtons as $customButton) {
-            $buttons .= $customButton->render();
-        }
-        return $buttons;
-    }
-
-    /**
-     * Создание своих кнопок
-     *
-     * @param \Illuminate\Contracts\View\Factory[]|\Illuminate\View\View[]|array $customButtons
-     * @return $this
-     */
-    public function setCustomButtons($customButtons = [])
-    {
-        if(is_array($customButtons) && count($customButtons)) {
-            $this->_customButtons = $customButtons;
-        } else {
-            $this->_customButtons[] = $this->view('column.customButton', []);
-        }
-        return $this;
+        return static::view($path, $data, $mergeData);
     }
 
     /**
@@ -171,7 +116,7 @@ class GridView implements GridInterface
      * @param  array  $mergeData
      * @return \Illuminate\View\View|\Illuminate\Contracts\View\Factory
      */
-    public function view($view = null, $data = [], $mergeData = [])
+    public static function view($view = null, $data = [], $mergeData = [])
     {
         return view(self::NAME . '::' . $view, $data, $mergeData);
     }
@@ -185,13 +130,13 @@ class GridView implements GridInterface
      * @param  string $locale
      * @return \Symfony\Component\Translation\TranslatorInterface|string
      */
-    public function trans($id = null, $parameters = [], $domain = 'messages', $locale = null)
+    public static function trans($id = null, $parameters = [], $domain = 'messages', $locale = null)
     {
         return trans(self::NAME . '::' . $id, $parameters, $domain, $locale);
     }
 
     /**
-     * Получение массива перебранных данных
+     * Return get result
      *
      * @return array
      * @throws \Exception
@@ -199,8 +144,8 @@ class GridView implements GridInterface
      */
     public function get()
     {
-        $this->setRequest();
-        $this->_hasColumns();
+        $this->_setRequest()
+            ->_hasColumns();
 
         $search = $this->_request->pull('search', '');
         $page = (int)$this->_request->pull('page', 1);
@@ -208,35 +153,35 @@ class GridView implements GridInterface
         $sortName = $this->_request->pull('sortName', 'id');
         $orderBy = $this->_request->pull('orderBy', 'ASC');
 
-        $filters = $this->filterScopes();
+        $this->filterScopes();
         $this->filterSearch($search);
         $this->filterOrderBy($sortName, $orderBy);
-        $data = $this->pagination($page, $limit);
-        /** @var \Illuminate\Support\HtmlString $pagination */
-        //        $pagination = $data->links(self::NAME . '::pagination.grid-pagination');
+        $data = $this->getPagination($page, $limit);
 
         return [
             'data'         => $data,
             'pagination'   => $this->getPaginationToArray($data),
             'headers'      => $this->columns->toArray(),
-            'createButton' => $this->getCreateButton()->render(),
-            'customButton' => $this->getCustomButtons(),
+            'createButton' => $this->buttons->getButtonCreate(),
+            'exportButton' => $this->buttons->getButtonExport(),
+            'customButton' => $this->buttons->render(),
             'page'         => $page,
             'orderBy'      => $orderBy,
             'search'       => $search,
             'count'        => $limit,
             'sortName'     => $sortName,
-            'filter'       => $filters->toArray(),
+            'filter'       => $this->_request->toArray(),
         ];
     }
 
     /**
+     * Returns a collection in view of pagination
      * Возвращает коллекцию в виде пагинации
      *
      * @param int $page
      * @param int $limit
      */
-    public function pagination($page, $limit = 10)
+    public function getPagination($page, $limit = 10)
     {
         /**
          * @var \Illuminate\Support\Collection $data
@@ -250,9 +195,9 @@ class GridView implements GridInterface
             foreach($this->columns->getColumns() as $column) {
                 $_listRow[$column->getKey()] = $column->getValues($instance);
             }
-            $buttons = $this->filterAction($instance);
+            $buttons = $this->columns->filterActions($instance);
             if(count($buttons)) {
-                $_listRow = array_merge($_listRow, [GridColumn::ACTION_NAME => implode('', $buttons)]);
+                $_listRow = array_merge($_listRow, [Column::ACTION_NAME => implode('', $buttons)]);
             }
             $data->offsetSet($key, $_listRow);
         }
@@ -263,75 +208,54 @@ class GridView implements GridInterface
     }
 
     /**
+     * Return pagination to Array
+     *
      * @param \Illuminate\Pagination\LengthAwarePaginator $data
      * @return array
      */
     public function getPaginationToArray($data)
     {
-        $list = [];
-        if($data->lastPage() > 1) {
-            $window = \Illuminate\Pagination\UrlWindow::make($data);
-
-            $elements = [
-                $window['first'],
-                is_array($window['slider']) ? '...' : null,
-                $window['slider'],
-                is_array($window['last']) ? '...' : null,
-                $window['last'],
-            ];
-
-            if($url = $data->previousPageUrl() ?: '') {
-                $list[] = $this->getItemForPagination('', '&laquo;', $url, 'prev', $data->currentPage() - 1);
-            };
-            foreach($elements as $item) {
-                if(is_string($item)) {
-                    $list[] = $this->getItemForPagination('disabled', $item);
-                }
-                if(is_array($item)) {
-                    foreach($item as $page => $url) {
-                        if($page == $data->currentPage()) {
-                            $list[] = $this->getItemForPagination('active', $page);
-                        } else {
-                            $list[] = $this->getItemForPagination('', '', $url, '', $page);
-                        }
-                    }
-                }
-            }
-            if($data->hasMorePages()) {
-                $list[] = $this->getItemForPagination('', '&raquo;', $data->nextPageUrl(), 'next', $data->currentPage() + 1);
-            };
-        }
-        return $list;
+        return (new Pagination)->setData($data)->toArray();
     }
 
     /**
-     * Метод получает кнопки для грид таблицы
-     *
-     * @param Model|static $instance
-     * return array
+     * @param boolean $visibleColumn
+     * @return GridView
      */
-    protected function filterAction($instance)
+    public function setVisibleColumn(bool $visibleColumn)
     {
-        $listButtons = [];
-        if($this->columns->count()) {
-            $buttons = $this->columns->getActions();
-            foreach($buttons as &$button) {
-                if($button->getValues($instance)) {
-                    $listButtons[] = $button->render();
-                    unset($button);
-                }
-            }
-        }
-        return $listButtons;
+        $this->visibleColumn = $visibleColumn;
+        return $this;
     }
 
     /**
-     * Очень простая фильтрация скоупов.
+     * @return boolean
+     */
+    public function isVisibleColumn(): bool
+    {
+        return $this->visibleColumn;
+    }
+
+    /**
+     * @return $this
+     */
+    protected function _setRequest()
+    {
+        if(!$this->_request) {
+            $this->_request = collect(request()->all());
+        }
+        return $this;
+    }
+
+    /**
+     * Very simple filtration scopes.<br><br>
+     * Очень простая фильтрация скоупов.<br><br>
      *
-     * Если необходимо отфильтровать скоупы по id чему либо, обязательно нужно создать scope следующего вида.<br>
-     * Пример:
-     * * Ссылка для фильтрации - `catalog_id=*`
-     * * Метод - `public function scopeCatalogId($int) {}`
+     * If you want to filter Scope by id or something, be sure to create the scope of the following form.<br><br>
+     * Если необходимо отфильтровать скоупы по id чему либо, обязательно нужно создать scope следующего вида.<br><br>
+     * Example:
+     * * link to filter - `catalog_id=*`
+     * * method - `public function scopeCatalogId($int) {}`
      *
      * @return \Illuminate\Support\Collection
      */
@@ -360,7 +284,8 @@ class GridView implements GridInterface
     }
 
     /**
-     * Метод фильтрует данные по словам
+     * The method filters the data according<br><br>
+     * Метод фильтрует данные по словам<br>
      *
      * @param string|int $search
      * @param null       $value       word
@@ -377,28 +302,17 @@ class GridView implements GridInterface
             $model = $this->_query->getModel();
             // поиск по словам
             if(is_string($search) || is_numeric($search)) {
-                $this->_query->where(function ($query) use (
-                    $model,
-                    $search,
-                    $value,
-                    $delimiter,
-                    $beforeValue,
-                    $afterValue
-                ) {
+                $this->_query->where(function ($query) use ($model, $search, $value, $delimiter, $beforeValue, $afterValue) {
                     /** @var \Illuminate\Database\Eloquent\Builder $query */
                     $tableName = $model->getTable();
                     if($value) {
                         if(Model::hasColumn($model, $search)) {
-                            $query->orWhere($tableName . '.' . $search, $delimiter,
-                                $beforeValue . $value . $afterValue);
+                            $query->orWhere($tableName . '.' . $search, $delimiter, $beforeValue . $value . $afterValue);
                         }
                     } else {
                         foreach(\Schema::getColumnListing($tableName) as $column) {
-                            // из-за проблем поиска с кириллицей, костыль.
-                            if(!preg_match("/[\w]+/i", $search)) {
-                                if(FilterEnum::hasFilterExecuteForCyrillicColumn($column)) {
-                                    continue;
-                                }
+                            if($this->hasFilterExecuteForCyrillicColumn($search, $column)) {
+                                continue;
                             }
                             if(Model::hasColumn($model, $column)) {
                                 $query->orWhere($tableName . '.' . $column, 'like', '%' . $search . '%');
@@ -411,8 +325,6 @@ class GridView implements GridInterface
     }
 
     /**
-     * Метод указывает сортировку данных
-     *
      * @param string $sortName
      * @param string $orderBy
      */
@@ -424,72 +336,58 @@ class GridView implements GridInterface
     }
 
     /**
-     * @param string $status
-     * @param string $text
-     * @param string $url
-     * @param string $rel
-     * @param string $page
-     * @return array
+     * Because of problems with the search Cyrillic, crutch.<br><br>
+     * Из-за проблем поиска с кириллицей, костыль.
+     *
+     * @param string $search
+     * @param string $column
      */
-    protected function getItemForPagination($status = '', $text = '', $url = '', $rel = '', $page = '')
+    protected function hasFilterExecuteForCyrillicColumn($search, $column)
     {
-        return [
-            'status' => $status,
-            'text'   => $text,
-            'url'    => $url,
-            'rel'    => $rel,
-            'page'   => $page,
-        ];
+        if(!preg_match("/[\w]+/i", $search) && \Assurrussa\GridView\Enums\FilterEnum::hasFilterExecuteForCyrillicColumn($column)) {
+            return true;
+        }
+        return false;
     }
 
     /**
+     * Check exists prepared columns<br><br>
      * Проверка существует ли предварительная подготовка данных.
      */
-    private function _hasColumns()
+    protected function _hasColumns()
     {
-        if(!$this->columns) {
+        if(!$this->columns->count()) {
             $this->_prepareColumns();
         }
     }
 
     /**
-     * Метод фильтрует строки по умолчанию для любой модели
+     * The method takes the default column for any model<br><br>
+     * Метод получает колонки по умолчанию для любой модели
      */
     protected function _prepareColumns()
     {
-        $this->columns(function ($grid) {
-            /** @var  \Assurrussa\GridView\Support\GridColumns $grid */
-            $model = $this->_query->getModel();
-            $lists = \Schema::getColumnListing($model->getTable());
-            $columns = [];
-            foreach($lists as $key => $list) {
-                $columns[] = $grid->column()->setKey($list)->setValue($list)
-                    ->setDate(true)->setSort(true);
-            }
-            $columns[] = $grid->column()->setKeyAction()->setActions(function ($data) use ($grid) {
-                $pathNameForModel = strtolower(str_plural(camel_case(class_basename($data))));
-                $buttons = [];
-                $buttons[] = $grid->button()
-                    ->setAction('delete')
-                    ->setLabel('deleted')
-                    ->setRoute('delete', [$pathNameForModel, $data->id])
-                    ->setIcon('fa-cancel');
-                $buttons[] = $grid->button()
-                    ->setAction('show')
-                    ->setLabel('show')
-                    ->setRoute('show', [$pathNameForModel, $data->id])
-                    ->setIcon('fa-show')
-                    ->setHandler(function ($data) {
-                        return false;
-                    });
-                $buttons[] = $grid->button()
-                    ->setAction('edit')
-                    ->setLabel('edit')
-                    ->setRoute('edit', [$pathNameForModel, $data->id])
-                    ->setIcon('fa-edit');
-                return $buttons;
+        $model = $this->_query->getModel();
+        $lists = \Schema::getColumnListing($model->getTable());
+        if($this->isVisibleColumn()) {
+            $lists = array_diff($lists, $model->getHidden());
+        }
+        foreach($lists as $key => $list) {
+            $this->column()
+                ->setKey($list)
+                ->setValue($list)
+                ->setDateActive(true)
+                ->setSort(true);
+        }
+        $this->columnButtons(function ($data) {
+            $pathNameForModel = strtolower(str_plural(camel_case(class_basename($data))));
+            $buttons = [];
+            $buttons[] = $this->columnButton()->setActionDelete('delete', [$pathNameForModel, $data->id]);
+            $buttons[] = $this->columnButton()->setActionShow('show', [$pathNameForModel, $data->id])->setHandler(function ($data) {
+                return false;
             });
-            return $grid->setColumns($columns);
+            $buttons[] = $this->columnButton()->setActionEdit('edit', [$pathNameForModel, $data->id]);
+            return $buttons;
         });
     }
 }

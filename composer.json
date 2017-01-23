@@ -1,7 +1,12 @@
 {
   "name": "assurrussa/grid-view-vue",
-  "description": "Mini gridView for laravel feat Vue.js.",
-  "keywords": ["laravel", "gridView", "Vue"],
+  "description": "Grid view for laravel feat Vue.js.",
+  "keywords": [
+    "laravel",
+    "gridView",
+    "grid",
+    "Vue"
+  ],
   "type": "package",
   "homepage": "https://github.com/assurrussa/grid-view-vue",
   "license": "MIT",
@@ -12,7 +17,7 @@
     }
   ],
   "require": {
-    "php": ">=5.5.9",
+    "php": ">=5.6.4",
     "laravel/framework": ">=5.3.0"
   },
   "require-dev": {
@@ -26,7 +31,10 @@
   "autoload": {
     "psr-4": {
       "Assurrussa\\GridView\\": "src/"
-    }
+    },
+    "files": [
+      "src/Helpers.php"
+    ]
   },
   "extra": {
     "branch-alias": {

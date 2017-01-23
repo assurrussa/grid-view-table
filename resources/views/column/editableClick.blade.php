@@ -81,7 +81,7 @@ if(is_array($value)) {
    <?php } ?>
    <?php if($rows) { ?>
    data-rows='<?= $rows; ?>'
-   <?php } ?>
+<?php } ?>
         <?php if($callback) {
     echo (string)$callback;
 } ?>

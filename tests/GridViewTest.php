@@ -12,6 +12,27 @@ class GridViewTest extends TestCase
      */
     public function testColumns()
     {
-        $this->assertTrue(true);
+        /** @var \Assurrussa\GridView\GridView $gridView */
+        $gridView = $this->app->make(\Assurrussa\GridView\GridView::NAME);
+        $gridView->column()->setKey('id')->setValue('ID')->setSort(true);
+        $gridView->column()->setKey('name')->setValue('name label')->setSort(true)->setHandler(function ($data) {
+            return $data->name . ' ' . $data->name;
+        });
+        $gridView->columnButtons(function ($data) use ($gridView) {
+            /** @var \Assurrussa\AmiCMS\Models\Model $data */
+            $buttons = [];
+            $buttons[] = $gridView->columnButton()->setActionDelete();
+            $buttons[] = $gridView->columnButton()->setActionEdit();
+            return $buttons;
+        });
+        $gridView->button()->setButtonCreate();
+        $gridView->button()->setButtonExport();
+        $gridView->button()->setButtonCheckboxAction();
+        $this->assertEquals(true, is_array($gridView->buttons->getButtons()));
+        $this->assertEquals(3, count($gridView->buttons->getButtons()));
+        $this->assertEquals(true, is_array($gridView->buttons->getButtonCreate(true)));
+        $this->assertEquals(2, count($gridView->buttons->getButtons()));
+        $this->assertEquals(true, is_array($gridView->buttons->getButtonExport(true)));
+        $this->assertEquals(1, count($gridView->buttons->getButtons()));
     }
 }

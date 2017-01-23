@@ -30,8 +30,8 @@ class ModelBaseGridController extends BaseController
      */
     public function index()
     {
-        $header = $this->gridView->trans('grid.general');
-        return view(GridView::NAME . '::' . config('amigridview.pathView'), compact('header'));
+        $header = GridView::trans('grid.general');
+        return GridView::view(config('amigrid.pathView'), compact('header'));
     }
 
 
@@ -108,7 +108,7 @@ class ModelBaseGridController extends BaseController
     public function sync($model, $scope = null)
     {
         /** @var Model $modelName */
-        $modelName = config('amigridview.namespace') . str_singular(ucfirst($model));
+        $modelName = config('amigrid.namespace') . str_singular(ucfirst($model));
         $query = $modelName::query();
         if($scope) {
             $query->where(function ($query) use ($scope) {

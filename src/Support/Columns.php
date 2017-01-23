@@ -2,70 +2,35 @@
 
 namespace Assurrussa\GridView\Support;
 
-use Assurrussa\GridView\Interfaces\GridColumnInterface;
-use Assurrussa\GridView\Interfaces\GridColumnsInterface;
+use Assurrussa\GridView\Interfaces\ColumnInterface;
+use Assurrussa\GridView\Interfaces\ColumnsInterface;
 
 /**
- * Class GridColumns
+ * Class Columns
  *
- * @package Assurrussa\AmiCMS\Components\Support
+ * @package Assurrussa\GridView\Support
  */
-class GridColumns implements GridColumnsInterface
+class Columns implements ColumnsInterface
 {
-
-    /** @var GridColumn[] */
+    /** @var array */
     private $_columns = [];
-
-    /**
-     * GridColumns constructor.
-     * @param null|GridColumnInterface $columns
-     */
-    public function __construct($columns = null)
-    {
-        if($columns) {
-            $this->setColumns($columns);
-        }
-    }
-
-    /**
-     * Создает класс GridColumn
-     *
-     * @return GridColumn
-     */
-    public function column()
-    {
-        return new GridColumn();
-    }
-
-    /**
-     * Создает класс ButtonItem
-     *
-     * @return ButtonItem
-     */
-    public function button()
-    {
-        return new ButtonItem();
-    }
 
     /**
      * Добавление необходимых полей для Grid
      *
-     * @param \Closure|GridColumnInterface[] $columns
+     * @param \Closure|ColumnInterface $columns
      * @return $this
      */
-    public function setColumns($columns)
+    public function setColumn($column)
     {
-        if(is_callable($columns)) {
-            $columns = call_user_func($columns, $this);
-        }
-        $this->_columns = $columns;
+        $this->_columns[] = $column;
         return $this;
     }
 
     /**
      * Получение необходимых полей для Grid
      *
-     * @return GridColumn[]
+     * @return Column[]
      */
     public function getColumns()
     {
@@ -75,7 +40,7 @@ class GridColumns implements GridColumnsInterface
     /**
      * Получение необходимых полей для Grid
      *
-     * @return ButtonItem[]|[]
+     * @return Button[]|array
      */
     public function getActions()
     {
@@ -85,6 +50,27 @@ class GridColumns implements GridColumnsInterface
             }
         }
         return [];
+    }
+
+    /**
+     * Метод получает кнопки для грид таблицы
+     *
+     * @param \Assurrussa\GridView\Models\Model|static $instance
+     * return array
+     */
+    public function filterActions($instance)
+    {
+        $listButtons = [];
+        if($this->count()) {
+            $buttons = $this->getActions();
+            foreach($buttons as &$button) {
+                if($button->getValues($instance)) {
+                    $listButtons[] = $button->render();
+                    unset($button);
+                }
+            }
+        }
+        return $listButtons;
     }
 
     /**

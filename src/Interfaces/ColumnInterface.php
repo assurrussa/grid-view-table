@@ -7,6 +7,6 @@ namespace Assurrussa\GridView\Interfaces;
  *
  * @package Assurrussa\GridView\Interfaces
  */
-interface GridColumnInterface
+interface ColumnInterface
 {
 }
