@@ -1,5 +1,6 @@
 <?php
 
+use Assurrussa\GridView\Support\Button;
 use Assurrussa\GridView\Support\Column;
 
 class ColumnTest extends TestCase
@@ -74,16 +75,20 @@ class ColumnTest extends TestCase
     {
         $column = new Column();
         $this->assertEquals(false, $column->isKeyAction());
-        $this->assertEquals(false, $column->getActions() instanceof Closure);
+        $this->assertEquals(null, $column->getActions());
         $column->setKey('test')
             ->setValue('name column')
             ->setActions(function ($data) {
-                return $data == null;
+                return $data->id == 3;
             });
+        $object = new stdClass();
+        $object->id = 3;
         $this->assertEquals(Column::ACTION_NAME, $column->getKey());
         $this->assertEquals(Column::ACTION_NAME, $column->getValue());
         $this->assertEquals(true, $column->isKeyAction());
         $this->assertEquals(true, $column->getActions() instanceof Closure);
+        $column->setInstance($object);
+        $this->assertEquals(true, $column->getActions());
     }
 
     /**

@@ -10,8 +10,10 @@
  * *         ])->render();
  * result: "productOne - variantThree"
  *
+ * @var string           $initJsEvent   Init js event
  * @var string           $initJsClass   Init js class
  * @var string           $class
+ * @var string           $$name
  * @var string           $text
  * @var string|array|int $value
  * @var string           $url

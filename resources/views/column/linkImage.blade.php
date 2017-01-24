@@ -3,9 +3,13 @@
  * @var string $link
  * @var string $title
  * @var string $class
+ * @var string $style
  */
-$class = isset($class) ? $class : '';
+$link = isset($link) ? $link : '';
+$title = isset($title) ? $title : '';
+$class = isset($class) ? $class : 'thumbnail';
+$style = isset($style) ? $style : 'width: 80px;';
 ?>
-<a href="{{ $link }}" data-lightbox="{{ $title }}" data-title="{{ $title }}" class="thumbnail {{ $class }}">
-    <img title="{{ $title }}" src="{{ $link }}" width="80px">
+<a href="{{ $link }}" data-lightbox="{{ $title }}" data-title="{{ $title }}" class="{{ $class }}">
+    <img title="{{ $title }}" src="{{ $link }}" style="{{ $style }}">
 </a>

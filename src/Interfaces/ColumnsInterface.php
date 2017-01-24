@@ -16,14 +16,20 @@ interface ColumnsInterface
     public function setColumn($column);
 
     /**
-     * @return mixed
+     * @return ColumnInterface[]
      */
     public function getColumns();
 
     /**
-     * @return mixed
+     * @return ButtonInterface[]
      */
     public function getActions();
+
+    /**
+     * @param $instance
+     * @return ButtonInterface[]
+     */
+    public function filterActions($instance);
 
     /**
      * @return int

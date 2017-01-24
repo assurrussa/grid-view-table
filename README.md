@@ -65,7 +65,7 @@ or
         // create new model GridView
         $gridView = amiGrid();
         // set Builder Query
-        $gridView->query($query);
+        $gridView->setQuery($query);
 
         $catalogs = Catalog::pluck('title', 'id');
         $brands = Brand::pluck('name', 'id');
@@ -103,15 +103,15 @@ or
 
 
         // added column actions
-        $gridView->columnButtons(function ($data) use ($gridView) {
+        $gridView->columnActions(function ($data) use ($gridView) {
             /** @var Entity $data */
             $buttons = [];
-            $buttons[] = $gridView->columnButton()->setActionDelete('admin.entity.delete', [$data->id]);
-            $buttons[] = $gridView->columnButton()->setActionShow('admin.entity.show', [$data->id])->setHandler(function ($data) {
+            $buttons[] = $gridView->columnAction()->setActionDelete('admin.entity.delete', [$data->id]);
+            $buttons[] = $gridView->columnAction()->setActionShow('admin.entity.show', [$data->id])->setHandler(function ($data) {
                 /** @var Entity $data */
                 return false;
             });
-            $buttons[] = $gridView->columnButton()->setActionEdit('admin.entity.edit', [$data->id]);
+            $buttons[] = $gridView->columnAction()->setActionEdit('admin.entity.edit', [$data->id]);
             return $buttons;
         });
 

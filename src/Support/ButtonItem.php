@@ -122,7 +122,7 @@ class ButtonItem extends Button
     /**
      * Кастомная кнопка для удаления
      *
-     * @param string|null $route
+     * @param string      $route
      * @param string|null $params
      * @param string|null $text
      * @param string|null $confirmText
@@ -131,15 +131,15 @@ class ButtonItem extends Button
      * @return string
      */
     public function setButtonCheckboxAction(
-        $view = null,
-        $route = null,
+        $route,
         $params = null,
+        $view = null,
         $text = null,
         $confirmText = null,
         $class = null,
         $icon = null
     ) {
-        $route = $route ?: 'admin.coupon.customDeleted';
+        $route = $route ?: '';
         $params = $params ?: ['deleted='];
         $class = $class ?: 'btn btn-default js-btnCustomAction js-linkDelete';
         $icon = $icon ?: '';

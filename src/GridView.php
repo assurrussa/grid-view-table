@@ -2,14 +2,17 @@
 
 namespace Assurrussa\GridView;
 
+use Assurrussa\GridView\Exception\ColumnsException;
+use Assurrussa\GridView\Exception\QueryException;
 use Assurrussa\GridView\Interfaces\GridInterface;
 use Assurrussa\GridView\Models\Model;
 use Assurrussa\GridView\Support\ButtonItem;
 use Assurrussa\GridView\Support\Button;
 use Assurrussa\GridView\Support\Buttons;
 use Assurrussa\GridView\Support\Column;
+use Assurrussa\GridView\Support\ColumnCeil;
 use Assurrussa\GridView\Support\Columns;
-use Assurrussa\GridView\Support\Pagination;
+use Assurrussa\GridView\Support\EloquentPagination;
 
 /**
  * Class GridView
@@ -21,6 +24,10 @@ class GridView implements GridInterface
 
     const NAME = 'amiGrid';
     /**
+     * @var string
+     */
+    public $id;
+    /**
      * @var bool
      */
     public $visibleColumn;
@@ -30,6 +37,9 @@ class GridView implements GridInterface
 
     /** @var Buttons */
     public $buttons;
+
+    /** @var EloquentPagination */
+    public $pagination;
 
     /** @var \Illuminate\Support\Collection $_request */
     private $_request;
@@ -44,6 +54,7 @@ class GridView implements GridInterface
     {
         $this->columns = new Columns();
         $this->buttons = new Buttons();
+        $this->pagination = new EloquentPagination();
         $this->setVisibleColumn(config('amigrid.visibleColumn', true));
     }
 
@@ -53,9 +64,10 @@ class GridView implements GridInterface
      * @param \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder|\Eloquent $query
      * @return $this
      */
-    public function query($query)
+    public function setQuery($query)
     {
         $this->_query = $query;
+        $this->pagination->setQuery($this->_query);
         return $this;
     }
 
@@ -84,7 +96,7 @@ class GridView implements GridInterface
      * @param Button[]|\Closure $action
      * @return Column
      */
-    public function columnButtons($action)
+    public function columnActions($action)
     {
         return $this->column()->setActions($action);
     }
@@ -92,9 +104,17 @@ class GridView implements GridInterface
     /**
      * @return Button
      */
-    public function columnButton()
+    public function columnAction()
     {
         return new Button();
+    }
+
+    /**
+     * @return ColumnCeil
+     */
+    public static function columnCeil()
+    {
+        return new ColumnCeil();
     }
 
     /**
@@ -138,84 +158,70 @@ class GridView implements GridInterface
     /**
      * Return get result
      *
-     * @return array
-     * @throws \Exception
-     * @throws \Throwable
+     * @return array|string
+     * @throws ColumnsException
+     * @throws QueryException
      */
     public function get()
     {
+        if(!$this->_query) {
+            throw new QueryException();
+        }
         $this->_setRequest()
             ->_hasColumns();
 
-        $search = $this->_request->pull('search', '');
+        $this->pagination->setColumns($this->columns);
+
+        if(!$this->columns->count()) {
+            throw new ColumnsException();
+        }
+
         $page = (int)$this->_request->pull('page', 1);
+        $orderBy = $this->_request->pull('orderBy', 'ASC');
+        $search = $this->_request->pull('search', '');
         $limit = (int)$this->_request->pull('count', 10);
         $sortName = $this->_request->pull('sortName', 'id');
-        $orderBy = $this->_request->pull('orderBy', 'ASC');
 
         $this->filterScopes();
         $this->filterSearch($search);
         $this->filterOrderBy($sortName, $orderBy);
-        $data = $this->getPagination($page, $limit);
 
-        return [
-            'data'         => $data,
-            'pagination'   => $this->getPaginationToArray($data),
-            'headers'      => $this->columns->toArray(),
-            'createButton' => $this->buttons->getButtonCreate(),
-            'exportButton' => $this->buttons->getButtonExport(),
-            'customButton' => $this->buttons->render(),
-            'page'         => $page,
-            'orderBy'      => $orderBy,
-            'search'       => $search,
-            'count'        => $limit,
-            'sortName'     => $sortName,
-            'filter'       => $this->_request->toArray(),
-        ];
+        $gridViewResult = new \Assurrussa\GridView\Helpers\GridViewResult();
+        $gridViewResult->id = $this->getId();
+        $gridViewResult->data = $this->pagination->get($page, $limit);
+        $gridViewResult->pagination = $this->pagination->toArray();
+        $gridViewResult->headers = $this->columns->toArray();
+        $gridViewResult->createButton = $this->buttons->getButtonCreate();
+        $gridViewResult->exportButton = $this->buttons->getButtonExport();
+        $gridViewResult->customButton = $this->buttons->render();
+        $gridViewResult->filter = $this->_request->toArray();
+        $gridViewResult->page = $page;
+        $gridViewResult->orderBy = $orderBy;
+        $gridViewResult->search = $search;
+        $gridViewResult->count = $limit;
+        $gridViewResult->sortName = $sortName;
+        return $gridViewResult->toArray();
     }
 
     /**
-     * Returns a collection in view of pagination
-     * Возвращает коллекцию в виде пагинации
-     *
-     * @param int $page
-     * @param int $limit
+     * @param string $id
+     * @return GridView
      */
-    public function getPagination($page, $limit = 10)
+    public function setId(string $id)
     {
-        /**
-         * @var \Illuminate\Support\Collection $data
-         */
-        $countTotal = $this->_query->count();
-        $this->_query->skip(($limit * $page) - $limit);
-        $this->_query->limit($limit);
-        $data = collect();
-        foreach($this->_query->get() as $key => $instance) {
-            $_listRow = [];
-            foreach($this->columns->getColumns() as $column) {
-                $_listRow[$column->getKey()] = $column->getValues($instance);
-            }
-            $buttons = $this->columns->filterActions($instance);
-            if(count($buttons)) {
-                $_listRow = array_merge($_listRow, [Column::ACTION_NAME => implode('', $buttons)]);
-            }
-            $data->offsetSet($key, $_listRow);
+        $this->id = $id;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getId(): string
+    {
+        if(!$this->id) {
+            $this->setId(self::NAME . '_' . 1);
         }
-        return new \Illuminate\Pagination\LengthAwarePaginator($data, $countTotal, $limit, $page, [
-            'path'     => \Illuminate\Pagination\Paginator::resolveCurrentPath(),
-            'pageName' => 'page',
-        ]);
-    }
-
-    /**
-     * Return pagination to Array
-     *
-     * @param \Illuminate\Pagination\LengthAwarePaginator $data
-     * @return array
-     */
-    public function getPaginationToArray($data)
-    {
-        return (new Pagination)->setData($data)->toArray();
+        return $this->id;
     }
 
     /**
@@ -379,15 +385,16 @@ class GridView implements GridInterface
                 ->setDateActive(true)
                 ->setSort(true);
         }
-        $this->columnButtons(function ($data) {
+        $this->columnActions(function ($data) {
             $pathNameForModel = strtolower(str_plural(camel_case(class_basename($data))));
             $buttons = [];
-            $buttons[] = $this->columnButton()->setActionDelete('delete', [$pathNameForModel, $data->id]);
-            $buttons[] = $this->columnButton()->setActionShow('show', [$pathNameForModel, $data->id])->setHandler(function ($data) {
+            $buttons[] = $this->columnAction()->setActionDelete('delete', [$pathNameForModel, $data->id]);
+            $buttons[] = $this->columnAction()->setActionShow('show', [$pathNameForModel, $data->id])->setHandler(function ($data) {
                 return false;
             });
-            $buttons[] = $this->columnButton()->setActionEdit('edit', [$pathNameForModel, $data->id]);
+            $buttons[] = $this->columnAction()->setActionEdit('edit', [$pathNameForModel, $data->id]);
             return $buttons;
         });
+        $this->button()->setButtonCreate();
     }
 }

@@ -15,6 +15,9 @@
  * @var string                         $delimiter
  * @var string                         $delimiterAddition
  */
+if(!isset($data)) {
+    return;
+}
 $title = isset($title) ? $title : 'title';
 $titleAddition = isset($titleAddition) ? $titleAddition : null;
 $class = isset($class) ? $class : 'label label-info';

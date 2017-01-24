@@ -5,9 +5,9 @@ namespace Assurrussa\GridView\Support;
 use Assurrussa\GridView\Interfaces\ColumnInterface;
 
 /**
- * Class GridColumn
+ * Class Column
  *
- * @package Assurrussa\AmiCMS\Components\Support
+ * @package Assurrussa\GridView\Support
  */
 class Column implements ColumnInterface
 {
@@ -80,6 +80,9 @@ class Column implements ColumnInterface
      */
     private $_handler = null;
 
+    /**
+     * Column constructor.
+     */
     public function __construct()
     {
         $this->setDateFormat(config('amigrid.format'));

@@ -425,7 +425,7 @@ class Button implements ButtonInterface, Renderable, Arrayable
      * @param object $instance
      * @return bool|mixed
      */
-    public function getValues($instance)
+    public function getValues($instance = null)
     {
         $this->_setInstance($instance);
         if($this->isHandler()) {

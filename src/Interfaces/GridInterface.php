@@ -15,16 +15,7 @@ interface GridInterface
      *
      * @param \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder|static $query
      */
-    public function query($query);
-
-    /**
-     * Added required column for grid
-     * Добавление необходимой колонки для сетки
-     *
-     * @param \Closure $callback
-     * @return $this
-     */
-    public function column();
+    public function setQuery($query);
 
     /**
      * Получение необходимых данных для пагинации

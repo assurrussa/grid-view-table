@@ -115,6 +115,6 @@ class ModelBaseGridController extends BaseController
                 $query->$scope();
             });
         }
-        return $this->gridView->query($query)->get();
+        return $this->gridView->setQuery($query)->get();
     }
 }
