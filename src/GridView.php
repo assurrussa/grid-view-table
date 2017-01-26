@@ -4,6 +4,7 @@ namespace Assurrussa\GridView;
 
 use Assurrussa\GridView\Exception\ColumnsException;
 use Assurrussa\GridView\Exception\QueryException;
+use Assurrussa\GridView\Export\ExportData;
 use Assurrussa\GridView\Interfaces\GridInterface;
 use Assurrussa\GridView\Models\Model;
 use Assurrussa\GridView\Support\ButtonItem;
@@ -13,6 +14,8 @@ use Assurrussa\GridView\Support\Column;
 use Assurrussa\GridView\Support\ColumnCeil;
 use Assurrussa\GridView\Support\Columns;
 use Assurrussa\GridView\Support\EloquentPagination;
+use Assurrussa\GridView\Support\Input;
+use Assurrussa\GridView\Support\Inputs;
 
 /**
  * Class GridView
@@ -23,10 +26,20 @@ class GridView implements GridInterface
 {
 
     const NAME = 'amiGrid';
-    /**
-     * @var string
-     */
+    /** @var string */
     public $id;
+    /** @var int */
+    public $page;
+    /** @var int */
+    public $limit;
+    /** @var string */
+    public $orderBy;
+    /** @var string */
+    public $search;
+    /** @var string */
+    public $sortName;
+    /** @var array */
+    public $counts;
     /**
      * @var bool
      */
@@ -38,8 +51,14 @@ class GridView implements GridInterface
     /** @var Buttons */
     public $buttons;
 
+    /** @var Inputs */
+    public $inputs;
+
     /** @var EloquentPagination */
     public $pagination;
+
+    /** @var array */
+    private $_config;
 
     /** @var \Illuminate\Support\Collection $_request */
     private $_request;
@@ -50,12 +69,20 @@ class GridView implements GridInterface
     /**
      * GridView constructor.
      */
-    public function __construct()
+    public function __construct(Columns $columns, Buttons $buttons, Inputs $inputs, EloquentPagination $eloquentPagination)
     {
-        $this->columns = new Columns();
-        $this->buttons = new Buttons();
-        $this->pagination = new EloquentPagination();
-        $this->setVisibleColumn(config('amigrid.visibleColumn', true));
+        $this->_config = config('amigrid');
+        $this->columns = $columns;
+        $this->buttons = $buttons;
+        $this->inputs = $inputs;
+        $this->pagination = $eloquentPagination;
+        $this->counts = $this->getConfig('counts', [
+            10  => 10,
+            25  => 25,
+            100 => 100,
+            200 => 200,
+        ]);
+        $this->setVisibleColumn($this->getConfig('visibleColumn', true));
     }
 
     /**
@@ -68,6 +95,16 @@ class GridView implements GridInterface
     {
         $this->_query = $query;
         $this->pagination->setQuery($this->_query);
+        return $this;
+    }
+
+    /**
+     * @param array $array
+     * @return $this
+     */
+    public function setFieldsForExport(array $array)
+    {
+        $this->columns->setFields($array);
         return $this;
     }
 
@@ -90,6 +127,16 @@ class GridView implements GridInterface
         $column = new Column();
         $this->columns->setColumn($column);
         return $column;
+    }
+
+    /**
+     * @return Input
+     */
+    public function input()
+    {
+        $input = new Input();
+        $this->inputs->setInput($input);
+        return $input;
     }
 
     /**
@@ -123,9 +170,13 @@ class GridView implements GridInterface
      * @param array  $mergeData
      * @return mixed
      */
-    public function render($path = 'gridView', $data = [], $mergeData = [])
+    public function render($data = [], $path = 'gridView', $mergeData = [])
     {
-        return static::view($path, $data, $mergeData);
+        if(request()->ajax() || request()->wantsJson()) {
+            $path = $path === 'gridView' ? 'part.grid' : $path;
+            return static::view($path, $data, $mergeData)->render();
+        }
+        return static::view($path, $data, $mergeData)->render();
     }
 
     /**
@@ -158,49 +209,32 @@ class GridView implements GridInterface
     /**
      * Return get result
      *
-     * @return array|string
+     * @return \Assurrussa\GridView\Helpers\GridViewResult
      * @throws ColumnsException
      * @throws QueryException
      */
     public function get()
     {
-        if(!$this->_query) {
-            throw new QueryException();
-        }
-        $this->_setRequest()
-            ->_hasColumns();
-
-        $this->pagination->setColumns($this->columns);
-
-        if(!$this->columns->count()) {
-            throw new ColumnsException();
-        }
-
-        $page = (int)$this->_request->pull('page', 1);
-        $orderBy = $this->_request->pull('orderBy', 'ASC');
-        $search = $this->_request->pull('search', '');
-        $limit = (int)$this->_request->pull('count', 10);
-        $sortName = $this->_request->pull('sortName', 'id');
-
-        $this->filterScopes();
-        $this->filterSearch($search);
-        $this->filterOrderBy($sortName, $orderBy);
+        $this->fetch();
 
         $gridViewResult = new \Assurrussa\GridView\Helpers\GridViewResult();
         $gridViewResult->id = $this->getId();
-        $gridViewResult->data = $this->pagination->get($page, $limit);
-        $gridViewResult->pagination = $this->pagination->toArray();
+        $gridViewResult->data = $this->pagination->get($this->page, $this->limit);
+        $gridViewResult->pagination = $this->getPaginationRender();
         $gridViewResult->headers = $this->columns->toArray();
-        $gridViewResult->createButton = $this->buttons->getButtonCreate();
-        $gridViewResult->exportButton = $this->buttons->getButtonExport();
-        $gridViewResult->customButton = $this->buttons->render();
+        $gridViewResult->buttonCreate = $this->buttons->getButtonCreate();
+        $gridViewResult->buttonExport = $this->buttons->getButtonExport();
+        $gridViewResult->buttonCustoms = $this->buttons->render();
+        $gridViewResult->inputCustoms = $this->inputs->render();
         $gridViewResult->filter = $this->_request->toArray();
-        $gridViewResult->page = $page;
-        $gridViewResult->orderBy = $orderBy;
-        $gridViewResult->search = $search;
-        $gridViewResult->count = $limit;
-        $gridViewResult->sortName = $sortName;
-        return $gridViewResult->toArray();
+        $gridViewResult->page = $this->page;
+        $gridViewResult->orderBy = $this->orderBy;
+        $gridViewResult->search = $this->search;
+        $gridViewResult->limit = $this->limit;
+        $gridViewResult->sortName = $this->sortName;
+        $gridViewResult->counts = $this->counts;
+
+        return $gridViewResult;
     }
 
     /**
@@ -240,6 +274,71 @@ class GridView implements GridInterface
     public function isVisibleColumn(): bool
     {
         return $this->visibleColumn;
+    }
+
+    /**
+     * @param string $key
+     * @param null   $default
+     * @return mixed|null
+     */
+    public function getConfig($key, $default = null)
+    {
+        if(isset($this->_config[$key])) {
+            return $this->_config[$key];
+        }
+        return $default;
+    }
+
+    /**
+     * @return $this|bool
+     * @throws ColumnsException
+     * @throws QueryException
+     */
+    protected function fetch()
+    {
+        if(!$this->_query) {
+            throw new QueryException();
+        }
+        $this->_setRequest()
+            ->_hasColumns();
+
+        $this->pagination->setColumns($this->columns);
+
+        if(!$this->columns->count()) {
+            throw new ColumnsException();
+        }
+
+        $this->page = (int)$this->_request->pull('page', 1);
+        $this->orderBy = $this->_request->pull('by', Column::FILTER_ORDER_BY_ASC);
+        $this->search = $this->_request->pull('search', '');
+        $this->limit = (int)$this->_request->pull('count', 10);
+        $this->sortName = $this->_request->pull('sort', 'id');
+        $export = (bool)$this->_request->pull('export', false);
+
+        $this->filterScopes();
+        $this->filterSearch($this->search);
+        $this->filterOrderBy($this->sortName, $this->orderBy);
+
+        if($export) {
+            return $this->getExport();
+        }
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    protected function getExport()
+    {
+        return (new ExportData())->fetch($this->_query, $this->columns->toFields());
+    }
+
+    /**
+     * @return string
+     */
+    protected function getPaginationRender()
+    {
+        return $this->pagination->render($this->getConfig('pagination'));
     }
 
     /**
@@ -388,11 +487,11 @@ class GridView implements GridInterface
         $this->columnActions(function ($data) {
             $pathNameForModel = strtolower(str_plural(camel_case(class_basename($data))));
             $buttons = [];
-            $buttons[] = $this->columnAction()->setActionDelete('delete', [$pathNameForModel, $data->id]);
-            $buttons[] = $this->columnAction()->setActionShow('show', [$pathNameForModel, $data->id])->setHandler(function ($data) {
+            $buttons[] = $this->columnAction()->setActionDelete('amigrid.delete', [$pathNameForModel, $data->id]);
+            $buttons[] = $this->columnAction()->setActionShow('amigrid.show', [$pathNameForModel, $data->id])->setHandler(function ($data) {
                 return false;
             });
-            $buttons[] = $this->columnAction()->setActionEdit('edit', [$pathNameForModel, $data->id]);
+            $buttons[] = $this->columnAction()->setActionEdit('amigrid.edit', [$pathNameForModel, $data->id]);
             return $buttons;
         });
         $this->button()->setButtonCreate();

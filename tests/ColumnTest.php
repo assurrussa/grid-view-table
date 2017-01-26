@@ -37,10 +37,10 @@ class ColumnTest extends TestCase
         $this->assertEquals([
             'name' => 'field',
             'data' => ['key' => 'value'],
-            'mode' => '',
+            'mode' => 'select',
         ], $column->getFilter());
         $this->assertEquals(true, $column->isHandler());
-        $this->assertEquals(null, $column->getHandler());
+        $this->assertEquals(true, $column->getHandler() instanceof Closure);
     }
 
     /**
@@ -52,12 +52,12 @@ class ColumnTest extends TestCase
         $column->setKey('test')
             ->setValue('name column')
             ->setFilter('field', []);
-        $this->assertEquals(['name' => 'field', 'data' => [], 'mode' => ''], $column->getFilter());
+        $this->assertEquals(['name' => 'field', 'data' => [], 'mode' => 'select'], $column->getFilter());
         $this->assertEquals(false, $column->getDateActive());
         $this->assertEquals(Column::DEFAULT_TO_STRING_FORMAT, $column->getDateFormat());
 
         $column->setFilter('field1', 'text');
-        $this->assertEquals(['name' => 'field1', 'data' => 'text', 'mode' => ''], $column->getFilter());
+        $this->assertEquals(['name' => 'field1', 'data' => 'text', 'mode' => 'select'], $column->getFilter());
 
         $column->setFilterString('field2', 'text');
         $this->assertEquals(['name' => 'field2', 'data' => 'text', 'mode' => 'string'], $column->getFilter());

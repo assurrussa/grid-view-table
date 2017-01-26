@@ -23,4 +23,12 @@ interface GridInterface
      * return mixed
      */
     public function get();
+
+    /**
+     * @param array  $data
+     * @param string $path
+     * @param array  $mergeData
+     * @return mixed
+     */
+    public function render($data = [], $path = 'gridView', $mergeData = []);
 }

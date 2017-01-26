@@ -78,6 +78,18 @@ class EloquentPagination implements PaginationInterface
     }
 
     /**
+     * @param string $view
+     * @return string
+     */
+    public function render($view = null)
+    {
+        if(!$this->_data) {
+            return '';
+        }
+        return $this->_data->appends(request()->all())->render($view);
+    }
+
+    /**
      * @return array
      */
     public function toArray()

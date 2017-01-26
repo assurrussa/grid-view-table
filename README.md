@@ -43,9 +43,9 @@ Mini gridView for laravel feat Vue.js.
 ### Использование ###
 
 ```
-{!! amiGrid()->render() !!}
+{!! amiGrid()->render(['data' => $data]) !!}
 or
-{!! \AmiGridView::render() !!}
+{!! \AmiGridView::render(['data' => $data]) !!}
 
 ```
 
@@ -57,7 +57,7 @@ or
     /**
      * @return array
      */
-    public function sync()
+    public function index()
     {
         $model = new Entity();
         $query = $model->newQuery()->with('catalogs', 'brand');
@@ -65,7 +65,7 @@ or
         // create new model GridView
         $gridView = amiGrid();
         // set Builder Query
-        $gridView->setQuery($query);
+        $gridView->query($query);
 
         $catalogs = Catalog::pluck('title', 'id');
         $brands = Brand::pluck('name', 'id');
@@ -121,7 +121,11 @@ or
         $gridView->button()->setButtonCheckboxAction();
 
         // return result
-        return $gridView->get();
+        $data = $gridView->get();
+        if(request()->ajax() || request()->wantsJson()) {
+            return amiGrid()->render(compact('data'));
+        }
+        return view('index', compact('data'));
     }
 ```
 ![exapmle](https://github.com/assurrussa/grid-view-vue/blob/master/example.png)

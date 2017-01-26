@@ -12,8 +12,10 @@ use Assurrussa\GridView\Interfaces\ColumnsInterface;
  */
 class Columns implements ColumnsInterface
 {
-    /** @var array */
+    /** @var Column[] */
     private $_columns = [];
+    /** @var  array */
+    private $_fields = [];
 
     /**
      * Добавление необходимых полей для Grid
@@ -24,6 +26,16 @@ class Columns implements ColumnsInterface
     public function setColumn($column)
     {
         $this->_columns[] = $column;
+        return $this;
+    }
+
+    /**
+     * @param array $fields
+     * @return $this
+     */
+    public function setFields(array $fields)
+    {
+        $this->_fields = $fields;
         return $this;
     }
 
@@ -83,6 +95,28 @@ class Columns implements ColumnsInterface
         $columns = [];
         foreach($this->_columns as $column) {
             $columns[] = $column->toArray();
+        }
+        return $columns;
+    }
+
+    /**
+     * @return array
+     */
+    public function toFields()
+    {
+        if(count($this->_fields)) {
+            return $this->_fields;
+        }
+        $columns = [];
+        $pregMatch = config('amigrid.pregMatchForFields', "/[<]+/i");
+        foreach($this->_columns as $column) {
+            $key = $column->getValue();
+            if(preg_match($pregMatch, $key)) {
+                continue;
+            }
+            $value = ($column->isHandler()) ? $column->getHandler() : $column->getKey();
+
+            $columns[$key] = $value;
         }
         return $columns;
     }

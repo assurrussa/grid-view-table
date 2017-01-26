@@ -1,136 +1,29 @@
-<!-- component template -->
-<template id="grid-template">
-    <table class="table table-stripped table-hover table-condensed">
-        <thead>
-        <tr>
-            <th
-                    v-for="column in columns"
-            @click="sortBy(column.key, column.sortBool)"
-            :class="{active: sortName == column.key}">
-            <span v-if="column.screening && (column.key == 'checkbox')">
-                @{{{ column.value }}}
-            </span>
-            <span v-else>
-                @{{ column.value }}
-            </span>
-            <span class="arrow" v-if="column.sortBool"
-                  :class="sortOrders ? sortOrders[column.key] > 0 ? 'dsc' : 'asc' : (column.key == sortName) ? 'asc' : 'dsc'"></span>
-            </th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr>
-            <td v-for="column in columns" track-by="$index">
-            <span v-if="column.filter.data == ''">
-                <div class="js-textFilter input-group date">
-                    <input type="text"
-                           v-model="selected[column.filter.name]"
-                           value="@{{ selected[column.filter.name] }}"
-                           class="js-textFilter_@{{ column.filter.name }} form-control"
-                           data-name="@{{ column.filter.name }}"
-                           data-mode="@{{ column.filter.mode }}"
-                    @change="selectedSelect(column.filter.name, selected[column.filter.name])">
-                    <span class="input-group-addon">
-                        <span class="glyphicon glyphicon-time"></span>
-                    </span>
-                </div>
-            </span>
-                <span v-else>
-                <select v-if="column.filter.data" v-model="selected[column.filter.name]"
-                    @change="selectedSelect(column.filter.name, selected[column.filter.name])"
-                class="form-control js-selectFilter js-selectFilter_@{{ column.filter.name }}"
-                data-mode="@{{ column.filter.mode }}"
-                data-name="@{{ column.filter.name }}">
-                <option disabled>{{ trans(Assurrussa\GridView\GridView::NAME.'::grid.selectFilter') }}</option>
-                <option value="" selected></option>
-                <option v-for="(id, name) in column.filter.data" value="@{{ id }}"> @{{ name }}</option>
-                    </select>
-            </span>
-            </td>
-        </tr>
-        <tr v-for="entry in data | filterBy" track-by="$index">
-            <td v-for="column in columns" track-by="$index">
-                <span v-if="column.screening">
-                    @{{{ entry[column.key] }}}
-                </span>
-                <span v-else>@{{ entry[column.key] }}</span>
-            </td>
-        </tr>
-        </tbody>
-    </table>
-</template>
-
-<!-- gridList root element -->
-<div id="gridList">
-    <div class="box">
-
-        <div class="row">
-            <div class="col-sm-6">
-                <label>
-                    <select class=" input-sm"
-                            v-model="gridCountPage">
-                        <option value="10">10</option>
-                        <option value="25">25</option>
-                        <option value="50">50</option>
-                        <option value="100">100</option>
-                        <option value="200">200</option>
-                    </select>
-                </label>
-                @{{{ createButton }}}
-            </div>
-            <div class="col-sm-6">
-                @{{{ customButton }}}
-                <form id="search" class="pull-right">
-                    <label>
-                        <input type="search" spellcheck="true" name="query" class="form-control input-sm"
-                               placeholder="search"
-                               v-model="searchQueries"
-                               debounce=300>
-                    </label>
-                </form>
-            </div>
-        </div>
-
-        <div class="content-box">
-            <grid-view
-                    :data="gridData"
-                    :columns="gridColumns"
-                    :sort-name="sortName"
-                    :order="orderBy">
-            </grid-view>
-        </div>
-
-        <div class="row">
-            <div class="col-sm-6">
-                <div>
-                    Записи с @{{ gridFrom }} по @{{ gridTo }} из @{{ gridTotal }}
-                </div>
-            </div>
-            <div class="col-sm-6">
-                <ul class="pagination pagination-sm pull-right">
-
-                    <li :class="link.status" v-for="link in gridPagination">
-                        <a @click="onPage(link.page, $event)" href="link.url" rel="@{{ link.rel }}">
-                        @{{{ (link.text) ?link.text : link.page }}}
-                        </a>
-                    </li>
-
-                </ul>
-            </div>
-        </div>
-    </div>
-    <span v-if="loadIcon" style="position:fixed; top:45%;left:48%;">
+<?php
+/**
+ * @var \Assurrussa\GridView\Helpers\GridViewResult $data
+ */
+?>
+<form id="<?= $data->getElementName(); ?>" action="">
+    @include('amiGrid::part.grid', ['data' => $data])
+    <div id="js-loadingNotification" class="position-fixed-center">
         <div class="cssload-loader"></div>
-    </span>
-</div>
-
+    </div>
+</form>
 <style>
     .box {
         padding: 15px;
     }
 
-    .content-box {
-        *overflow: auto;
+    .position-fixed-center {
+        display: none;
+        position: fixed;
+        top: 45%;
+        left: 48%;
+    }
+
+    .images ul li {
+        position: relative;
+        text-align: center;
     }
 
     .table > thead > tr > th {
@@ -138,16 +31,19 @@
     }
 
     th {
-        background-color: #42b983 !important;
-        color: rgba(255, 255, 255, 0.66);
+        width: auto;
+        background-color: #f4f4f4 !important;
         cursor: pointer;
         -webkit-user-select: none;
         -moz-user-select: none;
-        -user-select: none;
+        position: relative;
+        padding-top: 10px !important;
+        padding-bottom: 10px !important;
+        padding-right: 15px !important;
     }
 
     th.active {
-        color: #fff;
+        background-color: #e5e5e5 !important;
     }
 
     th.active .arrow {
@@ -162,53 +58,219 @@
     .arrow {
         display: inline-block;
         vertical-align: middle;
-        width: 0;
-        height: 0;
-        margin-left: 5px;
-        opacity: 0.66;
+        position: absolute;
+        right: 5px;
+        top: 17px;
     }
 
     .arrow.asc {
-        border-left: 4px solid transparent;
-        border-right: 4px solid transparent;
-        border-bottom: 4px solid #fff;
+        border-left: 5px solid transparent;
+        border-right: 5px solid transparent;
+        border-bottom: 5px solid #333;
     }
 
-    .arrow.dsc {
-        border-left: 4px solid transparent;
-        border-right: 4px solid transparent;
-        border-top: 4px solid #fff;
+    .arrow.desc {
+        border-left: 5px solid transparent;
+        border-right: 5px solid transparent;
+        border-top: 5px solid #333;
     }
 
-    #search {
-        margin-bottom: 10px;
-    }
-
-    @media (max-width: 640px) {
-        .content-box {
-            overflow: auto;
-        }
+    .content-box {
+        overflow: auto;
     }
 </style>
 @push('scripts')
-<script src="{{ asset('vendor/grid-view/js/gridView.js') }}"></script>
 <script>
     $(function () {
-        $(document).on('change', '.js-adminSelectAll', function () {
-            var checked = $(this).is(':checked');
-            $('.js-adminCheckboxRow').prop('checked', checked).filter(':first').change();
-        });
-        $(document).delegate('.js-adminCheckboxRow', 'change', function () {
-            var selected = [];
-            $('.js-adminCheckboxRow:checked').each(function () {
-                selected.push($(this).val());
-            });
-            $('.js-btnCustomAction').each(function () {
-                var $this = $(this);
-                var url = $this.data('href') + selected.join(',');
-                $this.attr('href', url);
-            });
-        });
+        'use strict';
+        var timer, milliSeconds = 600;
+
+        window.AmiGridJS = {
+            /**
+             * Initialize
+             */
+            initialize: function () {
+                this.modules();
+                this.setUpListeners();
+            },
+            /**
+             * Modules
+             */
+            modules: function () {
+            },
+            /**
+             * Set up listeners
+             */
+            setUpListeners: function () {
+            },
+            /**
+             *
+             */
+            loadingShow: function () {
+                $('#js-loadingNotification').show();
+                $('#js-loadCatalogItems').find('.js-loaderBody').css('opacity', 0.3);
+            },
+            /**
+             *
+             */
+            loadingHide: function () {
+                $('#js-loadingNotification').hide();
+            },
+            /**
+             *
+             * @param url
+             * @param data
+             */
+            getEntities: function (url, data) {
+                data = data == 'undefined' ? [] : data;
+                clearTimeout(timer);
+                timer = setTimeout(function () {
+                    $.ajax({
+                        url: url,
+                        data: data,
+                        onDropdownHide: function (event) {
+                            alert('Dropdown closed.');
+                        }
+                    }).done(function (data) {
+                        AmiGridJS.loadingHide();
+                        $('#<?= $data->getElementName(); ?>').html(data);
+                    }).fail(function () {
+                        console.info('could not be loaded.');
+                    });
+                }, milliSeconds);
+            },
+            /**
+             *
+             */
+            filterTableHeader: function (e) {
+                var $that = $(this),
+                        $children = $that.children('span');
+                if ($that.find('input').length == 1) {
+                    return;
+                }
+                e.preventDefault();
+
+                if ($children.hasClass('asc')) {
+                    $children.removeClass('asc').addClass('desc');
+                    $that.siblings().removeClass('active');
+                    $that.removeClass('active');
+                    $('#js-amiOrderBy').val('desc');
+                } else if ($children.hasClass('desc')) {
+                    $('#js-amiOrderBy').val('asc');
+                    $children.removeClass('desc').addClass('asc');
+                    $that.siblings().removeClass('active');
+                    $that.removeClass('active');
+                } else {
+                    return;
+                }
+                $('#js-amiSortName').val($that.data('name'));
+                $that.addClass('active');
+
+                clearTimeout(timer);
+                timer = setTimeout(function () {
+                    $('#<?= $data->getElementName(); ?>').submit();
+                }, milliSeconds);
+            },
+            /**
+             *
+             */
+            filterCheckedChanged: function (e) {
+                e.preventDefault();
+                clearTimeout(timer);
+                timer = setTimeout(function () {
+                    $('#<?= $data->getElementName(); ?>').submit();
+                }, milliSeconds);
+            },
+            /**
+             *
+             */
+            filterPagination: function (e) {
+                e.preventDefault();
+                var $button = $(this),
+                        url = $button.attr('href');
+                AmiGridJS.loadingShow();
+                AmiGridJS.getEntities(url);
+                window.history.pushState("", "", url);
+            },
+            /**
+             *
+             */
+            filterSearchClearSubmit: function (e) {
+                e.preventDefault();
+                var $that = $(this),
+                        url = window.location.pathname;
+                AmiGridJS.loadingShow();
+                AmiGridJS.getEntities(url);
+                window.history.pushState("", "", url);
+            },
+            /**
+             *
+             */
+            filterSubmitForm: function (e) {
+                e.preventDefault();
+                var $form = $(this),
+                        data = $form.serializeArray(),
+                        url = $form.attr('action'),
+                        dataResult = [],
+                        result;
+                $(data).each(function (i, elem) {
+                    if (elem.name == '_token') {
+                    } else {
+                        dataResult.push(elem);
+                    }
+                });
+                AmiGridJS.loadingShow();
+                AmiGridJS.getEntities(url, dataResult);
+                result = $.param(dataResult);
+                if (result != '') {
+                    result = '?' + result;
+                }
+                window.history.pushState("", "", url + result);
+            },
+            /**
+             *
+             */
+            filterSelectCheckedInput: function () {
+                var checked = $(this).is(':checked');
+                $('.js-adminCheckboxRow').prop('checked', checked).filter(':first').change();
+            },
+            /**
+             *
+             */
+            filterCheckboxArrow: function () {
+                var selected = [];
+                $('.js-adminCheckboxRow:checked').each(function () {
+                    selected.push($(this).val());
+                });
+                $('.js-btnCustomAction').each(function () {
+                    var $this = $(this);
+                    var url = $this.data('href') + selected.join(',');
+                    $this.attr('href', url);
+                });
+            },
+            /**
+             * Распрсивает json текст и выводит нужные сообщения.
+             * тип массива [{message: '...', type: '...', ...}, {...}]
+             *
+             * @param data
+             */
+            notifyParseJson: function (data) {
+                // list = $.parseJSON(data);
+                $(data).each(function (i, element) {
+                    $.notify({message: element.message}, {type: element.type});
+                });
+            }
+        };
+        AmiGridJS.initialize();
+
+        $(document).on('click', '#<?= $data->getElementName(); ?> .js-amiTableHeader', AmiGridJS.filterTableHeader);
+        $(document).on('input', '#<?= $data->getElementName(); ?> input[type="text"]', AmiGridJS.filterCheckedChanged);
+        $(document).on('change', '#<?= $data->getElementName(); ?> select', AmiGridJS.filterCheckedChanged);
+        $(document).on('click', '#<?= $data->getElementName(); ?> .js-filterSearchPagination .pagination a', AmiGridJS.filterPagination);
+        $(document).on('click', '#<?= $data->getElementName(); ?> #js-filterSearchClearSubmit', AmiGridJS.filterSearchClearSubmit);
+        $(document).on('submit', '#<?= $data->getElementName(); ?>', AmiGridJS.filterSubmitForm);
+        $(document).on('change', '#<?= $data->getElementName(); ?> .js-adminSelectAll', AmiGridJS.filterSelectCheckedInput);
+        $(document).delegate('#<?= $data->getElementName(); ?> .js-adminCheckboxRow', 'change', AmiGridJS.filterCheckboxArrow);
     });
 </script>
 @endpush

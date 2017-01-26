@@ -78,14 +78,23 @@ class ButtonItem extends Button
      * @param \Illuminate\Contracts\View\Factory|\Illuminate\View\View|bool $button
      * @return bool|string
      */
-    public function setButtonExport($button = true)
+    public function setButtonExport($url = null)
     {
+        $addUrl = 'export=1';
+        if(!$url) {
+            $url = url()->current();
+            if($array = request()->except('export')) {
+                $url .= '?' . http_build_query($array);
+            }
+        }
+        $addUrl = str_is('*?*', $url) ? '&' . $addUrl : '?' . $addUrl;
         return $this->setTypeExport()
+            ->setId('js-amiExportButton')
             ->setClass('btn btn-default')
             ->setTitle(GridView::trans('grid.export'))
             ->setLabel(GridView::trans('grid.export'))
             ->setIcon('fa fa-upload')
-            ->setButtonCustom($button, '/export');
+            ->setButtonCustom($url, $addUrl, true);
     }
 
     /**
@@ -101,8 +110,11 @@ class ButtonItem extends Button
      * @param string                                                        $postfix
      * @return bool|string
      */
-    public function setButtonCustom($buttonView = true, $postfix = '')
+    public function setButtonCustom($buttonView = true, $postfix = '', $requiredPostFix = false)
     {
+        if($requiredPostFix) {
+            $buttonView .= $postfix;
+        }
         if($buttonView === true) {
             if($this->_query) {
                 $button = $this->setUrl($this->_query->getModel()->getTable() . $postfix)->renderGridView();
@@ -123,7 +135,7 @@ class ButtonItem extends Button
      * Кастомная кнопка для удаления
      *
      * @param string      $route
-     * @param string|null $params
+     * @param string|null $addPostRoute
      * @param string|null $text
      * @param string|null $confirmText
      * @param string|null $class
@@ -132,7 +144,7 @@ class ButtonItem extends Button
      */
     public function setButtonCheckboxAction(
         $route,
-        $params = null,
+        $addPostRoute = null,
         $view = null,
         $text = null,
         $confirmText = null,
@@ -140,12 +152,12 @@ class ButtonItem extends Button
         $icon = null
     ) {
         $route = $route ?: '';
-        $params = $params ?: ['deleted='];
+        $addPostRoute = $addPostRoute ?: '?deleted=';
         $class = $class ?: 'btn btn-default js-btnCustomAction js-linkDelete';
         $icon = $icon ?: '';
         $text = $text ?: GridView::trans('grid.selectDelete');
         $confirmText = $confirmText ?: GridView::trans('grid.clickDelete');
-        $this->setRoute($route, $params)
+        $this->setUrl($route . $addPostRoute)
             ->setClass($class)
             ->setIcon($icon)
             ->setLabel($text)

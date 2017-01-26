@@ -7,6 +7,17 @@ use Assurrussa\GridView\Interfaces\ColumnInterface;
 /**
  * Class Column
  *
+ * @property string                 $key
+ * @property string                 $value
+ * @property bool                   $sort
+ * @property bool                   $screening
+ * @property array                  $filter
+ * @property string                 $dateFormat
+ * @property bool                   $dateActive
+ * @property \Eloquent|null         $instance
+ * @property \Closure               $handler
+ * @property Button[]|\Closure|null $actions
+ *
  * @package Assurrussa\GridView\Support
  */
 class Column implements ColumnInterface
@@ -26,59 +37,73 @@ class Column implements ColumnInterface
      */
     const DEFAULT_TO_STRING_FORMAT = 'Y-m-d H:i:s';
 
-    /**
-     * @var string
-     */
-    private $_key = '';
+    /** type string for filter */
+    const FILTER_TYPE_STRING = 'string';
+    /** type date for filter */
+    const FILTER_TYPE_DATE = 'date';
+    /** type array for filter */
+    const FILTER_TYPE_SELECT = 'select';
+
+    const FILTER_ORDER_BY_ASC = 'asc';
+    const FILTER_ORDER_BY_DESC = 'desc';
+
+    const FILTER_KEY_NAME = 'name';
+    const FILTER_KEY_DATA = 'data';
+    const FILTER_KEY_MODE = 'mode';
 
     /**
-     * @var string
+     * @property string
      */
-    private $_value = '';
+    public $key = '';
 
     /**
-     * @var bool
+     * @property string
      */
-    private $_sort = false;
+    public $value = '';
 
     /**
-     * @var bool
+     * @property bool
      */
-    private $_screening = false;
+    public $sort = false;
 
     /**
-     * @var array
+     * @property bool
      */
-    private $_filter = [];
+    public $screening = false;
+
+    /**
+     * @property array
+     */
+    public $filter = [];
 
     /**
      * Format Date
      *
-     * @var string
+     * @property string
      */
-    private $_dateFormat = self::DEFAULT_TO_STRING_FORMAT;
+    public $dateFormat = self::DEFAULT_TO_STRING_FORMAT;
 
     /**
      * Active date column
      *
-     * @var bool
+     * @property bool
      */
-    private $_dateActive = false;
+    public $dateActive = false;
 
     /**
-     * @var \Eloquent|null
+     * @property \Eloquent|null
      */
-    private $_instance = null;
+    public $instance = null;
 
     /**
-     * @var Button[]|\Closure|null
+     * @property Button[]|\Closure|null
      */
-    private $_actions = null;
+    public $actions = null;
 
     /**
-     * @var \Closure
+     * @property \Closure
      */
-    private $_handler = null;
+    public $handler = null;
 
     /**
      * Column constructor.
@@ -96,7 +121,7 @@ class Column implements ColumnInterface
      */
     public function setKey($key)
     {
-        $this->_key = $key;
+        $this->key = $key;
         return $this;
     }
 
@@ -107,7 +132,7 @@ class Column implements ColumnInterface
      */
     public function setKeyAction()
     {
-        $this->_key = self::ACTION_NAME;
+        $this->key = self::ACTION_NAME;
         $this->setValue(self::ACTION_NAME);
         $this->setSort(false);
         $this->setScreening(true);
@@ -122,7 +147,7 @@ class Column implements ColumnInterface
      */
     public function setValue($value)
     {
-        $this->_value = $value;
+        $this->value = $value;
         return $this;
     }
 
@@ -134,7 +159,7 @@ class Column implements ColumnInterface
      */
     public function setSort($sort = false)
     {
-        $this->_sort = $sort;
+        $this->sort = $sort;
         return $this;
     }
 
@@ -147,7 +172,7 @@ class Column implements ColumnInterface
      */
     public function setScreening($screening = false)
     {
-        $this->_screening = $screening;
+        $this->screening = $screening;
         return $this;
     }
 
@@ -163,7 +188,7 @@ class Column implements ColumnInterface
      */
     public function setHandler($handler)
     {
-        $this->_handler = $handler;
+        $this->handler = $handler;
         return $this;
     }
 
@@ -175,15 +200,15 @@ class Column implements ColumnInterface
      * @param string                               $mode  Режим
      * @return $this
      */
-    public function setFilter($field, $array, $mode = '')
+    public function setFilter($field, $array, $mode = self::FILTER_TYPE_SELECT)
     {
         if($array instanceof \Illuminate\Support\Collection) {
             $array = $array->toArray();
         }
-        $this->_filter = [
-            'name' => $field,
-            'data' => $array,
-            'mode' => $mode,
+        $this->filter = [
+            self::FILTER_KEY_NAME => $field,
+            self::FILTER_KEY_DATA => $array,
+            self::FILTER_KEY_MODE => $mode,
         ];
         return $this;
     }
@@ -195,7 +220,7 @@ class Column implements ColumnInterface
      */
     public function setFilterString($field, $string = '')
     {
-        return $this->setFilter($field, $string, 'string');
+        return $this->setFilter($field, $string, self::FILTER_TYPE_STRING);
     }
 
     /**
@@ -211,7 +236,7 @@ class Column implements ColumnInterface
         if($format) {
             $this->setDateFormat($format);
         }
-        return $this->setFilter($field, $string, 'date');
+        return $this->setFilter($field, $string, self::FILTER_TYPE_DATE);
     }
 
     /**
@@ -220,7 +245,7 @@ class Column implements ColumnInterface
      */
     public function setDateFormat($format)
     {
-        $this->_dateFormat = $format;
+        $this->dateFormat = $format;
         return $this;
     }
 
@@ -230,7 +255,7 @@ class Column implements ColumnInterface
      */
     public function setDateActive($bool = false)
     {
-        $this->_dateActive = $bool;
+        $this->dateActive = $bool;
         return $this;
     }
 
@@ -241,7 +266,7 @@ class Column implements ColumnInterface
     public function setActions($action)
     {
         $this->setKeyAction();
-        $this->_actions = $action;
+        $this->actions = $action;
         return $this;
     }
 
@@ -250,7 +275,7 @@ class Column implements ColumnInterface
      */
     public function isKeyAction()
     {
-        return $this->_key == self::ACTION_NAME;
+        return $this->key == self::ACTION_NAME;
     }
 
     /**
@@ -258,7 +283,7 @@ class Column implements ColumnInterface
      */
     public function isSort()
     {
-        return $this->_sort;
+        return $this->sort;
     }
 
     /**
@@ -266,7 +291,7 @@ class Column implements ColumnInterface
      */
     public function isScreening()
     {
-        return $this->_screening;
+        return $this->screening;
     }
 
     /**
@@ -277,7 +302,7 @@ class Column implements ColumnInterface
      */
     public function isHandler()
     {
-        return is_callable($this->_handler);
+        return is_callable($this->handler);
     }
 
     /**
@@ -285,7 +310,7 @@ class Column implements ColumnInterface
      */
     public function getInstance()
     {
-        return $this->_instance;
+        return $this->instance;
     }
 
     /**
@@ -293,7 +318,7 @@ class Column implements ColumnInterface
      */
     public function getKey()
     {
-        return $this->_key;
+        return $this->key;
     }
 
     /**
@@ -301,16 +326,19 @@ class Column implements ColumnInterface
      */
     public function getValue()
     {
-        return $this->_value;
+        return $this->value;
     }
 
     /**
-     * @return mixed|null
+     * @return callable|\Closure|mixed|null
      */
     public function getHandler()
     {
-        if(is_callable($this->_handler) && $this->getInstance()) {
-            return call_user_func($this->_handler, $this->getInstance());
+        if(is_callable($this->handler)) {
+            if($this->getInstance()) {
+                return call_user_func($this->handler, $this->getInstance());
+            }
+            return $this->handler;
         }
         return null;
     }
@@ -330,7 +358,7 @@ class Column implements ColumnInterface
         if($this->isHandler()) {
             return $this->getHandler();
         }
-        return $this->getValueColumn($this->_instance, $this->_key);
+        return $this->getValueColumn($this->instance, $this->key);
     }
 
     /**
@@ -368,7 +396,7 @@ class Column implements ColumnInterface
      */
     public function getDateFormat()
     {
-        return $this->_dateFormat;
+        return $this->dateFormat;
     }
 
     /**
@@ -376,7 +404,7 @@ class Column implements ColumnInterface
      */
     public function getDateActive()
     {
-        return $this->_dateActive;
+        return $this->dateActive;
     }
 
     /**
@@ -384,7 +412,7 @@ class Column implements ColumnInterface
      */
     public function getFilter()
     {
-        return $this->_filter;
+        return $this->filter;
     }
 
     /**
@@ -392,10 +420,10 @@ class Column implements ColumnInterface
      */
     public function getActions()
     {
-        if(is_callable($this->_actions) && $this->getInstance()) {
-            return call_user_func($this->_actions, $this->getInstance());
+        if(is_callable($this->actions) && $this->getInstance()) {
+            return call_user_func($this->actions, $this->getInstance());
         }
-        return $this->_actions;
+        return $this->actions;
     }
 
     /**
@@ -405,7 +433,7 @@ class Column implements ColumnInterface
      */
     public function setInstance($instance)
     {
-        $this->_instance = $instance;
+        $this->instance = $instance;
     }
 
     /**
@@ -420,7 +448,10 @@ class Column implements ColumnInterface
             ->setSort(false)
             ->setScreening(true)
             ->setHandler(function ($data) {
-                return '<input type="checkbox" class="js-adminCheckboxRow" value="' . $data->id . '">';
+                if($data && $data->id) {
+                    return '<input type="checkbox" class="js-adminCheckboxRow" value="' . $data->id . '">';
+                }
+                return '';
             });
     }
 
@@ -432,7 +463,7 @@ class Column implements ColumnInterface
         return [
             'key'             => $this->getKey(),
             'value'           => $this->getValue(),
-            'sortBool'        => $this->isSort(),
+            'sort'            => $this->isSort(),
             'screening'       => $this->isScreening(),
             'filter'          => $this->getFilter(),
             'handler'         => $this->getHandler(),

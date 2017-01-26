@@ -23,17 +23,6 @@ class ModelBaseGridController extends BaseController
         $this->gridView = $gridView;
     }
 
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
-     */
-    public function index()
-    {
-        $header = GridView::trans('grid.general');
-        return GridView::view(config('amigrid.pathView'), compact('header'));
-    }
-
 
     /**
      * Show the form for creating a new resource.
@@ -99,22 +88,5 @@ class ModelBaseGridController extends BaseController
     public function destroy($id)
     {
         //
-    }
-
-    /**
-     * @param string $model
-     * @return array
-     */
-    public function sync($model, $scope = null)
-    {
-        /** @var Model $modelName */
-        $modelName = config('amigrid.namespace') . str_singular(ucfirst($model));
-        $query = $modelName::query();
-        if($scope) {
-            $query->where(function ($query) use ($scope) {
-                $query->$scope();
-            });
-        }
-        return $this->gridView->setQuery($query)->get();
     }
 }

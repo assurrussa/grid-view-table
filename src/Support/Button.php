@@ -269,7 +269,12 @@ class Button implements ButtonInterface, Renderable, Arrayable
             if($route === null) {
                 $url = '#';
             } else {
-                $url = route($route, $params);
+                $url = '#';
+                if(app('router')->has($route)) {
+                    $url = route($route, $params);
+                } else {
+                    $this->setVisible(false);
+                }
             }
             $this->setUrl($url);
         }
@@ -543,6 +548,9 @@ class Button implements ButtonInterface, Renderable, Arrayable
      */
     public function toArray()
     {
+        if(!$this->isVisibility()) {
+            return [];
+        }
         return [
             'type'        => $this->getType(),
             'action'      => $this->getAction(),

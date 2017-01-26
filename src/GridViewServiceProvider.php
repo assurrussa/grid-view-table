@@ -2,6 +2,7 @@
 
 namespace Assurrussa\GridView;
 
+use Illuminate\Contracts\Container\Container;
 use Illuminate\Support\ServiceProvider;
 
 /**
@@ -55,7 +56,8 @@ class GridViewServiceProvider extends ServiceProvider
     public function register()
     {
         $this->app->bind(\Assurrussa\GridView\Interfaces\GridInterface::class, function ($app) {
-            return new GridView($app);
+            /** @var Container $app */
+            return $app->make(GridView::class);
         });
         $this->app->alias(\Assurrussa\GridView\GridView::class, GridView::NAME);
         $this->app->alias(\Assurrussa\GridView\GridView::class, \Assurrussa\GridView\Interfaces\GridInterface::class);
