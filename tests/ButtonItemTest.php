@@ -14,7 +14,7 @@ class ButtonItemTest extends TestCase
 
         $button->setAction('show')
             ->setLabel('show')
-            ->setRoute('show', ['entity', 1])
+            ->setRoute('amigrid.show', ['entity', 1])
             ->setIcon('icon')
             ->setHandler(function ($data) {
                 return $data == null;

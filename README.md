@@ -47,6 +47,10 @@ Mini gridView for laravel feat Vue.js.
 or
 {!! \AmiGridView::render(['data' => $data]) !!}
 
+in template use
+
+    @stack('scripts')
+
 ```
 
 ### Готово! ###
