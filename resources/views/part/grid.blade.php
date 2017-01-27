@@ -25,5 +25,6 @@ if($requestOrderBy = request()->get('by')) {
         @include('amiGrid::part.header')
         @include('amiGrid::part.table')
         @include('amiGrid::part.footer')
+        <input type="submit" id="js-filterButtonSubmitForm" style="display:none;">
     </div>
 </div>

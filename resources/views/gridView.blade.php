@@ -168,7 +168,7 @@
 
                 clearTimeout(timer);
                 timer = setTimeout(function () {
-                    $('#<?= $data->getElementName(); ?>').submit();
+                    $('#<?= $data->getElementName(); ?> #js-filterButtonSubmitForm').click();
                 }, milliSeconds);
             },
             /**
@@ -178,7 +178,7 @@
                 e.preventDefault();
                 clearTimeout(timer);
                 timer = setTimeout(function () {
-                    $('#<?= $data->getElementName(); ?>').submit();
+                    $('#<?= $data->getElementName(); ?> #js-filterButtonSubmitForm').click();
                 }, milliSeconds);
             },
             /**
@@ -208,11 +208,12 @@
              */
             filterSubmitForm: function (e) {
                 e.preventDefault();
-                var $form = $(this),
+                var $form = $(this).parents('form'),
                         data = $form.serializeArray(),
                         url = $form.attr('action'),
                         dataResult = [],
                         result;
+                console.log($form);
                 $(data).each(function (i, elem) {
                     if (elem.name == '_token') {
                     } else {
@@ -264,11 +265,12 @@
         AmiGridJS.initialize();
 
         $(document).on('click', '#<?= $data->getElementName(); ?> .js-amiTableHeader', AmiGridJS.filterTableHeader);
-        $(document).on('input', '#<?= $data->getElementName(); ?> input[type="text"]', AmiGridJS.filterCheckedChanged);
-        $(document).on('change', '#<?= $data->getElementName(); ?> select', AmiGridJS.filterCheckedChanged);
+        $(document).on('input', '#<?= $data->getElementName(); ?> #js-amiSearchInput', AmiGridJS.filterCheckedChanged);
+        $(document).on('input', '#<?= $data->getElementName(); ?> .js-textFilter > input[type="text"]', AmiGridJS.filterCheckedChanged);
+        $(document).on('change', '#<?= $data->getElementName(); ?> .js-selectFilter', AmiGridJS.filterCheckedChanged);
         $(document).on('click', '#<?= $data->getElementName(); ?> .js-filterSearchPagination .pagination a', AmiGridJS.filterPagination);
         $(document).on('click', '#<?= $data->getElementName(); ?> #js-filterSearchClearSubmit', AmiGridJS.filterSearchClearSubmit);
-        $(document).on('submit', '#<?= $data->getElementName(); ?>', AmiGridJS.filterSubmitForm);
+        $(document).on('click', '#<?= $data->getElementName(); ?> #js-filterButtonSubmitForm', AmiGridJS.filterSubmitForm);
         $(document).on('change', '#<?= $data->getElementName(); ?> .js-adminSelectAll', AmiGridJS.filterSelectCheckedInput);
         $(document).delegate('#<?= $data->getElementName(); ?> .js-adminCheckboxRow', 'change', AmiGridJS.filterCheckboxArrow);
     });

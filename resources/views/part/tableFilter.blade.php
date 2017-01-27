@@ -32,7 +32,7 @@ use Assurrussa\GridView\Support\Column;
         <?php } else { ?>
         <select name="<?= $header->filter[Column::FILTER_KEY_NAME]; ?>"
                 id="js-selectFilter_<?= $header->filter[Column::FILTER_KEY_NAME]; ?>"
-                class="form-control"
+                class="js-selectFilter form-control"
                 data-mode="<?= $header->filter[Column::FILTER_KEY_MODE]; ?>">
             <option disabled><?= \Assurrussa\GridView\GridView::trans('grid.selectFilter'); ?></option>
             <option value="" selected></option>
