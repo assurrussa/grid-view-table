@@ -268,6 +268,7 @@
         $(document).on('input', '#<?= $data->getElementName(); ?> #js-amiSearchInput', AmiGridJS.filterCheckedChanged);
         $(document).on('input', '#<?= $data->getElementName(); ?> .js-textFilter > input[type="text"]', AmiGridJS.filterCheckedChanged);
         $(document).on('change', '#<?= $data->getElementName(); ?> .js-selectFilter', AmiGridJS.filterCheckedChanged);
+        $(document).on('change', '#<?= $data->getElementName(); ?> #js-amiSelectCount', AmiGridJS.filterCheckedChanged);
         $(document).on('click', '#<?= $data->getElementName(); ?> .js-filterSearchPagination .pagination a', AmiGridJS.filterPagination);
         $(document).on('click', '#<?= $data->getElementName(); ?> #js-filterSearchClearSubmit', AmiGridJS.filterSearchClearSubmit);
         $(document).on('click', '#<?= $data->getElementName(); ?> #js-filterButtonSubmitForm', AmiGridJS.filterSubmitForm);

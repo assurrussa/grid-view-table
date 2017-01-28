@@ -7,7 +7,7 @@ use Assurrussa\GridView\GridView;
 <div class="row">
     <div class="col-sm-6">
         <label>
-            <select name="count" class="input-sm">
+            <select id="js-amiSelectCount" name="count" class="input-sm">
                 <?php foreach($data->counts as $key => $value) { ?>
                 <option <?= request()->get('count') == $key ? 'selected' : ''; ?> value="<?= $key; ?>">
                     <?= $value; ?>
