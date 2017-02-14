@@ -213,7 +213,6 @@
                         url = $form.attr('action'),
                         dataResult = [],
                         result;
-                console.log($form);
                 $(data).each(function (i, elem) {
                     if (elem.name == '_token') {
                     } else {
