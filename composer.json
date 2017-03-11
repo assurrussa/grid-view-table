@@ -1,13 +1,13 @@
 {
-  "name": "assurrussa/grid-view-vue",
-  "description": "Mini gridView for laravel feat Vue.js.",
+  "name": "assurrussa/grid-view-table",
+  "description": "Mini grid view table for laravel.",
   "keywords": [
     "laravel",
     "gridView",
     "Vue"
   ],
   "type": "package",
-  "homepage": "https://github.com/assurrussa/grid-view-vue",
+  "homepage": "https://github.com/assurrussa/grid-view-table",
   "license": "MIT",
   "authors": [
     {
@@ -24,8 +24,8 @@
     "phpunit/phpunit": "~4.0"
   },
   "support": {
-    "source": "https://github.com/assurrussa/grid-view-vue",
-    "issues": "https://github.com/assurrussa/grid-view-vue/issues"
+    "source": "https://github.com/assurrussa/grid-view-table",
+    "issues": "https://github.com/assurrussa/grid-view-table/issues"
   },
   "autoload": {
     "psr-4": {
