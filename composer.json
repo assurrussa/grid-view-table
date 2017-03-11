@@ -4,7 +4,8 @@
   "keywords": [
     "laravel",
     "gridView",
-    "Vue"
+    "Vue",
+    "Table"
   ],
   "type": "package",
   "homepage": "https://github.com/assurrussa/grid-view-table",
