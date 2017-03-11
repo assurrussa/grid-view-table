@@ -1,6 +1,6 @@
-# AmiCMS mini GridView for Laravel >= 5.3 #
+# Mini GridView table for Laravel >= 5.3 #
 
-Mini gridView for laravel feat Vue.js.
+Mini gridView table for laravel.
 
 ## Install packages ##
 1) Добавить в `composer.json` строки и сделать `composer update`
@@ -8,10 +8,10 @@ Mini gridView for laravel feat Vue.js.
         ...
         "require": {
         ...
-            "assurrussa/grid-view-vue": "^0.9.2"
+            "assurrussa/grid-view-table": "^0.9.2"
         ...
 ```
-или `composer require assurrussa/grid-view-vue`
+или `composer require assurrussa/grid-view-table`
 
 2) Добавить в конфиг `config/app.php`
 ```
