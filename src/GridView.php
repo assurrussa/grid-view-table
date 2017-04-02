@@ -26,6 +26,7 @@ class GridView implements GridInterface
 {
 
     const NAME = 'amiGrid';
+
     /** @var string */
     public $id;
     /** @var int */
@@ -37,7 +38,7 @@ class GridView implements GridInterface
     /** @var string */
     public $search;
     /** @var bool */
-    public $searchInput;
+    public $searchInput = false;
     /** @var string */
     public $sortName;
     /** @var array */
