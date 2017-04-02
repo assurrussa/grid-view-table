@@ -17,7 +17,6 @@ class FilterEnum
      */
     public static $filterExecuteForCyrillicColumn = [
         '_at',
-        '_time',
     ];
 
     /**
