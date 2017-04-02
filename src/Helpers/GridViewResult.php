@@ -24,6 +24,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
  * @property int                                         $limit
  * @property string                                      $sortName
  * @property array                                       $counts
+ * @property bool                                        $searchInput
  *
  * Class GridViewResult
  */
@@ -37,17 +38,18 @@ class GridViewResult
     public function toArray()
     {
         $array = (array)$this;
-        foreach($array as $key => $items) {
-            if($items instanceof LengthAwarePaginator) {
+        foreach ($array as $key => $items) {
+            if ($items instanceof LengthAwarePaginator) {
                 $array[$key] = $items->toArray();
-            } elseif($items instanceof \stdClass) {
+            } elseif ($items instanceof \stdClass) {
                 $items = (array)$items;
-                foreach($items as $keyItem => $valueItem) {
+                foreach ($items as $keyItem => $valueItem) {
                     $items[$keyItem] = (array)$valueItem;
                 }
                 $array[$key] = $items;
             }
         }
+
         return $array;
     }
 
@@ -61,14 +63,17 @@ class GridViewResult
 
     /**
      * @param null $text
+     *
      * @return string
      */
     public function getElementName($text = null)
     {
-        if($text) {
+        if ($text) {
             $text = str_replace('.', '_', $text);
+
             return '_' . $text;
         }
+
         return 'js-amiGridList_' . $this->id;
     }
 
@@ -78,9 +83,9 @@ class GridViewResult
      */
     public function __set($property, $value)
     {
-        if(is_array($value)) {
-            foreach($value as $keyItem => $valueItem) {
-                if(is_array($valueItem)) {
+        if (is_array($value)) {
+            foreach ($value as $keyItem => $valueItem) {
+                if (is_array($valueItem)) {
                     $value[$keyItem] = (object)$valueItem;
                 } else {
                     $value[$keyItem] = $valueItem;

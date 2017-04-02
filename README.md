@@ -65,6 +65,9 @@ or facade
         $gridView = amiGrid();
         // set Builder Query
         $gridView->query($query);
+        
+        // search input for table
+        $gridView->setSearchInput(false);
 
         $catalogs = Catalog::pluck('title', 'id');
         $brands = Brand::pluck('name', 'id');

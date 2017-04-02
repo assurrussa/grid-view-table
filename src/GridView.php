@@ -36,6 +36,8 @@ class GridView implements GridInterface
     public $orderBy;
     /** @var string */
     public $search;
+    /** @var bool */
+    public $searchInput;
     /** @var string */
     public $sortName;
     /** @var array */
@@ -233,6 +235,7 @@ class GridView implements GridInterface
         $gridViewResult->limit = $this->limit;
         $gridViewResult->sortName = $this->sortName;
         $gridViewResult->counts = $this->counts;
+        $gridViewResult->searchInput = $this->searchInput;
 
         return $gridViewResult;
     }
@@ -269,11 +272,30 @@ class GridView implements GridInterface
     }
 
     /**
+     * @param bool $searchInput
+     *
+     * @return $this
+     */
+    public function setSearchInput(bool $searchInput = false)
+    {
+        $this->searchInput = $searchInput;
+        return $this;
+    }
+
+    /**
      * @return boolean
      */
     public function isVisibleColumn(): bool
     {
         return $this->visibleColumn;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isSearchInput(): bool
+    {
+        return $this->searchInput;
     }
 
     /**
@@ -316,7 +338,9 @@ class GridView implements GridInterface
         $export = (bool)$this->_request->pull('export', false);
 
         $this->filterScopes();
-        $this->filterSearch($this->search);
+        if($this->isSearchInput()) {
+            $this->filterSearch($this->search);
+        }
         $this->filterOrderBy($this->sortName, $this->orderBy);
 
         if($export) {

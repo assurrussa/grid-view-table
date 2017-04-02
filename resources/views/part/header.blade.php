@@ -28,6 +28,7 @@ use Assurrussa\GridView\GridView;
                 <i class="fa fa-times"></i>
                 <?= GridView::trans('grid.clear'); ?>
             </a>
+            <?php if($data->searchInput) { ?>
             <label>
                 <input type="text"
                        id="js-amiSearchInput"
@@ -36,6 +37,7 @@ use Assurrussa\GridView\GridView;
                        class="form-control input-sm"
                        placeholder="search">
             </label>
+            <?php } ?>
         </div>
     </div>
 </div>
