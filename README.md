@@ -75,18 +75,13 @@ or facade
         $gridView->column()->setKey('catalogs.title')->setValue(trans('app.menu.catalog'))
             ->setSort(false)->setScreening(true)->setFilter('catalog_id', $catalogs)->setHandler(function ($data) {
                 /** @var Entity $data */
-                return GridView::view('column.listToString', [
-                    'data' => $data->catalogs,
-                ])->render();
+                return amiGridColumnCeil()->listToString($data->catalogs);
             });
         $gridView->column()->setKey('brands.name')->setValue(trans('app.menu.brand'))
             ->setSort(false)->setScreening(true)->setFilter('brand_id', $brands)->setHandler(function ($data) {
                 /** @var Entity $data */
                 $brand = $data->brand->name;
-                $link = GridView::view('column.filterButton', [
-                    'name' => 'brand_id',
-                    'id'   => $data->brand->id,
-                ])->render();
+                $link = amiGridColumnCeil()->filterButton($data->brand->id, 'brand_id');
                 return $brand . ' ' . $link;
             });
         $gridView->column()->setKey('title')->setValue(trans('app.label.title'))->setSort(true);
@@ -94,10 +89,7 @@ or facade
         $gridView->column()->setKey('preview')->setValue(trans('app.label.preview'))->setSort(false)
             ->setScreening(true)->setHandler(function ($data) {
                 /** @var Entity $data */
-                return GridView::view('column.linkImage', [
-                    'link'  => $data->entityInfo->preview,
-                    'title' => $data->entityInfo->title,
-                ])->render();
+                return amiGridColumnCeil()->image($data->entityInfo->preview, $data->entityInfo->title);    
             });
 
 
@@ -117,7 +109,7 @@ or facade
         // added buttons for table
         $gridView->button()->setButtonCreate(route('admin.entity.create'));
         $gridView->button()->setButtonExport();
-        $gridView->button()->setButtonCheckboxAction();
+        $gridView->button()->setButtonCheckboxAction(route('admin.entity.custom'));
 
         // return result
         $data = $gridView->get();
