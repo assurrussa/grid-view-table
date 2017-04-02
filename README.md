@@ -1,9 +1,7 @@
-# Mini GridView table for Laravel >= 5.3 #
-
-Mini gridView table for laravel.
+# Mini grid view table for Laravel >= 5.4 #
 
 ## Install packages ##
-1) Добавить в `composer.json` строки и сделать `composer update`
+1) `composer.json` and `composer update`
 ```
         ...
         "require": {
@@ -11,9 +9,9 @@ Mini gridView table for laravel.
             "assurrussa/grid-view-table": "^0.9.2"
         ...
 ```
-или `composer require assurrussa/grid-view-table`
+or `composer require assurrussa/grid-view-table`
 
-2) Добавить в конфиг `config/app.php`
+2) Add to config `config/app.php`
 ```
     'providers' => [
         ...
@@ -27,33 +25,30 @@ Mini gridView table for laravel.
         ...
     ],
 ```
-3) Выполнить команду `composer dump-autoload`. После набрать команду
+3) Execute command `composer dump-autoload`
 ```
     php artisan vendor:publish --provider=Assurrussa\GridView\GridViewServiceProvider
 ```
-при необходимости произвести команду `composer dump-autoload`.
 
-### Настройки ###
-* в файле `config/amigrid.php` необходимые настройки
+### Setting ###
+* In file `config/amigrid.php` required settings
 
 ### Routes ###
 
-* Если вам не нужны пути роутов, то в конфиге `config/amigrid.php` просто укажите `FALSE`, для `routes`
+* If you do not need routing paths, then in the config `config/amigrid.php` just specify `FALSE`, for` routes`
 
-### Использование ###
-
-```
-{!! amiGrid()->render(['data' => $data]) !!}
-or
-{!! \AmiGridView::render(['data' => $data]) !!}
+### Include ###
 
 in template use
+```
+{!! amiGrid()->render(['data' => $data]) !!}
+or facade
+{!! \AmiGridView::render(['data' => $data]) !!}
 
-    @stack('scripts')
-
+@stack('scripts')
 ```
 
-### Готово! ###
+### Done! ###
 
 ### Example ###
 
