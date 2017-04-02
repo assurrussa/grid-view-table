@@ -19,8 +19,8 @@ class Model extends \Illuminate\Database\Eloquent\Model
     public static function hasColumn($model, $column)
     {
         $table = $model->getTable();
-        $columns = \Cache::remember('amigrid.columns.' . $table, 60, function () use ($table) {
-            return \Schema::getColumnListing($table);
+        $columns = app('cache')->remember('amigrid.columns.' . $table, 60, function () use ($table) {
+            return app('schema')->getColumnListing($table);
         });
         return array_search($column, $columns) !== false;
     }
