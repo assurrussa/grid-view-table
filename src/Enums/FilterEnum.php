@@ -16,9 +16,8 @@ class FilterEnum
      * @var array
      */
     public static $filterExecuteForCyrillicColumn = [
-        'created_at',
-        'updated_at',
-        'published_at',
+        '_at',
+        '_time',
     ];
 
     /**
@@ -39,6 +38,6 @@ class FilterEnum
      */
     public static function hasFilterExecuteForCyrillicColumn($column)
     {
-        return in_array($column, static::getFilterExecuteForCyrillicColumn());
+        return in_array(mb_substr($column, -3), static::getFilterExecuteForCyrillicColumn());
     }
 }

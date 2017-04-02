@@ -20,7 +20,7 @@ class Model extends \Illuminate\Database\Eloquent\Model
     {
         $table = $model->getTable();
         $columns = app('cache')->remember('amigrid.columns.' . $table, 60, function () use ($table) {
-            return app('schema')->getColumnListing($table);
+            return \Schema::getColumnListing($table);
         });
         return array_search($column, $columns) !== false;
     }
