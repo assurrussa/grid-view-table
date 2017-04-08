@@ -31,6 +31,13 @@ class Column implements ColumnInterface
     const ACTION_NAME = 'action';
 
     /**
+     * Кey for string columns
+     *
+     * @var string
+     */
+    const ACTION_STRING_TR = 'tr';
+
+    /**
      * Default format to use for __toString method when type juggling occurs.
      *
      * @var string
@@ -117,11 +124,13 @@ class Column implements ColumnInterface
      * Какое поле из таблицы вытащить
      *
      * @param string $key
+     *
      * @return $this
      */
     public function setKey($key)
     {
         $this->key = $key;
+
         return $this;
     }
 
@@ -136,6 +145,7 @@ class Column implements ColumnInterface
         $this->setValue(self::ACTION_NAME);
         $this->setSort(false);
         $this->setScreening(true);
+
         return $this;
     }
 
@@ -143,11 +153,13 @@ class Column implements ColumnInterface
      * Текст для поля
      *
      * @param string $value
+     *
      * @return $this
      */
     public function setValue($value)
     {
         $this->value = $value;
+
         return $this;
     }
 
@@ -155,11 +167,13 @@ class Column implements ColumnInterface
      * Включить сортировку по колонке
      *
      * @param bool $sort
+     *
      * @return $this
      */
     public function setSort($sort = false)
     {
         $this->sort = $sort;
+
         return $this;
     }
 
@@ -168,11 +182,13 @@ class Column implements ColumnInterface
      * Внимание!!! опасайтесь XSS атак
      *
      * @param bool $screening
+     *
      * @return $this
      */
     public function setScreening($screening = false)
     {
         $this->screening = $screening;
+
         return $this;
     }
 
@@ -184,11 +200,13 @@ class Column implements ColumnInterface
      * *  }),
      *
      * @param \Closure $handler функция замыкания для своего условия принимает в себя $_instance модели.
+     *
      * @return $this
      */
     public function setHandler($handler)
     {
         $this->handler = $handler;
+
         return $this;
     }
 
@@ -198,11 +216,12 @@ class Column implements ColumnInterface
      * @param string                               $field Имя поля которое будет фильтроваться
      * @param array|\Illuminate\Support\Collection $array Массив вида [1 => 'name', ...], для селекта
      * @param string                               $mode  Режим
+     *
      * @return $this
      */
     public function setFilter($field, $array, $mode = self::FILTER_TYPE_SELECT)
     {
-        if($array instanceof \Illuminate\Support\Collection) {
+        if ($array instanceof \Illuminate\Support\Collection) {
             $array = $array->toArray();
         }
         $this->filter = [
@@ -210,12 +229,14 @@ class Column implements ColumnInterface
             self::FILTER_KEY_DATA => $array,
             self::FILTER_KEY_MODE => $mode,
         ];
+
         return $this;
     }
 
     /**
      * @param string $field
      * @param string $string
+     *
      * @return Column
      */
     public function setFilterString($field, $string = '')
@@ -228,45 +249,72 @@ class Column implements ColumnInterface
      * @param string $string
      * @param bool   $active
      * @param string $format
+     *
      * @return Column
      */
     public function setFilterDate($field, $string = '', $active = true, $format = null)
     {
         $this->setDateActive($active);
-        if($format) {
+        if ($format) {
             $this->setDateFormat($format);
         }
+
         return $this->setFilter($field, $string, self::FILTER_TYPE_DATE);
     }
 
     /**
      * @param $format
+     *
      * @return $this
      */
     public function setDateFormat($format)
     {
         $this->dateFormat = $format;
+
         return $this;
     }
 
     /**
      * @param bool $date
+     *
      * @return $this
      */
     public function setDateActive($bool = false)
     {
         $this->dateActive = $bool;
+
         return $this;
     }
 
     /**
      * @param Button[]|\Closure $action
+     *
      * @return Column
      */
     public function setActions($action)
     {
         $this->setKeyAction();
         $this->actions = $action;
+
+        return $this;
+    }
+
+    /**
+     * Если необходим свой обработчик для каждой строки таблицы.
+     * * Пример:
+     * *  ->setClass(function ($data) {
+     * *      ...
+     * *  }),
+     *
+     * @param \Closure $handler функция замыкания для своего условия принимает в себя $_instance модели.
+     *
+     * @return $this
+     */
+    public function setClassForString($handler)
+    {
+        $this->key = self::ACTION_STRING_TR;
+        $this->setHandler($handler);
+
         return $this;
     }
 
@@ -306,6 +354,17 @@ class Column implements ColumnInterface
     }
 
     /**
+     * Проверяет является ли свойство Closure
+     *
+     * @return bool
+     * @see \Closure
+     */
+    public function isStringTr()
+    {
+        return $this->key === self::ACTION_STRING_TR;
+    }
+
+    /**
      * @return \Eloquent|null
      */
     public function getInstance()
@@ -334,12 +393,14 @@ class Column implements ColumnInterface
      */
     public function getHandler()
     {
-        if(is_callable($this->handler)) {
-            if($this->getInstance()) {
+        if (is_callable($this->handler)) {
+            if ($this->getInstance()) {
                 return call_user_func($this->handler, $this->getInstance());
             }
+
             return $this->handler;
         }
+
         return null;
     }
 
@@ -347,17 +408,19 @@ class Column implements ColumnInterface
      * Взависимости от того какое поле пришло и присутствует ли Closure
      *
      * @param object|null $instance
+     *
      * @return bool|mixed
      * @see \Closure
      */
     public function getValues($instance = null)
     {
-        if($instance) {
+        if ($instance) {
             $this->setInstance($instance);
         }
-        if($this->isHandler()) {
+        if ($this->isHandler()) {
             return $this->getHandler();
         }
+
         return $this->getValueColumn($this->instance, $this->key);
     }
 
@@ -366,28 +429,30 @@ class Column implements ColumnInterface
      *
      * @param \Illuminate\Database\Eloquent\Collection|\Eloquent $instance
      * @param string                                             $name
+     *
      * @return mixed
      */
     public function getValueColumn($instance, $name)
     {
-        if(!$instance) {
+        if (!$instance) {
             return null;
         }
         $parts = explode('.', $name);
         $part = array_shift($parts);
 
-        if($instance instanceof \Illuminate\Database\Eloquent\Collection) {
+        if ($instance instanceof \Illuminate\Database\Eloquent\Collection) {
             $instance = $instance->pluck($part)->first();
         } else {
             $instance = $instance->{$part};
         }
-        if(!empty($parts) && !is_null($instance)) {
+        if (!empty($parts) && !is_null($instance)) {
             return $this->getValueColumn($instance, implode('.', $parts));
         }
 
-        if($instance instanceof \DateTimeInterface) {
+        if ($instance instanceof \DateTimeInterface) {
             $instance = $this->getDateActive() ? $instance->format($this->getDateFormat()) : $instance;
         }
+
         return $instance;
     }
 
@@ -420,9 +485,10 @@ class Column implements ColumnInterface
      */
     public function getActions()
     {
-        if(is_callable($this->actions) && $this->getInstance()) {
+        if (is_callable($this->actions) && $this->getInstance()) {
             return call_user_func($this->actions, $this->getInstance());
         }
+
         return $this->actions;
     }
 
@@ -448,9 +514,10 @@ class Column implements ColumnInterface
             ->setSort(false)
             ->setScreening(true)
             ->setHandler(function ($data) {
-                if($data && $data->id) {
+                if ($data && $data->id) {
                     return '<input type="checkbox" class="js-adminCheckboxRow" value="' . $data->id . '">';
                 }
+
                 return '';
             });
     }

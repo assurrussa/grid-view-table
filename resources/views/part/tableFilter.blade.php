@@ -5,7 +5,10 @@
 use Assurrussa\GridView\Support\Column;
 ?>
 <tr>
-    <?php foreach($data->headers as $header) { ?>
+    <?php foreach($data->headers as $header) {
+    if ($header->key === Column::ACTION_STRING_TR) {
+        continue;
+    } ?>
     <td>
         <?php if(count($header->filter)) { ?>
         <?php if($header->filter[Column::FILTER_KEY_MODE] === Column::FILTER_TYPE_STRING) { ?>

@@ -4,16 +4,8 @@
  */
 use Assurrussa\GridView\Support\Column;
 
-$sortName = 'id';
-if($requestSortName = request()->get('sort')) {
-    $sortName = $requestSortName;
-}
-$orderBy = Column::FILTER_ORDER_BY_ASC;
-if($requestOrderBy = request()->get('by')) {
-    $orderBy = (strtolower($requestOrderBy) === Column::FILTER_ORDER_BY_ASC)
-            ? Column::FILTER_ORDER_BY_ASC
-            : Column::FILTER_ORDER_BY_DESC;
-}
+$sortName = $data->sortName;
+$orderBy = $data->orderBy;
 ?>
 <div class="content-box">
     <input type="hidden" id="js-amiOrderBy" name="by" value="<?= $orderBy; ?>">
@@ -22,18 +14,21 @@ if($requestOrderBy = request()->get('by')) {
         <thead>
         <tr>
             <?php foreach($data->headers as $header) {
-            if($sortName == $header->key) {
+            if ($header->key === Column::ACTION_STRING_TR) {
+                continue;
+            }
+            if ($sortName == $header->key) {
                 $orderByResult = $header->sort ? 'arrow ' . $orderBy : '';
             } else {
                 $orderByResult = $header->sort ? 'arrow ' . Column::FILTER_ORDER_BY_ASC : '';
             }
             ?>
             <th id="js-amiTableHeader<?= $data->getElementName($header->key); ?>"
-                class="<?= $requestSortName === $header->key ? 'active' : ''; ?> js-amiTableHeader"
+                class="<?= $sortName === $header->key ? 'active' : ''; ?> js-amiTableHeader"
                 data-name="<?= $header->key; ?>">
                 <?= ($header->screening && ($header->key === 'checkbox'))
-                        ? $header->value
-                        : e($header->value); ?>
+                    ? $header->value
+                    : e($header->value); ?>
                 <span class="<?= $orderByResult; ?>"></span>
             </th>
             <?php } ?>
@@ -45,9 +40,19 @@ if($requestOrderBy = request()->get('by')) {
         <!-- ============================== FILTER =============================== -->
 
         <!-- ============================== BODY =============================== -->
-        <?php foreach($data->data->items() as $item) { ?>
-        <tr class="js-loaderBody">
-            <?php foreach($data->headers as $header) { ?>
+        <?php foreach($data->data->items() as $item) {
+        $classString = '';
+        foreach ($data->headers as $header) {
+            if ($header->key === Column::ACTION_STRING_TR) {
+                $classString = e($item[$header->key]);
+            }
+        }
+        ?>
+        <tr class="js-loaderBody <?= $classString; ?>">
+            <?php foreach($data->headers as $header) {
+            if ($header->key === Column::ACTION_STRING_TR) {
+                continue;
+            } ?>
             <td>
                 <?= $header->screening ? $item[$header->key] : e($item[$header->key]); ?>
             </td>

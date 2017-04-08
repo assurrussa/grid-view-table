@@ -2,19 +2,6 @@
 /**
  * @var \Assurrussa\GridView\Helpers\GridViewResult $data
  */
-use Assurrussa\GridView\GridView;
-use Assurrussa\GridView\Support\Column;
-
-$sortName = 'id';
-if($requestSortName = request()->get('sort')) {
-    $sortName = $requestSortName;
-}
-$orderBy = Column::FILTER_ORDER_BY_ASC;
-if($requestOrderBy = request()->get('by')) {
-    $orderBy = (strtolower($requestOrderBy) === Column::FILTER_ORDER_BY_ASC)
-            ? Column::FILTER_ORDER_BY_ASC
-            : Column::FILTER_ORDER_BY_DESC;
-}
 ?>
 <div class="box">
     <form action=""></form>
