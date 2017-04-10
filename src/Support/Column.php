@@ -57,6 +57,8 @@ class Column implements ColumnInterface
     const FILTER_KEY_NAME = 'name';
     const FILTER_KEY_DATA = 'data';
     const FILTER_KEY_MODE = 'mode';
+    const FILTER_KEY_CLASS = 'class';
+    const FILTER_KEY_STYLE = 'style';
 
     /**
      * @property string
@@ -216,32 +218,54 @@ class Column implements ColumnInterface
      * @param string                               $field Имя поля которое будет фильтроваться
      * @param array|\Illuminate\Support\Collection $array Массив вида [1 => 'name', ...], для селекта
      * @param string                               $mode  Режим
+     * @param string                               $class
+     * @param string                               $style
      *
      * @return $this
      */
-    public function setFilter($field, $array, $mode = self::FILTER_TYPE_SELECT)
+    public function setFilter($field, $array, $mode = self::FILTER_TYPE_SELECT, $class = '', $style = '')
     {
         if ($array instanceof \Illuminate\Support\Collection) {
             $array = $array->toArray();
         }
         $this->filter = [
-            self::FILTER_KEY_NAME => $field,
-            self::FILTER_KEY_DATA => $array,
-            self::FILTER_KEY_MODE => $mode,
+            self::FILTER_KEY_NAME  => $field,
+            self::FILTER_KEY_DATA  => $array,
+            self::FILTER_KEY_MODE  => $mode,
+            self::FILTER_KEY_CLASS => $class,
+            self::FILTER_KEY_STYLE => $style,
         ];
 
         return $this;
     }
 
     /**
+     * Filter for select
+     *
+     * @param string                               $field Имя поля которое будет фильтроваться
+     * @param array|\Illuminate\Support\Collection $array Массив вида [1 => 'name', ...], для селекта
+     * @param string                               $mode  Режим
+     * @param string                               $class
+     * @param string                               $style
+     *
+     * @return $this
+     */
+    public function setFilterSelect($field, $array, $class = '', $style = '')
+    {
+        return $this->setFilter($field, $array, self::FILTER_TYPE_SELECT, $class, $style);
+    }
+
+    /**
      * @param string $field
      * @param string $string
+     * @param string $class
+     * @param string $style
      *
      * @return Column
      */
-    public function setFilterString($field, $string = '')
+    public function setFilterString($field, $string = '', $class = '', $style = '')
     {
-        return $this->setFilter($field, $string, self::FILTER_TYPE_STRING);
+        return $this->setFilter($field, $string, self::FILTER_TYPE_STRING, $class, $style);
     }
 
     /**
@@ -249,17 +273,19 @@ class Column implements ColumnInterface
      * @param string $string
      * @param bool   $active
      * @param string $format
+     * @param string $class
+     * @param string $style
      *
      * @return Column
      */
-    public function setFilterDate($field, $string = '', $active = true, $format = null)
+    public function setFilterDate($field, $string = '', $active = true, $format = null, $class = '', $style = '')
     {
         $this->setDateActive($active);
         if ($format) {
             $this->setDateFormat($format);
         }
 
-        return $this->setFilter($field, $string, self::FILTER_TYPE_DATE);
+        return $this->setFilter($field, $string, self::FILTER_TYPE_DATE, $class, $style);
     }
 
     /**
