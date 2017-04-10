@@ -17,7 +17,8 @@ use Assurrussa\GridView\Support\Column;
                    name="<?= $header->filter[Column::FILTER_KEY_NAME]; ?>"
                    value="<?= request()->get($header->filter[Column::FILTER_KEY_NAME]); ?>"
                    id="js-textFilter_<?= $header->filter[Column::FILTER_KEY_NAME]; ?>"
-                   class="form-control"
+                   class="form-control <?= e($header->filter[Column::FILTER_KEY_CLASS]); ?>"
+                   style="<?= e($header->filter[Column::FILTER_KEY_STYLE]); ?>"
                    data-mode="<?= $header->filter[Column::FILTER_KEY_MODE]; ?>">
         </div>
         <?php } elseif($header->filter[Column::FILTER_KEY_MODE] === Column::FILTER_TYPE_DATE) { ?>
@@ -26,7 +27,8 @@ use Assurrussa\GridView\Support\Column;
                    name="<?= $header->filter[Column::FILTER_KEY_NAME]; ?>"
                    value="<?= request()->get($header->filter[Column::FILTER_KEY_NAME]); ?>"
                    id="js-textFilter_<?= $header->filter[Column::FILTER_KEY_NAME]; ?>"
-                   class="form-control"
+                   class="form-control <?= e($header->filter[Column::FILTER_KEY_CLASS]); ?>"
+                   style="<?= e($header->filter[Column::FILTER_KEY_STYLE]); ?>"
                    data-mode="<?= $header->filter[Column::FILTER_KEY_MODE]; ?>">
             <span class="input-group-addon">
                                 <span class="glyphicon glyphicon-time"></span>
@@ -35,7 +37,8 @@ use Assurrussa\GridView\Support\Column;
         <?php } else { ?>
         <select name="<?= $header->filter[Column::FILTER_KEY_NAME]; ?>"
                 id="js-selectFilter_<?= $header->filter[Column::FILTER_KEY_NAME]; ?>"
-                class="js-selectFilter form-control"
+                class="js-selectFilter form-control <?= e($header->filter[Column::FILTER_KEY_CLASS]); ?>"
+                style="<?= e($header->filter[Column::FILTER_KEY_STYLE]); ?>"
                 data-mode="<?= $header->filter[Column::FILTER_KEY_MODE]; ?>">
             <option disabled><?= \Assurrussa\GridView\GridView::trans('grid.selectFilter'); ?></option>
             <option value="" selected></option>
