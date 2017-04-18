@@ -34,7 +34,9 @@ use Assurrussa\GridView\Support\Column;
                                 <span class="glyphicon glyphicon-time"></span>
                             </span>
         </div>
-        <?php } else { ?>
+        <?php } else {
+        $filterValue = request()->get($header->filter[Column::FILTER_KEY_NAME], null);
+        ?>
         <select name="<?= $header->filter[Column::FILTER_KEY_NAME]; ?>"
                 id="js-selectFilter_<?= $header->filter[Column::FILTER_KEY_NAME]; ?>"
                 class="js-selectFilter form-control <?= e($header->filter[Column::FILTER_KEY_CLASS]); ?>"
@@ -44,7 +46,7 @@ use Assurrussa\GridView\Support\Column;
             <option value="" selected></option>
             <?php foreach($header->filter[Column::FILTER_KEY_DATA] as $key => $name) { ?>
             <option value="<?= $key; ?>"
-            <?= request()->get($header->filter[Column::FILTER_KEY_NAME]) == $key ? 'selected' : ''; ?>
+            <?= $filterValue === $key || $filterValue === (string)$key ? 'selected' : ''; ?>
             >
                 <?= $name; ?>
             </option>
