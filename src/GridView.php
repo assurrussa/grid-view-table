@@ -482,7 +482,7 @@ class GridView implements GridInterface
     {
         if (count($this->_request) > 0) {
             foreach ($this->_request as $scope => $value) {
-                if (!empty($value)) {
+                if (!empty($value) || $value === 0 || $value === '0') {
                     //checked scope method for model
                     if (method_exists($this->_query->getModel(), 'scope' . camel_case($scope))) {
                         $this->_query->{camel_case($scope)}($value);
