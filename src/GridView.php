@@ -43,6 +43,7 @@ class GridView implements GridInterface
     /** @var string */
     public $sortName;
     public $sortNameDefault = 'id';
+    public $defaultCountItems = 10;
     /** @var array */
     public $counts;
     /** @var bool */
@@ -87,7 +88,7 @@ class GridView implements GridInterface
         $this->buttons = $buttons;
         $this->inputs = $inputs;
         $this->pagination = $eloquentPagination;
-        $this->counts = $this->getConfig('counts', [
+        $this->counts = $this->getConfig('limit', [
             10  => 10,
             25  => 25,
             100 => 100,
@@ -299,6 +300,18 @@ class GridView implements GridInterface
     }
 
     /**
+     * @param int $defaultCountItems
+     *
+     * @return GridView
+     */
+    public function setDefaultCountItems(int $defaultCountItems): GridView
+    {
+        $this->defaultCountItems = $defaultCountItems;
+
+        return $this;
+    }
+
+    /**
      * @param bool $searchInput
      *
      * @return $this
@@ -421,7 +434,7 @@ class GridView implements GridInterface
         $this->page = (int)$this->_request->pull('page', 1);
         $this->orderBy = $this->_request->pull('by', $this->getOrderBy());
         $this->search = $this->_request->pull('search', '');
-        $this->limit = (int)$this->_request->pull('count', 10);
+        $this->limit = $this->countItems();
         $this->sortName = $this->_request->pull('sort', $this->getSortName());
         $export = (bool)$this->_request->pull('export', false);
 
@@ -579,6 +592,21 @@ class GridView implements GridInterface
         }
 
         return false;
+    }
+
+    /**
+     * @return int
+     */
+    protected function countItems(): int
+    {
+        $count = $this->_request->has('count')
+            ? $this->_request->pull('count')
+            : array_first($this->counts);
+        if (!isset($this->counts[$count])) {
+            $count = $this->defaultCountItems;
+        }
+
+        return (int)$count;
     }
 
     /**
