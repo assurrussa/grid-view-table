@@ -113,6 +113,14 @@ class GridView implements GridInterface
     }
 
     /**
+     *
+     *      example array $fields = [
+     *                      'ID'            => 'id',
+     *                      'Time'          => 'setup_at',
+     *                      0               => 'brand.name',
+     *                      'Name'          => function() {return 'name';},
+     *                  ];
+     *
      * @param array $array
      *
      * @return $this
