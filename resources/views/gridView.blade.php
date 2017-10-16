@@ -3,7 +3,7 @@
  * @var \Assurrussa\GridView\Helpers\GridViewResult $data
  */
 ?>
-<form id="<?= $data->getElementName(); ?>" action="">
+<form id="<?= $data->getElementName(); ?>" action="<?= $data->formAction; ?>">
     @include('amiGrid::part.grid', ['data' => $data])
     <div id="js-loadingNotification" class="position-fixed-center">
         <div class="cssload-loader"></div>
@@ -80,199 +80,181 @@
     }
 </style>
 @push('scripts')
-<script>
-    $(function () {
-        'use strict';
-        var timer, milliSeconds = 600;
+    <script>
+        $(function () {
+            'use strict';
 
-        window.AmiGridJS = {
-            /**
-             * Initialize
-             */
-            initialize: function () {
-                this.modules();
-                this.setUpListeners();
-            },
-            /**
-             * Modules
-             */
-            modules: function () {
-            },
-            /**
-             * Set up listeners
-             */
-            setUpListeners: function () {
-            },
-            /**
-             *
-             */
-            loadingShow: function () {
-                $('#js-loadingNotification').show();
-                $('#js-loadCatalogItems').find('.js-loaderBody').css('opacity', 0.3);
-            },
-            /**
-             *
-             */
-            loadingHide: function () {
-                $('#js-loadingNotification').hide();
-            },
-            /**
-             *
-             * @param url
-             * @param data
-             */
-            getEntities: function (url, data) {
-                data = data == 'undefined' ? [] : data;
-                clearTimeout(timer);
-                timer = setTimeout(function () {
-                    $.ajax({
-                        url: url,
-                        data: data,
-                        onDropdownHide: function (event) {
-                            alert('Dropdown closed.');
-                        }
-                    }).done(function (data) {
-                        AmiGridJS.loadingHide();
-                        $('#<?= $data->getElementName(); ?>').html(data);
-                    }).fail(function () {
-                        console.info('could not be loaded.');
-                    });
-                }, milliSeconds);
-            },
-            /**
-             *
-             */
-            filterTableHeader: function (e) {
-                var $that = $(this),
-                        $children = $that.children('span');
-                if ($that.find('input').length == 1) {
-                    return;
-                }
-                e.preventDefault();
-
-                if ($children.hasClass('asc')) {
-                    $children.removeClass('asc').addClass('desc');
-                    $that.siblings().removeClass('active');
-                    $that.removeClass('active');
-                    $('#js-amiOrderBy').val('desc');
-                } else if ($children.hasClass('desc')) {
-                    $('#js-amiOrderBy').val('asc');
-                    $children.removeClass('desc').addClass('asc');
-                    $that.siblings().removeClass('active');
-                    $that.removeClass('active');
-                } else {
-                    return;
-                }
-                $('#js-amiSortName').val($that.data('name'));
-                $that.addClass('active');
-
-                clearTimeout(timer);
-                timer = setTimeout(function () {
-                    $('#<?= $data->getElementName(); ?> #js-filterButtonSubmitForm').click();
-                }, milliSeconds);
-            },
-            /**
-             *
-             */
-            filterCheckedChanged: function (e) {
-                e.preventDefault();
-                clearTimeout(timer);
-                timer = setTimeout(function () {
-                    $('#<?= $data->getElementName(); ?> #js-filterButtonSubmitForm').click();
-                }, milliSeconds);
-            },
-            /**
-             *
-             */
-            filterPagination: function (e) {
-                e.preventDefault();
-                var $button = $(this),
-                        url = $button.attr('href');
-                AmiGridJS.loadingShow();
-                AmiGridJS.getEntities(url);
-                window.history.pushState("", "", url);
-            },
-            /**
-             *
-             */
-            filterSearchClearSubmit: function (e) {
-                e.preventDefault();
-                var $that = $(this),
-                        url = window.location.pathname;
-                AmiGridJS.loadingShow();
-                AmiGridJS.getEntities(url);
-                window.history.pushState("", "", url);
-            },
-            /**
-             *
-             */
-            filterSubmitForm: function (e) {
-                e.preventDefault();
-                var $form = $(this).parents('form'),
-                        data = $form.serializeArray(),
-                        url = $form.attr('action'),
-                        dataResult = [],
-                        result;
-                $(data).each(function (i, elem) {
-                    if (elem.name == '_token') {
-                    } else {
-                        dataResult.push(elem);
+            window.AmiGridJS = {
+                gridId: 'js-amiGridList_1',
+                eventPopstate: true,
+                timer: null,
+                milliSeconds: 600,
+                /**
+                 * Initialize
+                 */
+                init: function () {
+                    this.initEventPopstate();
+                    $(document).on('click', '#' + this.gridId + ' .js-amiTableHeader', this.filterTableHeader);
+                    $(document).on('input', '#' + this.gridId + ' #js-amiSearchInput', this.filterCheckedChanged);
+                    $(document).on('input', '#' + this.gridId + ' .js-textFilter > input[type="text"]', this.filterCheckedChanged);
+                    $(document).on('change', '#' + this.gridId + ' .js-selectFilter', this.filterCheckedChanged);
+                    $(document).on('change', '#' + this.gridId + ' #js-amiSelectCount', this.filterCheckedChanged);
+                    $(document).on('click', '#' + this.gridId + ' .js-filterSearchPagination .pagination a', this.filterPagination);
+                    $(document).on('click', '#' + this.gridId + ' #js-filterSearchClearSubmit', this.filterSearchClearSubmit);
+                    $(document).on('click', '#' + this.gridId + ' #js-filterButtonSubmitForm', this.filterSubmitForm);
+                    $(document).on('change', '#' + this.gridId + ' .js-adminSelectAll', this.filterSelectCheckedInput);
+                    $(document).delegate('#' + this.gridId + ' .js-adminCheckboxRow', 'change', this.filterCheckboxArrow);
+                },
+                /**
+                 *
+                 */
+                initEventPopstate: function () {
+                    if (this.eventPopstate) {
+                        // Глобальные события
+                        addEventListener("popstate", function (e) {
+                            e.preventDefault();
+                            window.location = window.location.href;
+                        }, false);
                     }
-                });
-                AmiGridJS.loadingShow();
-                AmiGridJS.getEntities(url, dataResult);
-                result = $.param(dataResult);
-                if (result != '') {
-                    result = '?' + result;
-                }
-                window.history.pushState("", "", url + result);
-            },
-            /**
-             *
-             */
-            filterSelectCheckedInput: function () {
-                var checked = $(this).is(':checked');
-                $('.js-adminCheckboxRow').prop('checked', checked).filter(':first').change();
-            },
-            /**
-             *
-             */
-            filterCheckboxArrow: function () {
-                var selected = [];
-                $('.js-adminCheckboxRow:checked').each(function () {
-                    selected.push($(this).val());
-                });
-                $('.js-btnCustomAction').each(function () {
-                    var $this = $(this);
-                    var url = $this.data('href') + selected.join(',');
-                    $this.attr('href', url);
-                });
-            },
-            /**
-             * Распрсивает json текст и выводит нужные сообщения.
-             * тип массива [{message: '...', type: '...', ...}, {...}]
-             *
-             * @param data
-             */
-            notifyParseJson: function (data) {
-                // list = $.parseJSON(data);
-                $(data).each(function (i, element) {
-                    $.notify({message: element.message}, {type: element.type});
-                });
-            }
-        };
-        AmiGridJS.initialize();
+                },
+                /**
+                 *
+                 */
+                loadingShow: function () {
+                    $('#js-loadingNotification').show();
+                    $('#js-loadCatalogItems').find('.js-loaderBody').css('opacity', 0.3);
+                },
+                /**
+                 *
+                 */
+                loadingHide: function () {
+                    $('#js-loadingNotification').hide();
+                },
+                /**
+                 *
+                 * @param  url
+                 * @param  data
+                 */
+                getEntities: function (url, data) {
+                    data = data == 'undefined' ? [] : data;
+                    var dataResult = [];
 
-        $(document).on('click', '#<?= $data->getElementName(); ?> .js-amiTableHeader', AmiGridJS.filterTableHeader);
-        $(document).on('input', '#<?= $data->getElementName(); ?> #js-amiSearchInput', AmiGridJS.filterCheckedChanged);
-        $(document).on('input', '#<?= $data->getElementName(); ?> .js-textFilter > input[type="text"]', AmiGridJS.filterCheckedChanged);
-        $(document).on('change', '#<?= $data->getElementName(); ?> .js-selectFilter', AmiGridJS.filterCheckedChanged);
-        $(document).on('change', '#<?= $data->getElementName(); ?> #js-amiSelectCount', AmiGridJS.filterCheckedChanged);
-        $(document).on('click', '#<?= $data->getElementName(); ?> .js-filterSearchPagination .pagination a', AmiGridJS.filterPagination);
-        $(document).on('click', '#<?= $data->getElementName(); ?> #js-filterSearchClearSubmit', AmiGridJS.filterSearchClearSubmit);
-        $(document).on('click', '#<?= $data->getElementName(); ?> #js-filterButtonSubmitForm', AmiGridJS.filterSubmitForm);
-        $(document).on('change', '#<?= $data->getElementName(); ?> .js-adminSelectAll', AmiGridJS.filterSelectCheckedInput);
-        $(document).delegate('#<?= $data->getElementName(); ?> .js-adminCheckboxRow', 'change', AmiGridJS.filterCheckboxArrow);
-    });
-</script>
+                    dataResult.push({name: 'location', value: window.location.pathname});
+                    $(data).each(function (i, elem) {
+                        if (elem.name == '_token') {
+                        } else {
+                            dataResult.push(elem);
+                        }
+                    });
+                    clearTimeout(this.timer);
+                    this.timer = setTimeout(function () {
+                        AmiGridJS.loadingShow();
+                        $.ajax({
+                            url: url,
+                            data: dataResult,
+                        }).done(function (data) {
+                            AmiGridJS.loadingHide();
+                            window.history.pushState("", "", data.url);
+                            $('#' + AmiGridJS.gridId + '').html(data.data);
+                        }).fail(function () {
+                            console.info('could not be loaded.');
+                        });
+                    }, this.milliSeconds);
+                },
+                /**
+                 *
+                 */
+                filterTableHeader: function (e) {
+                    var $that = $(this),
+                        $children = $that.children('span');
+                    if ($that.find('input').length == 1) {
+                        return;
+                    }
+                    e.preventDefault();
+
+                    if ($children.hasClass('asc')) {
+                        $children.removeClass('asc').addClass('desc');
+                        $that.siblings().removeClass('active');
+                        $that.removeClass('active');
+                        $('#js-amiOrderBy').val('desc');
+                    } else if ($children.hasClass('desc')) {
+                        $('#js-amiOrderBy').val('asc');
+                        $children.removeClass('desc').addClass('asc');
+                        $that.siblings().removeClass('active');
+                        $that.removeClass('active');
+                    } else {
+                        return;
+                    }
+                    $('#js-amiSortName').val($that.data('name'));
+                    $that.addClass('active');
+
+                    clearTimeout(this.timer);
+                    this.timer = setTimeout(function () {
+                        $('#' + AmiGridJS.gridId + ' #js-filterButtonSubmitForm').click();
+                    }, this.milliSeconds);
+                },
+                /**
+                 *
+                 */
+                filterCheckedChanged: function (e) {
+                    e.preventDefault();
+                    clearTimeout(this.timer);
+                    this.timer = setTimeout(function () {
+                        $('#' + AmiGridJS.gridId + ' #js-filterButtonSubmitForm').click();
+                    }, this.milliSeconds);
+                },
+                /**
+                 *
+                 */
+                filterPagination: function (e) {
+                    e.preventDefault();
+                    var $button = $(this),
+                        url = $button.attr('href');
+                    AmiGridJS.getEntities(url);
+                },
+                /**
+                 *
+                 */
+                filterSearchClearSubmit: function (e) {
+                    e.preventDefault();
+                    var $that = $(this),
+                        url = window.location.pathname;
+                    AmiGridJS.getEntities(url);
+                },
+                /**
+                 *
+                 */
+                filterSubmitForm: function (e) {
+                    e.preventDefault();
+                    var $form = $(this).parents('form'),
+                        data = $form.serializeArray(),
+                        url = $form.attr('action');
+                    AmiGridJS.getEntities(url, data);
+                },
+                /**
+                 *
+                 */
+                filterSelectCheckedInput: function () {
+                    var checked = $(this).is(':checked');
+                    $('.js-adminCheckboxRow').prop('checked', checked).filter(':first').change();
+                },
+                /**
+                 *
+                 */
+                filterCheckboxArrow: function () {
+                    var selected = [];
+                    $('.js-adminCheckboxRow:checked').each(function () {
+                        selected.push($(this).val());
+                    });
+                    $('.js-btnCustomAction').each(function () {
+                        var $this = $(this);
+                        var url = $this.data('href') + selected.join(',');
+                        $this.attr('href', url);
+                    });
+                },
+            };
+            AmiGridJS.gridId = '<?= $data->getElementName(); ?>';
+            AmiGridJS.init();
+        });
+    </script>
 @endpush

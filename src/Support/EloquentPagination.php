@@ -78,15 +78,18 @@ class EloquentPagination implements PaginationInterface
     }
 
     /**
-     * @param string $view
-     * @return string
+     * @param null   $view
+     * @param array  $data
+     * @param string $formAction
+     *
+     * @return \Illuminate\Support\HtmlString|string
      */
-    public function render($view = null)
+    public function render($view = null, array $data = [], string $formAction = '')
     {
         if(!$this->_data) {
             return '';
         }
-        return $this->_data->appends(request()->all())->render($view);
+        return $this->_data->setPath($formAction)->appends($data)->render($view);
     }
 
     /**

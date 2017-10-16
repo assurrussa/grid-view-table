@@ -10,6 +10,9 @@ use Illuminate\Pagination\LengthAwarePaginator;
 
 /**
  * @property string                                      $id
+ * @property string                                      $location
+ * @property string                                      $formAction
+ * @property string                                      $requestParams
  * @property \Illuminate\Pagination\LengthAwarePaginator $data
  * @property array                                       $pagination
  * @property Column[]                                    $headers
@@ -30,6 +33,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
  */
 class GridViewResult
 {
+
     /**
      * Get the instance as an array.
      *

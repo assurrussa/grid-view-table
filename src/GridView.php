@@ -42,35 +42,34 @@ class GridView implements GridInterface
     public $searchInput = false;
     /** @var string */
     public $sortName;
+    /** @var string */
     public $sortNameDefault = 'id';
+    /** @var int */
     public $defaultCountItems = 10;
     /** @var array */
     public $counts;
     /** @var bool */
     public $export = false;
-    /**
-     * @var bool
-     */
+    /**  @var bool */
     public $visibleColumn;
-
     /** @var Columns */
     public $columns;
-
     /** @var Buttons */
     public $buttons;
-
     /** @var Inputs */
     public $inputs;
-
     /** @var EloquentPagination */
     public $pagination;
-
+    /** @var string */
+    protected $locationUrl = '';
+    /** @var array */
+    protected $requestParams = [];
+    /** @var string */
+    protected $formAction = '';
     /** @var array */
     private $_config;
-
     /** @var \Illuminate\Support\Collection $_request */
     private $_request;
-
     /** @var \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder|static */
     private $_query;
 
@@ -204,7 +203,10 @@ class GridView implements GridInterface
         if (request()->ajax() || request()->wantsJson()) {
             $path = $path === 'gridView' ? 'part.grid' : $path;
 
-            return static::view($path, $data, $mergeData)->render();
+            return [
+                'url'  => $data['data']->location . '?' . http_build_query($data['data']->requestParams),
+                'data' => static::view($path, $data, $mergeData)->render(),
+            ];
         }
 
         return static::view($path, $data, $mergeData)->render();
@@ -252,6 +254,9 @@ class GridView implements GridInterface
 
         $gridViewResult = new \Assurrussa\GridView\Helpers\GridViewResult();
         $gridViewResult->id = $this->getId();
+        $gridViewResult->formAction = $this->formAction;
+        $gridViewResult->location = $this->locationUrl;
+        $gridViewResult->requestParams = $this->requestParams;
         $gridViewResult->data = $this->pagination->get($this->page, $this->limit);
         $gridViewResult->pagination = $this->getPaginationRender();
         $gridViewResult->headers = $this->columns->toArray();
@@ -382,6 +387,28 @@ class GridView implements GridInterface
     }
 
     /**
+     * @param string $url
+     *
+     * @return $this
+     */
+    public function setFormAction(string $url)
+    {
+        $this->formAction = $url;
+
+        return $this;
+    }
+
+    /**
+     * @param null $text
+     *
+     * @return string
+     */
+    public function getFormAction(): string
+    {
+        return $this->formAction;
+    }
+
+    /**
      * @return bool
      */
     public function isExport(): bool
@@ -439,6 +466,8 @@ class GridView implements GridInterface
             throw new ColumnsException();
         }
 
+        $this->locationUrl = $this->_request->pull('location');
+        $this->requestParams = $this->_request->all();
         $this->page = (int)$this->_request->pull('page', 1);
         $this->orderBy = $this->_request->pull('by', $this->getOrderBy());
         $this->search = $this->_request->pull('search', '');
@@ -472,7 +501,7 @@ class GridView implements GridInterface
      */
     protected function getPaginationRender()
     {
-        return $this->pagination->render($this->getConfig('pagination'));
+        return $this->pagination->render($this->getConfig('pagination'), $this->requestParams, $this->getFormAction());
     }
 
     /**
@@ -508,6 +537,7 @@ class GridView implements GridInterface
                     if (method_exists($this->_query->getModel(), 'scope' . camel_case($scope))) {
                         $this->_query->{camel_case($scope)}($value);
                     } else {
+                        dd($this->_request);
                         $values = explode(',', $value);
                         if (count($values) > 1) {
                             $this->filterSearch($scope, $values[0], '>');
@@ -593,9 +623,7 @@ class GridView implements GridInterface
      */
     protected function hasFilterExecuteForCyrillicColumn($search, $column)
     {
-        if (!preg_match("/[\w]+/i",
-                $search) && \Assurrussa\GridView\Enums\FilterEnum::hasFilterExecuteForCyrillicColumn($column)
-        ) {
+        if (!preg_match("/[\w]+/i", $search) && \Assurrussa\GridView\Enums\FilterEnum::hasFilterExecuteForCyrillicColumn($column)) {
             return true;
         }
 
