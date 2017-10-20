@@ -537,7 +537,6 @@ class GridView implements GridInterface
                     if (method_exists($this->_query->getModel(), 'scope' . camel_case($scope))) {
                         $this->_query->{camel_case($scope)}($value);
                     } else {
-                        dd($this->_request);
                         $values = explode(',', $value);
                         if (count($values) > 1) {
                             $this->filterSearch($scope, $values[0], '>');
