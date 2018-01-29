@@ -1,5 +1,8 @@
 <?php
 
+declare(strict_types=1);
+
+
 namespace Assurrussa\GridView\Helpers;
 
 use Assurrussa\GridView\Support\Button;
@@ -35,11 +38,9 @@ class GridViewResult
 {
 
     /**
-     * Get the instance as an array.
-     *
      * @return array
      */
-    public function toArray()
+    public function toArray(): array
     {
         $array = (array)$this;
         foreach ($array as $key => $items) {
@@ -60,17 +61,17 @@ class GridViewResult
     /**
      * @return string
      */
-    public function toJson()
+    public function toJson(): string
     {
         return json_encode($this->toArray());
     }
 
     /**
-     * @param null $text
+     * @param string|null $text
      *
      * @return string
      */
-    public function getElementName($text = null)
+    public function getElementName(string $text = null): string
     {
         if ($text) {
             $text = str_replace('.', '_', $text);
@@ -82,10 +83,10 @@ class GridViewResult
     }
 
     /**
-     * @param $property
-     * @param $value
+     * @param string $property
+     * @param        $value
      */
-    public function __set($property, $value)
+    public function __set(string $property, $value): void
     {
         if (is_array($value)) {
             foreach ($value as $keyItem => $valueItem) {

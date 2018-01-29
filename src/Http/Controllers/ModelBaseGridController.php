@@ -1,5 +1,8 @@
 <?php
 
+declare(strict_types=1);
+
+
 namespace Assurrussa\GridView\Http\Controllers;
 
 use Assurrussa\GridView\GridView;

@@ -1,13 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Assurrussa\GridView;
 
 use Assurrussa\GridView\Exception\ColumnsException;
 use Assurrussa\GridView\Exception\QueryException;
 use Assurrussa\GridView\Export\ExportData;
+use Assurrussa\GridView\Interfaces\ButtonInterface;
+use Assurrussa\GridView\Interfaces\ColumnInterface;
 use Assurrussa\GridView\Interfaces\GridInterface;
 use Assurrussa\GridView\Models\Model;
-use Assurrussa\GridView\Support\ButtonItem;
 use Assurrussa\GridView\Support\Button;
 use Assurrussa\GridView\Support\Buttons;
 use Assurrussa\GridView\Support\Column;
@@ -16,6 +19,7 @@ use Assurrussa\GridView\Support\Columns;
 use Assurrussa\GridView\Support\EloquentPagination;
 use Assurrussa\GridView\Support\Input;
 use Assurrussa\GridView\Support\Inputs;
+use Illuminate\Contracts\Support\Renderable;
 
 /**
  * Class GridView
@@ -48,6 +52,8 @@ class GridView implements GridInterface
     public $defaultCountItems = 10;
     /** @var array */
     public $counts;
+    /** @var array */
+    public $filter;
     /** @var bool */
     public $export = false;
     /**  @var bool */
@@ -93,17 +99,20 @@ class GridView implements GridInterface
             100 => 100,
             200 => 200,
         ]);
-        $this->setVisibleColumn($this->getConfig('visibleColumn', true));
+        $this->filter = $this->getConfig('filter', [
+            'operator'    => 'like',
+            'beforeValue' => '',
+            'afterValue'  => '%',
+        ]);
+        $this->setVisibleColumn((bool)$this->getConfig('visibleColumn', true));
     }
 
     /**
-     * Added Builder Query
+     * @param \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder|static $query
      *
-     * @param \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder|\Eloquent $query
-     *
-     * @return $this
+     * @return GridInterface
      */
-    public function setQuery($query)
+    public function setQuery(\Illuminate\Database\Eloquent\Builder $query): GridInterface
     {
         $this->_query = $query;
         $this->pagination->setQuery($this->_query);
@@ -112,19 +121,19 @@ class GridView implements GridInterface
     }
 
     /**
+     * example:
+     * $fields = [
+     *             'ID'            => 'id',
+     *             'Time'          => 'setup_at',
+     *             0               => 'brand.name',
+     *             'Name'          => function() {return 'name';},
+     *         ];
      *
-     *      example array $fields = [
-     *                      'ID'            => 'id',
-     *                      'Time'          => 'setup_at',
-     *                      0               => 'brand.name',
-     *                      'Name'          => function() {return 'name';},
-     *                  ];
-     *
-     * @param array $array
+     * @param array $fields
      *
      * @return $this
      */
-    public function setFieldsForExport(array $array)
+    public function setFieldsForExport(array $array): GridInterface
     {
         $this->columns->setFields($array);
 
@@ -132,12 +141,11 @@ class GridView implements GridInterface
     }
 
     /**
-     * @return ButtonItem
+     * @return Button
      */
-    public function button()
+    public function button(): Button
     {
-        $button = new ButtonItem();
-        $button->setQuery($this->_query);
+        $button = new Button();
         $this->buttons->setButton($button);
 
         return $button;
@@ -146,7 +154,7 @@ class GridView implements GridInterface
     /**
      * @return Column
      */
-    public function column()
+    public function column(): Column
     {
         $column = new Column();
         $this->columns->setColumn($column);
@@ -157,7 +165,7 @@ class GridView implements GridInterface
     /**
      * @return Input
      */
-    public function input()
+    public function input(): Input
     {
         $input = new Input();
         $this->inputs->setInput($input);
@@ -166,11 +174,11 @@ class GridView implements GridInterface
     }
 
     /**
-     * @param Button[]|\Closure $action
+     * @param callable $action
      *
-     * @return Column
+     * @return ColumnInterface
      */
-    public function columnActions($action)
+    public function columnActions(Callable $action): ColumnInterface
     {
         return $this->column()->setActions($action);
     }
@@ -178,7 +186,7 @@ class GridView implements GridInterface
     /**
      * @return Button
      */
-    public function columnAction()
+    public function columnAction(): Button
     {
         return new Button();
     }
@@ -186,27 +194,28 @@ class GridView implements GridInterface
     /**
      * @return ColumnCeil
      */
-    public static function columnCeil()
+    public static function columnCeil(): ColumnCeil
     {
         return new ColumnCeil();
     }
 
     /**
-     * @param string $path
      * @param array  $data
+     * @param string $path
      * @param array  $mergeData
      *
-     * @return mixed
+     * @return string
+     * @throws \Throwable
      */
-    public function render($data = [], $path = 'gridView', $mergeData = [])
+    public function render(array $data = [], string $path = 'gridView', array $mergeData = []): string
     {
         if (request()->ajax() || request()->wantsJson()) {
             $path = $path === 'gridView' ? 'part.grid' : $path;
 
-            return [
+            return json_encode([
                 'url'  => $data['data']->location . '?' . http_build_query($data['data']->requestParams),
                 'data' => static::view($path, $data, $mergeData)->render(),
-            ];
+            ]);
         }
 
         return static::view($path, $data, $mergeData)->render();
@@ -221,7 +230,7 @@ class GridView implements GridInterface
      *
      * @return \Illuminate\View\View|\Illuminate\Contracts\View\Factory
      */
-    public static function view($view = null, $data = [], $mergeData = [])
+    public static function view(string $view = null, array $data = [], array $mergeData = []): Renderable
     {
         return view(self::NAME . '::' . $view, $data, $mergeData);
     }
@@ -236,7 +245,7 @@ class GridView implements GridInterface
      *
      * @return \Symfony\Component\Translation\TranslatorInterface|string
      */
-    public static function trans($id = null, $parameters = [], $domain = 'messages', $locale = null)
+    public static function trans(string $id = null, array $parameters = [], string $domain = 'messages', string $locale = null): string
     {
         return trans(self::NAME . '::' . $id, $parameters, $domain, $locale);
     }
@@ -248,7 +257,7 @@ class GridView implements GridInterface
      * @throws ColumnsException
      * @throws QueryException
      */
-    public function get()
+    public function get(): \Assurrussa\GridView\Helpers\GridViewResult
     {
         $this->fetch();
 
@@ -281,7 +290,7 @@ class GridView implements GridInterface
      *
      * @return GridView
      */
-    public function setId(string $id)
+    public function setId(string $id): GridInterface
     {
         $this->id = $id;
 
@@ -305,7 +314,7 @@ class GridView implements GridInterface
      *
      * @return GridView
      */
-    public function setVisibleColumn(bool $visibleColumn)
+    public function setVisibleColumn(bool $visibleColumn): GridInterface
     {
         $this->visibleColumn = $visibleColumn;
 
@@ -315,9 +324,9 @@ class GridView implements GridInterface
     /**
      * @param int $defaultCountItems
      *
-     * @return GridView
+     * @return GridInterface
      */
-    public function setDefaultCountItems(int $defaultCountItems): GridView
+    public function setDefaultCountItems(int $defaultCountItems): GridInterface
     {
         $this->defaultCountItems = $defaultCountItems;
 
@@ -329,7 +338,7 @@ class GridView implements GridInterface
      *
      * @return $this
      */
-    public function setSearchInput(bool $searchInput = false)
+    public function setSearchInput(bool $searchInput = false): GridInterface
     {
         $this->searchInput = $searchInput;
 
@@ -339,7 +348,7 @@ class GridView implements GridInterface
     /**
      * @return GridView
      */
-    public function setOrderByDesc()
+    public function setOrderByDesc(): GridInterface
     {
         $this->orderByDefault = Column::FILTER_ORDER_BY_DESC;
 
@@ -367,7 +376,7 @@ class GridView implements GridInterface
      *
      * @return $this
      */
-    public function setSortName(string $sortNameDefault)
+    public function setSortName(string $sortNameDefault): GridInterface
     {
         $this->sortNameDefault = $sortNameDefault;
 
@@ -379,7 +388,7 @@ class GridView implements GridInterface
      *
      * @return GridView
      */
-    public function setExport(bool $export)
+    public function setExport(bool $export): GridInterface
     {
         $this->export = $export;
 
@@ -391,7 +400,7 @@ class GridView implements GridInterface
      *
      * @return $this
      */
-    public function setFormAction(string $url)
+    public function setFormAction(string $url): GridInterface
     {
         $this->formAction = $url;
 
@@ -438,7 +447,7 @@ class GridView implements GridInterface
      *
      * @return mixed|null
      */
-    public function getConfig($key, $default = null)
+    protected function getConfig($key, $default = null)
     {
         if (isset($this->_config[$key])) {
             return $this->_config[$key];
@@ -448,11 +457,11 @@ class GridView implements GridInterface
     }
 
     /**
-     * @return $this|bool
+     * @return GridInterface
      * @throws ColumnsException
      * @throws QueryException
      */
-    protected function fetch()
+    protected function fetch(): GridInterface
     {
         if (!$this->_query) {
             throw new QueryException();
@@ -481,8 +490,8 @@ class GridView implements GridInterface
         }
         $this->filterOrderBy($this->sortName, $this->orderBy);
 
-        if ($this->isExport() && $export) {
-            return $this->getExport();
+        if ($this->isExport() && $export && $this->getExport()) {
+            return $this;
         }
 
         return $this;
@@ -491,7 +500,7 @@ class GridView implements GridInterface
     /**
      * @return bool
      */
-    protected function getExport()
+    protected function getExport(): bool
     {
         return (new ExportData())->fetch($this->_query, $this->columns->toFields());
     }
@@ -499,7 +508,7 @@ class GridView implements GridInterface
     /**
      * @return string
      */
-    protected function getPaginationRender()
+    protected function getPaginationRender(): string
     {
         return $this->pagination->render($this->getConfig('pagination'), $this->requestParams, $this->getFormAction());
     }
@@ -507,7 +516,7 @@ class GridView implements GridInterface
     /**
      * @return $this
      */
-    protected function _setRequest()
+    protected function _setRequest(): GridInterface
     {
         if (!$this->_request) {
             $this->_request = collect(request()->all());
@@ -518,17 +527,13 @@ class GridView implements GridInterface
 
     /**
      * Very simple filtration scopes.<br><br>
-     * Очень простая фильтрация скоупов.<br><br>
      *
-     * If you want to filter Scope by id or something, be sure to create the scope of the following form.<br><br>
-     * Если необходимо отфильтровать скоупы по id чему либо, обязательно нужно создать scope следующего вида.<br><br>
      * Example:
-     * * link to filter - `catalog_id=*`
      * * method - `public function scopeCatalogId($int) {}`
      *
      * @return \Illuminate\Support\Collection
      */
-    protected function filterScopes()
+    protected function filterScopes(): \Illuminate\Support\Collection
     {
         if (count($this->_request) > 0) {
             foreach ($this->_request as $scope => $value) {
@@ -542,7 +547,8 @@ class GridView implements GridInterface
                             $this->filterSearch($scope, $values[0], '>');
                             $this->filterSearch($scope, $values[1], '<');
                         } else {
-                            $this->filterSearch($scope, $value, 'like', '%', '%');
+                            $this->filterSearch($scope, $value, $this->filter['operator'], $this->filter['beforeValue'],
+                                $this->filter['afterValue']);
                         }
                     }
                 }
@@ -554,17 +560,21 @@ class GridView implements GridInterface
     }
 
     /**
-     * The method filters the data according<br><br>
-     * Метод фильтрует данные по словам<br>
+     * The method filters the data according
      *
      * @param string|int $search
-     * @param null       $value       word
-     * @param string     $delimiter   equal sign - '=', 'like' ...
+     * @param mixed|null $value       word
+     * @param string     $operator    equal sign - '=', 'like' ...
      * @param string     $beforeValue First sign before value
      * @param string     $afterValue  Last sign after value
      */
-    protected function filterSearch($search, $value = null, $delimiter = '=', $beforeValue = '', $afterValue = '')
-    {
+    protected function filterSearch(
+        string $search,
+        $value = null,
+        string $operator = '=',
+        string $beforeValue = '',
+        string $afterValue = ''
+    ): void {
         if ($search) {
             $value = trim($value);
             $search = trim($search);
@@ -576,7 +586,7 @@ class GridView implements GridInterface
                     $model,
                     $search,
                     $value,
-                    $delimiter,
+                    $operator,
                     $beforeValue,
                     $afterValue
                 ) {
@@ -584,7 +594,7 @@ class GridView implements GridInterface
                     $tableName = $model->getTable();
                     if ($value) {
                         if (Model::hasColumn($model, $search)) {
-                            $query->orWhere($tableName . '.' . $search, $delimiter,
+                            $query->orWhere($tableName . '.' . $search, $operator,
                                 $beforeValue . $value . $afterValue);
                         }
                     } else {
@@ -593,7 +603,7 @@ class GridView implements GridInterface
                                 continue;
                             }
                             if (Model::hasColumn($model, $column)) {
-                                $query->orWhere($tableName . '.' . $column, 'like', '%' . $search . '%');
+                                $query->orWhere($tableName . '.' . $column, $operator, $beforeValue . $search . $afterValue);
                             }
                         }
                     }
@@ -606,7 +616,7 @@ class GridView implements GridInterface
      * @param string $sortName
      * @param string $orderBy
      */
-    protected function filterOrderBy($sortName, $orderBy)
+    protected function filterOrderBy(string $sortName, string $orderBy): void
     {
         if ($sortName) {
             $this->_query->orderBy($this->_query->getModel()->getTable() . '.' . $sortName, $orderBy);
@@ -619,8 +629,10 @@ class GridView implements GridInterface
      *
      * @param string $search
      * @param string $column
+     *
+     * @return bool
      */
-    protected function hasFilterExecuteForCyrillicColumn($search, $column)
+    protected function hasFilterExecuteForCyrillicColumn(string $search, string $column): bool
     {
         if (!preg_match("/[\w]+/i", $search) && \Assurrussa\GridView\Enums\FilterEnum::hasFilterExecuteForCyrillicColumn($column)) {
             return true;
@@ -648,7 +660,7 @@ class GridView implements GridInterface
      * Check exists prepared columns<br><br>
      * Проверка существует ли предварительная подготовка данных.
      */
-    protected function _hasColumns()
+    protected function _hasColumns(): void
     {
         if (!$this->columns->count()) {
             $this->_prepareColumns();
@@ -659,7 +671,7 @@ class GridView implements GridInterface
      * The method takes the default column for any model<br><br>
      * Метод получает колонки по умолчанию для любой модели
      */
-    protected function _prepareColumns()
+    protected function _prepareColumns(): void
     {
         $model = $this->_query->getModel();
         $lists = \Schema::getColumnListing($model->getTable());
@@ -674,17 +686,22 @@ class GridView implements GridInterface
                 ->setSort(true);
         }
         $this->columnActions(function ($data) {
-            $pathNameForModel = strtolower(str_plural(camel_case(class_basename($data))));
             $buttons = [];
-            $buttons[] = $this->columnAction()->setActionDelete('amigrid.delete', [$pathNameForModel, $data->id]);
-            $buttons[] = $this->columnAction()->setActionShow('amigrid.show',
-                [$pathNameForModel, $data->id])->setHandler(function ($data) {
-                return false;
-            });
-            $buttons[] = $this->columnAction()->setActionEdit('amigrid.edit', [$pathNameForModel, $data->id]);
+            if($this->getConfig('routes')) {
+                $pathNameForModel = strtolower(str_plural(camel_case(class_basename($data))));
+                $buttons[] = $this->columnAction()->setActionDelete('amigrid.delete', [$pathNameForModel, $data->id]);
+                $buttons[] = $this->columnAction()->setActionShow('amigrid.show',
+                    [$pathNameForModel, $data->id])->setHandler(function ($data) {
+                    return false;
+                });
+                $buttons[] = $this->columnAction()->setActionEdit('amigrid.edit', [$pathNameForModel, $data->id]);
+            }
 
             return $buttons;
         });
-        $this->button()->setButtonCreate();
+        if($this->getConfig('routes')) {
+            $pathNameForModel = strtolower(str_plural(camel_case(class_basename($model))));
+            $this->button()->setButtonCreate(route('amigrid.create', [$pathNameForModel]));
+        }
     }
 }

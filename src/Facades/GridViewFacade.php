@@ -1,5 +1,8 @@
 <?php
 
+declare(strict_types=1);
+
+
 namespace Assurrussa\GridView\Facades;
 
 use Assurrussa\GridView\GridView;

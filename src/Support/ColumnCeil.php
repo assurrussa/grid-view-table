@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Assurrussa\GridView\Support;
 
 use Assurrussa\GridView\GridView;
@@ -19,22 +21,26 @@ class ColumnCeil
      * @param bool   $bool
      * @param string $checked
      * @param string $unchecked
+     *
      * @return string
      */
-    public function checked(bool $bool, $checked = '&check;', $unchecked = '-')
+    public function checked(bool $bool, string $checked = '&check;', string $unchecked = '-'): string
     {
         return $bool ? $checked : $unchecked;
     }
 
     /**
-     * @param string $link
-     * @param null   $title
-     * @param null   $view
+     * @param string      $link
+     * @param string|null $title
+     * @param string|null $view
+     *
      * @return string
+     * @throws \Throwable
      */
-    public function image($link, $title = null, $view = null)
+    public function image(string $link, string $title = null, string $view = null): string
     {
         $view = $view ?: 'column.linkImage';
+
         return GridView::view($view, [
             'link'  => $link,
             'title' => $title,
@@ -42,25 +48,28 @@ class ColumnCeil
     }
 
     /**
-     * @param \Illuminate\Support\Collection|array|object $data
-     * @param string                                      $title
-     * @param string                                      $titleAddition
-     * @param string                                      $class
-     * @param string                                      $delimiter
-     * @param string                                      $delimiterAddition
-     * @param null                                        $view
+     * @param             $data
+     * @param string|null $title
+     * @param string|null $titleAddition
+     * @param string|null $class
+     * @param string|null $delimiter
+     * @param string|null $delimiterAddition
+     * @param string|null $view
+     *
      * @return string
+     * @throws \Throwable
      */
     public function listToString(
         $data,
-        $title = null,
-        $titleAddition = null,
-        $class = null,
-        $delimiter = null,
-        $delimiterAddition = null,
-        $view = null
-    ) {
+        string $title = null,
+        string $titleAddition = null,
+        string $class = null,
+        string $delimiter = null,
+        string $delimiterAddition = null,
+        string $view = null
+    ): string {
         $view = $view ?: 'column.listToString';
+
         return GridView::view($view, [
             'data'              => $data,
             'title'             => $title,
@@ -72,22 +81,32 @@ class ColumnCeil
     }
 
     /**
-     * @param int    $id
-     * @param string $name
-     * @param string $class
-     * @param string $icon
-     * @param string $title
-     * @param string $originTitle
-     * @param null   $view
+     * @param string      $name
+     * @param string|null $id
+     * @param string|null $class
+     * @param string|null $icon
+     * @param string|null $title
+     * @param string|null $originTitle
+     * @param string|null $view
+     *
      * @return string
+     * @throws \Throwable
      */
-    public function filterButton($id, $name, $class = null, $icon = null, $title = null, $originTitle = null, $view = null)
-    {
+    public function filterButton(
+        string $name,
+        string $id = null,
+        string $class = null,
+        string $icon = null,
+        string $title = null,
+        string $originTitle = null,
+        string $view = null
+    ): string {
         $icon = $icon ? $icon : 'fa fa-filter';
         $class = $class ? $class : 'btn btn-xs btn-default';
         $title = $title ? $title : '';
         $originTitle = $originTitle ? $originTitle : GridView::trans('grid.showSimilar');
         $view = $view ?: 'column.listToString';
+
         return GridView::view($view, [
             'id'          => $id,
             'name'        => $name,
@@ -112,8 +131,8 @@ class ColumnCeil
      * * string           -  $type           - Type: text|textarea|select|checklist
      * * int              -  $pk             -
      * * array            -  $source         - Source data for list.
-     * * string           -  $sourceCache    - If true and source is string url - results will be cached for fields with the same source. Usefull for
-     * editable column in grid to prevent extra requests.
+     * * string           -  $sourceCache    - If true and source is string url - results will be cached for fields with the same source.
+     * Usefull for editable column in grid to prevent extra requests.
      * * string           -  $emptyText      -
      * * string           -  $originalTitle  - Original title
      * * string           -  $title          -
@@ -121,11 +140,12 @@ class ColumnCeil
      * * callable         -  $callback       - function
      * * ===========================================
      *
-     * @param array $options
-     * @param null  $view
+     * @param array       $options
+     * @param string|null $view
+     *
      * @return string
      */
-    public function editable($options = [], $view = null)
+    public function editable(array $options = [], string $view = null)
     {
         $view = $view ?: 'column.editableClick';
         $initJsEvent = isset($options['initJsEvent']) ? $options['initJsEvent'] : 'ready change';
@@ -145,6 +165,7 @@ class ColumnCeil
         $title = isset($options['title']) ? $options['title'] : null;
         $rows = isset($options['rows']) ? $options['rows'] : 10;
         $callback = isset($options['callback']) ? $options['callback'] : null;
+
         return GridView::view($view, [
             'class'         => $class,
             'name'          => $name,

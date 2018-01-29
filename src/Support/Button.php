@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Assurrussa\GridView\Support;
 
 use Assurrussa\GridView\GridView;
@@ -23,21 +25,27 @@ use Illuminate\View\View;
  * @property string $url
  * @property string $confirmText
  * @property array  $options
+ * @property array  $strings
  * @property bool   $visibility
  *
  * @package Assurrussa\AmiCMS\Support
  */
 class Button implements ButtonInterface, Renderable, Arrayable
 {
+
     const TYPE_ACTION_SHOW = 'show';
     const TYPE_ACTION_DELETE = 'delete';
     const TYPE_ACTION_EDIT = 'edit';
     const TYPE_ACTION_RESTORE = 'restore';
+    const TYPE_ACTION_CUSTOM = 'custom';
+
+    const TYPE_BUTTON_CREATE = 'create';
+    const TYPE_BUTTON_EXPORT = 'export';
 
     /**
      * @var string
      */
-    public $type;
+    public $type = self::TYPE_ACTION_CUSTOM;
 
     /**
      * @var string
@@ -84,6 +92,10 @@ class Button implements ButtonInterface, Renderable, Arrayable
      */
     protected $options = [];
     /**
+     * @var array
+     */
+    protected $strings = [];
+    /**
      * Menu item visibility
      *
      * @var bool
@@ -100,34 +112,240 @@ class Button implements ButtonInterface, Renderable, Arrayable
     private $_instance = null;
 
     /**
-     * @param bool $var
-     * @return $this
+     * @param string|null $route
+     * @param array       $params
+     * @param string      $label
+     * @param string      $title
+     * @param string      $class
+     * @param string      $icon
+     *
+     * @return ButtonInterface
      */
-    public function setVisible(bool $var = true)
+    public function setActionDelete(
+        string $route = null,
+        array $params = [],
+        string $label = '',
+        string $title = 'Deleted',
+        string $class = 'btn btn-danger btn-sm flat',
+        string $icon = 'fa fa-times'
+    ): ButtonInterface {
+        $this->setAction(self::TYPE_ACTION_DELETE)
+            ->setLabel($label)
+            ->setTitle($title)
+            ->setRoute($route, $params)
+            ->setClass($class)
+            ->setIcon($icon);
+
+        return $this;
+    }
+
+    /**
+     * @param string|null $route
+     * @param array       $params
+     * @param string      $label
+     * @param string      $title
+     * @param string      $class
+     * @param string      $icon
+     *
+     * @return ButtonInterface
+     */
+    public function setActionRestore(
+        string $route = null,
+        array $params = [],
+        string $label = '',
+        string $title = 'Restore',
+        string $class = 'btn btn-primary btn-sm flat',
+        string $icon = 'fa fa-reply'
+    ): ButtonInterface {
+        $this->setAction(self::TYPE_ACTION_RESTORE)
+            ->setRoute($route, $params)
+            ->setLabel($label)
+            ->setTitle($title)
+            ->setClass($class)
+            ->setIcon($icon);
+
+        return $this;
+    }
+
+    /**
+     * @param string|null $route
+     * @param array       $params
+     * @param string      $label
+     * @param string      $title
+     * @param string      $class
+     * @param string      $icon
+     *
+     * @return ButtonInterface
+     */
+    public function setActionEdit(
+        string $route = null,
+        array $params = [],
+        string $label = '',
+        string $title = 'Edit',
+        string $class = '',
+        string $icon = 'fa fa-pencil'
+    ): ButtonInterface {
+        $this->setAction(self::TYPE_ACTION_EDIT)
+            ->setRoute($route, $params)
+            ->setLabel($label)
+            ->setTitle($title)
+            ->setClass($class)
+            ->setIcon($icon);
+
+        return $this;
+    }
+
+    /**
+     * @param string|null $route
+     * @param array       $params
+     * @param string      $label
+     * @param string      $title
+     * @param string      $class
+     * @param string      $icon
+     *
+     * @return ButtonInterface
+     */
+    public function setActionShow(
+        string $route = null,
+        array $params = [],
+        string $label = '',
+        string $title = 'Show',
+        string $class = '',
+        string $icon = 'fa fa-eye'
+    ): ButtonInterface {
+        $this->setAction(self::TYPE_ACTION_SHOW)
+            ->setRoute($route, $params)
+            ->setLabel($label)
+            ->setTitle($title)
+            ->setClass($class)
+            ->setIcon($icon);
+
+        return $this;
+    }
+
+    /**
+     * @param string|null $url
+     * @param string      $label
+     * @param string      $class
+     * @param string      $icon
+     *
+     * @return ButtonInterface
+     */
+    public function setActionCustom(
+        string $url = null,
+        string $label = '',
+        string $class = 'btn btn-primary btn-sm flat',
+        string $icon = 'fa fa-paw'
+    ): ButtonInterface {
+        $this->setAction(self::TYPE_ACTION_CUSTOM)
+            ->setUrl($url)
+            ->setLabel($label)
+            ->setClass($class)
+            ->setIcon($icon);
+
+        return $this;
+    }
+
+    /**
+     * @param string|null $url
+     *
+     * @return ButtonInterface
+     */
+    public function setButtonExport(string $url = null): ButtonInterface
+    {
+        $addUrl = 'export=1';
+        if (!$url) {
+            $url = url()->current();
+        }
+        if ($array = request()->except('export')) {
+            $url .= '?' . http_build_query($array);
+        }
+        $addUrl = str_is('*?*', $url) ? '&' . $addUrl : '?' . $addUrl;
+        $text = GridView::trans('grid.export');
+
+        return $this->setActionCustom($url . $addUrl, $text, 'btn btn-default', 'fa fa-upload')
+            ->setType(self::TYPE_BUTTON_EXPORT)
+            ->setId('js-amiExportButton');
+    }
+
+    /**
+     * @param string $url
+     *
+     * @return ButtonInterface
+     */
+    public function setButtonCreate(string $url): ButtonInterface
+    {
+        $text = GridView::trans('grid.create');
+
+        return $this->setActionCustom($url, $text, 'btn btn-primary', 'fa fa-plus')
+            ->setType(self::TYPE_BUTTON_CREATE);
+    }
+
+    /**
+     * @param string|null $url
+     * @param string|null $addPostUrl
+     * @param string|null $view
+     * @param string|null $text
+     * @param string|null $confirmText
+     * @param string|null $class
+     * @param string|null $icon
+     *
+     * @return \Illuminate\Contracts\Support\Renderable
+     */
+    public function setButtonCheckboxAction(
+        string $url = null,
+        string $addPostUrl = null,
+        string $text = null,
+        string $confirmText = null,
+        string $class = null,
+        string $icon = ''
+    ): ButtonInterface {
+        $addPostUrl = $addPostUrl ?: '?deleted=';
+        $class = $class ?: 'btn btn-default js-btnCustomAction js-linkDelete';
+        $text = $text ?: GridView::trans('grid.selectDelete');
+        $confirmText = $confirmText ?: GridView::trans('grid.clickDelete');
+
+        return $this->setActionCustom($url . $addPostUrl, $text, $class, $icon)
+            ->setAction(self::TYPE_ACTION_CUSTOM)
+            ->setConfirmText($confirmText)
+            ->setOptions([
+                'data-href'    => $this->getUrl(),
+                'data-confirm' => $confirmText,
+            ]);
+    }
+
+    /**
+     * @param bool $var
+     *
+     * @return ButtonInterface
+     */
+    public function setVisible(bool $var = true): ButtonInterface
     {
         $this->visibility = $var;
+
         return $this;
     }
 
     /**
-     * @param bool $var
-     * @return $this
+     * @param array $array
+     *
+     * @return ButtonInterface
      */
-    public function setOptions(array $array = [])
+    public function setOptions(array $array = []): ButtonInterface
     {
         $this->options = $array;
+
         return $this;
     }
 
     /**
-     * Get or set menu item action
+     * @param string $method
      *
-     * @param string|null $action
-     * @return $this|string
+     * @return ButtonInterface
      */
-    public function setMethod($method = 'POST')
+    public function setMethod(string $method = 'POST'): ButtonInterface
     {
-        if($this->isVisibility()) {
+        if ($this->isVisibility()) {
             $this->method = $method;
         }
 
@@ -135,14 +353,13 @@ class Button implements ButtonInterface, Renderable, Arrayable
     }
 
     /**
-     * Get or set menu item action
+     * @param string $action
      *
-     * @param string|null $action
-     * @return $this|string
+     * @return ButtonInterface
      */
-    public function setAction($action = '')
+    public function setAction(string $action = ''): ButtonInterface
     {
-        if($this->isVisibility()) {
+        if ($this->isVisibility()) {
             $this->action = $action;
         }
 
@@ -150,14 +367,13 @@ class Button implements ButtonInterface, Renderable, Arrayable
     }
 
     /**
-     * Get or set menu item label
-     *
      * @param string|null $label
-     * @return $this|string
+     *
+     * @return ButtonInterface
      */
-    public function setLabel($label = null)
+    public function setLabel(string $label = null): ButtonInterface
     {
-        if($this->isVisibility()) {
+        if ($this->isVisibility()) {
             $this->label = $label;
         }
 
@@ -165,88 +381,111 @@ class Button implements ButtonInterface, Renderable, Arrayable
     }
 
     /**
-     * Get or set menu item icon
-     *
      * @param string|null $icon
-     * @return $this
+     *
+     * @return ButtonInterface
      */
-    public function setIcon($icon = null)
+    public function setIcon(string $icon = null): ButtonInterface
     {
-        if($this->isVisibility()) {
+        if ($this->isVisibility()) {
             $this->icon = $icon;
         }
+
         return $this;
     }
 
     /**
-     * @param string $class
-     * @return static
+     * @param string|null $text
+     *
+     * @return ButtonInterface
      */
-    public function setTitle($text = null)
+    public function setTitle(string $text = null): ButtonInterface
     {
-        if($this->isVisibility()) {
+        if ($this->isVisibility()) {
             $this->title = $text;
         }
+
         return $this;
     }
 
     /**
-     * @param string $class
-     * @return static
+     * @param string|null $id
+     *
+     * @return ButtonInterface
      */
-    public function setId($id = null)
+    public function setId(string $id = null): ButtonInterface
     {
-        if($this->isVisibility()) {
+        if ($this->isVisibility()) {
             $this->id = $id;
         }
+
         return $this;
     }
 
     /**
-     * @param string $class
-     * @return static
+     * @param string|null $class
+     *
+     * @return ButtonInterface
      */
-    public function setClass($class = null)
+    public function setClass(string $class = null): ButtonInterface
     {
-        if($this->isVisibility()) {
+        if ($this->isVisibility()) {
             $this->class = $class;
         }
+
         return $this;
     }
 
     /**
-     * @param string $class
-     * @return static
+     * @param string|null $class
+     *
+     * @return ButtonInterface
      */
-    public function setJsClass($class = null)
+    public function setJsClass(string $class = null): ButtonInterface
     {
-        if($this->isVisibility()) {
+        if ($this->isVisibility()) {
             $this->jsClass = $class;
         }
+
         return $this;
     }
 
     /**
-     * @param string $class
-     * @return static
+     * @param string $string
+     *
+     * @return ButtonInterface
      */
-    public function setConfirmText($text = null)
+    public function setAddString(string $string): ButtonInterface
     {
-        if($this->isVisibility()) {
+        if ($this->isVisibility()) {
+            $this->strings[] = $string;
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param string|null $text
+     *
+     * @return ButtonInterface
+     */
+    public function setConfirmText(string $text = null): ButtonInterface
+    {
+        if ($this->isVisibility()) {
             $this->confirmText = $text;
         }
+
         return $this;
     }
 
     /**
-     * Get or set menu item url
+     * @param string $url
      *
-     * @param string|null $url
-     * @return $this
+     * @return ButtonInterface
      */
-    public function setUrl($url = '#')
+    public function setUrl(string $url = '#'): ButtonInterface
     {
-        if($this->isVisibility()) {
+        if ($this->isVisibility()) {
             //            if($this->url !== null) {
             //                if(strpos($this->url, '://') !== false) {
             //                    return $this;
@@ -254,23 +493,24 @@ class Button implements ButtonInterface, Renderable, Arrayable
             //            }
             $this->url = $url;
         }
+
         return $this;
     }
 
     /**
-     * Get or set menu item route
-     *
      * @param string|null $route
-     * @return $this|string
+     * @param array       $params
+     *
+     * @return ButtonInterface
      */
-    public function setRoute($route = null, $params = [])
+    public function setRoute(string $route = null, array $params = []): ButtonInterface
     {
-        if($this->isVisibility()) {
-            if($route === null) {
+        if ($this->isVisibility()) {
+            if ($route === null) {
                 $url = '#';
             } else {
                 $url = '#';
-                if(app('router')->has($route)) {
+                if (app('router')->has($route)) {
                     $url = route($route, $params);
                 } else {
                     $this->setVisible(false);
@@ -278,140 +518,52 @@ class Button implements ButtonInterface, Renderable, Arrayable
             }
             $this->setUrl($url);
         }
+
         return $this;
     }
 
     /**
-     * @param mixed $type
+     * @param string $type
+     *
+     * @return ButtonInterface
      */
-    public function setType($type)
+    public function setType(string $type): ButtonInterface
     {
-        if($this->isVisibility()) {
+        if ($this->isVisibility()) {
             $this->type = $type;
         }
+
         return $this;
     }
 
     /**
-     * @param null        $route
-     * @param array       $params
-     * @param string      $label
-     * @param string      $title
-     * @param string|null $class
-     * @param string      $icon
-     * @return $this
-     */
-    public function setActionDelete(
-        $route = null,
-        $params = [],
-        $label = '',
-        $title = 'Deleted',
-        $class = 'btn btn-danger btn-sm flat',
-        $icon = 'fa fa-times'
-    ) {
-        $this->setAction(self::TYPE_ACTION_DELETE)
-            ->setLabel($label)
-            ->setTitle($title)
-            ->setRoute($route, $params)
-            ->setClass($class)
-            ->setIcon($icon);
-        return $this;
-    }
-
-    /**
-     * @param null        $route
-     * @param array       $params
-     * @param string      $label
-     * @param string      $title
-     * @param string|null $class
-     * @param string      $icon
-     * @return $this
-     */
-    public function setActionRestore(
-        $route = null,
-        $params = [],
-        $label = '',
-        $title = 'Restore',
-        $class = 'btn btn-primary btn-sm flat',
-        $icon = 'fa fa-reply'
-    ) {
-        $this->setAction(self::TYPE_ACTION_RESTORE)
-            ->setRoute($route, $params)
-            ->setLabel($label)
-            ->setTitle($title)
-            ->setClass($class)
-            ->setIcon($icon);
-        return $this;
-    }
-
-    /**
-     * @param null        $route
-     * @param array       $params
-     * @param string      $label
-     * @param string      $title
-     * @param string|null $class
-     * @param string      $icon
-     * @return $this
-     */
-    public function setActionEdit($route = null, $params = [], $label = '', $title = 'Edit', $class = '', $icon = 'fa fa-pencil')
-    {
-        $this->setAction(self::TYPE_ACTION_EDIT)
-            ->setRoute($route, $params)
-            ->setLabel($label)
-            ->setTitle($title)
-            ->setClass($class)
-            ->setIcon($icon);
-        return $this;
-    }
-
-    /**
-     * @param null        $route
-     * @param array       $params
-     * @param string      $label
-     * @param string      $title
-     * @param string|null $class
-     * @param string      $icon
-     * @return $this
-     */
-    public function setActionShow($route = null, $params = [], $label = '', $title = 'Show', $class = '', $icon = 'fa fa-eye')
-    {
-        $this->setAction(self::TYPE_ACTION_SHOW)
-            ->setRoute($route, $params)
-            ->setLabel($label)
-            ->setTitle($title)
-            ->setClass($class)
-            ->setIcon($icon);
-        return $this;
-    }
-
-    /**
-     * Если необходим свой обработчик для каждого поля колонки.
+     * @param callable $handler
      *
-     * @param \Closure $handler  функция замыкания для своего условия
-     * @param object   $instance Примается модель которая будет обрабатыватся в Closure
-     * @return $this
+     * @return ButtonInterface
      */
-    public function setHandler($handler)
+    public function setHandler(Callable $handler): ButtonInterface
     {
         $this->_handler = $handler;
+
         return $this;
     }
 
     /**
      * @return bool
      */
-    public function getHandler()
+    public function getHandler(): bool
     {
-        if(is_callable($this->_handler) && $this->getInstance()) {
+        if (is_callable($this->_handler) && $this->getInstance()) {
             return call_user_func($this->_handler, $this->getInstance());
         }
+
         return true;
     }
 
     /**
      * @return string
      */
-    public function getType()
+    public function getType(): string
     {
         return $this->type;
     }
@@ -419,30 +571,30 @@ class Button implements ButtonInterface, Renderable, Arrayable
     /**
      * @return array
      */
-    public function getOptions()
+    public function getOptions(): array
     {
         return is_array($this->options) ? $this->options : [];
     }
 
     /**
-     * Взависимости от того какое поле пришло и присутствует ли Closure
+     * @param \Illuminate\Database\Eloquent\Model|null $instance
      *
-     * @param object $instance
-     * @return bool|mixed
+     * @return bool
      */
-    public function getValues($instance = null)
+    public function getValues(\Illuminate\Database\Eloquent\Model $instance = null): bool
     {
-        $this->_setInstance($instance);
-        if($this->isHandler()) {
+        $this->_instance = $instance;
+        if ($this->isHandler()) {
             return $this->getHandler();
         }
+
         return true;
     }
 
     /**
-     * @return null|object
+     * @return \Illuminate\Database\Eloquent\Model|null
      */
-    public function getInstance()
+    public function getInstance(): ?\Illuminate\Database\Eloquent\Model
     {
         return $this->_instance;
     }
@@ -456,9 +608,9 @@ class Button implements ButtonInterface, Renderable, Arrayable
     }
 
     /**
-     * @return string
+     * @return null|string
      */
-    public function getConfirmText(): string
+    public function getConfirmText(): ?string
     {
         return $this->confirmText;
     }
@@ -528,9 +680,17 @@ class Button implements ButtonInterface, Renderable, Arrayable
     }
 
     /**
+     * @return array
+     */
+    public function getStrings(): array
+    {
+        return $this->strings;
+    }
+
+    /**
      * @return bool
      */
-    public function isHandler() : bool
+    public function isHandler(): bool
     {
         return is_callable($this->_handler);
     }
@@ -546,14 +706,16 @@ class Button implements ButtonInterface, Renderable, Arrayable
     /**
      * @return array
      */
-    public function toArray()
+    public function toArray(): array
     {
-        if(!$this->isVisibility()) {
+        if (!$this->isVisibility()) {
             return [];
         }
+
         return [
             'type'        => $this->getType(),
             'action'      => $this->getAction(),
+            'method'      => $this->getMethod(),
             'icon'        => $this->getIcon(),
             'label'       => $this->getLabel(),
             'title'       => $this->getTitle(),
@@ -563,36 +725,34 @@ class Button implements ButtonInterface, Renderable, Arrayable
             'jsClass'     => $this->getJsClass(),
             'confirmText' => $this->getConfirmText(),
             'options'     => $this->getOptions(),
+            'strings'     => $this->getStrings(),
         ];
     }
 
     /**
-     * @return View
+     * @param string     $view
+     * @param array|null $params
+     *
+     * @return Renderable
      */
-    public function render()
+    public function render(string $view = null, array $params = null): \Illuminate\Contracts\Support\Renderable
     {
-        return GridView::view('column.treeControl', $this->toArray());
+        $view = $view ? $view : 'column.treeControl';
+        $params = $params ? $params : $this->toArray();
+
+        return GridView::view($view, $params);
     }
 
 
     /**
      * @return string
      */
-    public function __toString()
+    public function __toString(): string
     {
-        if($this->isVisibility()) {
+        if ($this->isVisibility()) {
             return (string)$this->render();
         }
-        return '';
-    }
 
-    /**
-     * Необходимо устанавливать только в момент когда приходит инстанс модели!
-     *
-     * @param null|object $instance
-     */
-    private function _setInstance($instance)
-    {
-        $this->_instance = $instance;
+        return '';
     }
 }

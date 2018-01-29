@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Assurrussa\GridView\Support;
 
 use Assurrussa\GridView\GridView;
@@ -60,128 +62,27 @@ class Input implements InputInterface, Renderable, Arrayable
     private $_handler = null;
 
     /**
-     * @param bool $var
-     * @return $this
+     * @param null $text
+     *
+     * @return InputInterface
      */
-    public function setOptions(array $array = [])
-    {
-        $this->options = $array;
-        return $this;
-    }
-
-    /**
-     * @param string $class
-     * @return static
-     */
-    public function setName($text = null)
-    {
-        $this->name = $text;
-        return $this;
-    }
-
-    /**
-     * @param string $class
-     * @return static
-     */
-    public function setValue($text = null)
+    public function setValue($text = null): InputInterface
     {
         $this->value = $text;
+
         return $this;
     }
 
     /**
-     * @param string $class
-     * @return static
+     * @return bool|mixed|string
      */
-    public function setId($id = null)
+    public function getValue()
     {
-        $this->id = $id;
-        return $this;
-    }
+        if ($this->isHandler()) {
+            return $this->getHandler();
+        }
 
-    /**
-     * @param string $class
-     * @return static
-     */
-    public function setClass($class = null)
-    {
-        $this->class = $class;
-        return $this;
-    }
-
-    /**
-     * @param mixed $type
-     */
-    public function setType($type = self::TYPE_HIDDEN)
-    {
-        $this->type = $type;
-        return $this;
-    }
-
-    /**
-     * @param mixed $type
-     */
-    public function setTypeText()
-    {
-        return $this->setType(self::TYPE_TEXT);
-    }
-
-    /**
-     * @param mixed $type
-     */
-    public function setTypeDate()
-    {
-        return $this->setType(self::TYPE_DATE);
-    }
-
-    /**
-     * @param mixed $type
-     */
-    public function setTypeNumeric()
-    {
-        return $this->setType(self::TYPE_NUMERIC);
-    }
-
-    /**
-     * @param mixed $type
-     */
-    public function setTypeEmail()
-    {
-        return $this->setType(self::TYPE_EMAIL);
-    }
-
-
-    /**
-     * @param null        $route
-     * @param array       $params
-     * @param string      $label
-     * @param string      $title
-     * @param string|null $class
-     * @param string      $icon
-     * @return $this
-     */
-    public function setInputHidden($name = '', $value = '', $id = '', $class = '', $options = [])
-    {
-        $this->setType(self::TYPE_HIDDEN)
-            ->setName($name)
-            ->setValue($value)
-            ->setId($id)
-            ->setClass($class)
-            ->setOptions($options);
-        return $this;
-    }
-
-    /**
-     * Если необходим свой обработчик для каждого поля колонки.
-     *
-     * @param \Closure $handler  функция замыкания для своего условия
-     * @param object   $instance Примается модель которая будет обрабатыватся в Closure
-     * @return $this
-     */
-    public function setHandler($handler)
-    {
-        $this->_handler = $handler;
-        return $this;
+        return $this->value;
     }
 
     /**
@@ -189,16 +90,150 @@ class Input implements InputInterface, Renderable, Arrayable
      */
     public function getHandler()
     {
-        if(is_callable($this->_handler)) {
+        if (is_callable($this->_handler)) {
             return call_user_func($this->_handler);
         }
+
         return true;
+    }
+
+    /**
+     * @param array $array
+     *
+     * @return InputInterface
+     */
+    public function setOptions(array $array = []): InputInterface
+    {
+        $this->options = $array;
+
+        return $this;
+    }
+
+    /**
+     * @param string|null $text
+     *
+     * @return InputInterface
+     */
+    public function setName(string $text = null): InputInterface
+    {
+        $this->name = $text;
+
+        return $this;
+    }
+
+    /**
+     * @param string|null $id
+     *
+     * @return InputInterface
+     */
+    public function setId(string $id = null): InputInterface
+    {
+        $this->id = $id;
+
+        return $this;
+    }
+
+    /**
+     * @param string|null $class
+     *
+     * @return InputInterface
+     */
+    public function setClass(string $class = null): InputInterface
+    {
+        $this->class = $class;
+
+        return $this;
+    }
+
+    /**
+     * @param string $type
+     *
+     * @return InputInterface
+     */
+    public function setType(string $type = self::TYPE_HIDDEN): InputInterface
+    {
+        $this->type = $type;
+
+        return $this;
+    }
+
+    /**
+     * @return InputInterface
+     */
+    public function setTypeText(): InputInterface
+    {
+        return $this->setType(self::TYPE_TEXT);
+    }
+
+    /**
+     * @return InputInterface
+     */
+    public function setTypeDate(): InputInterface
+    {
+        return $this->setType(self::TYPE_DATE);
+    }
+
+    /**
+     * @return InputInterface
+     */
+    public function setTypeNumeric(): InputInterface
+    {
+        return $this->setType(self::TYPE_NUMERIC);
+    }
+
+    /**
+     * @return InputInterface
+     */
+    public function setTypeEmail(): InputInterface
+    {
+        return $this->setType(self::TYPE_EMAIL);
+    }
+
+
+    /**
+     * @param string $name
+     * @param string $value
+     * @param string $id
+     * @param string $class
+     * @param array  $options
+     *
+     * @return InputInterface
+     */
+    public function setInputHidden(
+        string $name = '',
+        string $value = '',
+        string $id = '',
+        string $class = '',
+        array $options = []
+    ): InputInterface {
+        $this->setType(self::TYPE_HIDDEN)
+            ->setName($name)
+            ->setValue($value)
+            ->setId($id)
+            ->setClass($class)
+            ->setOptions($options);
+
+        return $this;
+    }
+
+    /**
+     * If you need your handler for each column field.
+     *
+     * @param callable $handler
+     *
+     * @return $this
+     */
+    public function setHandler(Callable $handler): InputInterface
+    {
+        $this->_handler = $handler;
+
+        return $this;
     }
 
     /**
      * @return string
      */
-    public function getType()
+    public function getType(): string
     {
         return $this->type;
     }
@@ -206,20 +241,9 @@ class Input implements InputInterface, Renderable, Arrayable
     /**
      * @return array
      */
-    public function getOptions()
+    public function getOptions(): array
     {
         return is_array($this->options) ? $this->options : [];
-    }
-
-    /**
-     * @return bool|mixed
-     */
-    public function getValue()
-    {
-        if($this->isHandler()) {
-            return $this->getHandler();
-        }
-        return $this->value;
     }
 
     /**
@@ -249,7 +273,7 @@ class Input implements InputInterface, Renderable, Arrayable
     /**
      * @return bool
      */
-    public function isHandler() : bool
+    public function isHandler(): bool
     {
         return is_callable($this->_handler);
     }
@@ -257,7 +281,7 @@ class Input implements InputInterface, Renderable, Arrayable
     /**
      * @return array
      */
-    public function toArray()
+    public function toArray(): array
     {
         return [
             'type'    => $this->getType(),
@@ -272,7 +296,7 @@ class Input implements InputInterface, Renderable, Arrayable
     /**
      * @return View
      */
-    public function render()
+    public function render(): Renderable
     {
         return GridView::view('input.input', $this->toArray());
     }
@@ -281,7 +305,7 @@ class Input implements InputInterface, Renderable, Arrayable
     /**
      * @return string
      */
-    public function __toString()
+    public function __toString(): string
     {
         return (string)$this->render();
     }

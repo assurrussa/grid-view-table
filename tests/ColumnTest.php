@@ -1,7 +1,10 @@
 <?php
 
-use Assurrussa\GridView\Support\Button;
 use Assurrussa\GridView\Support\Column;
+
+use Tests\TestCase;
+use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 class ColumnTest extends TestCase
 {
@@ -35,9 +38,11 @@ class ColumnTest extends TestCase
         $this->assertEquals(false, $column->isSort());
         $this->assertEquals(true, $column->isScreening());
         $this->assertEquals([
-            'name' => 'field',
-            'data' => ['key' => 'value'],
-            'mode' => 'select',
+            'name'  => 'field',
+            'data'  => ['key' => 'value'],
+            'mode'  => 'select',
+            'class' => '',
+            'style' => ''
         ], $column->getFilter());
         $this->assertEquals(true, $column->isHandler());
         $this->assertEquals(true, $column->getHandler() instanceof Closure);
@@ -52,18 +57,18 @@ class ColumnTest extends TestCase
         $column->setKey('test')
             ->setValue('name column')
             ->setFilter('field', []);
-        $this->assertEquals(['name' => 'field', 'data' => [], 'mode' => 'select'], $column->getFilter());
+        $this->assertEquals(['name' => 'field', 'data' => [], 'mode' => 'select', 'class' => '', 'style' => ''], $column->getFilter());
         $this->assertEquals(false, $column->getDateActive());
         $this->assertEquals(Column::DEFAULT_TO_STRING_FORMAT, $column->getDateFormat());
 
         $column->setFilter('field1', 'text');
-        $this->assertEquals(['name' => 'field1', 'data' => 'text', 'mode' => 'select'], $column->getFilter());
+        $this->assertEquals(['name' => 'field1', 'data' => 'text', 'mode' => 'select', 'class' => '', 'style' => ''], $column->getFilter());
 
-        $column->setFilterString('field2', 'text');
-        $this->assertEquals(['name' => 'field2', 'data' => 'text', 'mode' => 'string'], $column->getFilter());
+        $column->setFilterString('field2');
+        $this->assertEquals(['name' => 'field2', 'data' => '', 'mode' => 'string', 'class' => '', 'style' => ''], $column->getFilter());
 
         $column->setFilterDate('field2', 'date', true, 'Y-m-d');
-        $this->assertEquals(['name' => 'field2', 'data' => 'date', 'mode' => 'date'], $column->getFilter());
+        $this->assertEquals(['name' => 'field2', 'data' => 'date', 'mode' => 'date', 'class' => '', 'style' => ''], $column->getFilter());
         $this->assertEquals(true, $column->getDateActive());
         $this->assertEquals('Y-m-d', $column->getDateFormat());
     }
@@ -81,7 +86,7 @@ class ColumnTest extends TestCase
             ->setActions(function ($data) {
                 return $data->id == 3;
             });
-        $object = new stdClass();
+        $object = new \Assurrussa\GridView\Models\Model();
         $object->id = 3;
         $this->assertEquals(Column::ACTION_NAME, $column->getKey());
         $this->assertEquals(Column::ACTION_NAME, $column->getValue());
@@ -102,7 +107,7 @@ class ColumnTest extends TestCase
             ->setActions(function ($data) {
                 return $data->action == 1;
             });
-        $object = new stdClass();
+        $object = new \Assurrussa\GridView\Models\Model();
         $object->action = 1;
         $this->assertEquals(true, $column->isKeyAction());
         $this->assertEquals(true, $column->getValues($object));
@@ -113,7 +118,7 @@ class ColumnTest extends TestCase
             ->setHandler(function ($data) {
                 return $data->key == 1;
             });
-        $object = new stdClass();
+        $object = new \Assurrussa\GridView\Models\Model();
         $object->key = 1;
         $this->assertEquals(false, $column->isKeyAction());
         $this->assertEquals(true, $column->getValues($object));
@@ -129,7 +134,7 @@ class ColumnTest extends TestCase
         $column = new Column();
         $column->setKey('key');
 
-        $object = new stdClass();
+        $object = new \Assurrussa\GridView\Models\Model();
         $object->key = 2;
 
         $this->assertEquals(null, $column->getValues());

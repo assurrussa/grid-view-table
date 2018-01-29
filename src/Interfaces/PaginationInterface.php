@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Assurrussa\GridView\Interfaces;
 
 /**
@@ -9,26 +11,21 @@ namespace Assurrussa\GridView\Interfaces;
  */
 interface PaginationInterface
 {
+    public function setQuery(\Illuminate\Database\Eloquent\Builder &$query): PaginationInterface;
 
-    /**
-     * @param $query
-     * @return mixed
-     */
-    public function setQuery(&$query);
+    public function setColumns(\Assurrussa\GridView\Support\Columns &$columns): PaginationInterface;
 
-    /**
-     * @param $columns
-     * @return mixed
-     */
-    public function setColumns(&$columns);
+    public function get(int $page, int $limit = 10): \Illuminate\Pagination\LengthAwarePaginator;
 
-    /**
-     * @return array
-     */
-    public function toArray();
+    public function render(string $view = null, array $data = [], string $formAction = ''): string;
 
-    /**
-     * @return mixed
-     */
-    public function get($page, $limit);
+    public function toArray(): array;
+
+    public function getItemForPagination(
+        string $status = '',
+        string $text = '',
+        string $url = '',
+        string $rel = '',
+        string $page = ''
+    ): array;
 }

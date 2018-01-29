@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Assurrussa\GridView\Support;
 
 use Assurrussa\GridView\Interfaces\ColumnInterface;
@@ -18,115 +20,122 @@ class Columns implements ColumnsInterface
     private $_fields = [];
 
     /**
-     * Добавление необходимых полей для Grid
+     * @param ColumnInterface $column
      *
-     * @param \Closure|ColumnInterface $columns
-     * @return $this
+     * @return ColumnInterface
      */
-    public function setColumn($column)
+    public function setColumn(\Assurrussa\GridView\Interfaces\ColumnInterface $column): ColumnsInterface
     {
         $this->_columns[] = $column;
+
         return $this;
     }
 
     /**
+     * example:
+     * $fields = [
+     *             'ID'            => 'id',
+     *             'Time'          => 'setup_at',
+     *             0               => 'brand.name',
+     *             'Name'          => function() {return 'name';},
+     *         ];
+     *
      * @param array $fields
+     *
      * @return $this
      */
-    public function setFields(array $fields)
+    public function setFields(array $fields): ColumnsInterface
     {
         $this->_fields = $fields;
+
         return $this;
     }
 
     /**
-     * Получение необходимых полей для Grid
-     *
-     * @return Column[]
+     * @return array|\Assurrussa\GridView\Interfaces\ColumnInterface[]
      */
-    public function getColumns()
+    public function getColumns(): array
     {
         return $this->_columns;
     }
 
     /**
-     * Получение необходимых полей для Grid
-     *
-     * @return Button[]|array
+     * @return array|\Assurrussa\GridView\Interfaces\ColumnInterface[]
      */
-    public function getActions()
+    public function getActions(): array
     {
-        foreach($this->getColumns() as $column) {
-            if($column->isKeyAction()) {
+        foreach ($this->getColumns() as $column) {
+            if ($column->isKeyAction()) {
                 return $column->getActions();
             }
         }
+
         return [];
     }
 
     /**
-     * Метод получает кнопки для грид таблицы
+     * The method gets the buttons for the grid table
      *
-     * @param \Assurrussa\GridView\Models\Model|static $instance
-     * return array
+     * @param \Illuminate\Database\Eloquent\Model $instance
+     *
+     * @return array
      */
-    public function filterActions($instance)
+    public function filterActions(\Illuminate\Database\Eloquent\Model $instance): array
     {
         $listButtons = [];
-        if($this->count()) {
+        if ($this->count()) {
             $buttons = $this->getActions();
-            foreach($buttons as &$button) {
-                if($button->getValues($instance)) {
+            foreach ($buttons as &$button) {
+                if ($button->getValues($instance)) {
                     $listButtons[] = $button->render();
                     unset($button);
                 }
             }
         }
+
         return $listButtons;
     }
 
     /**
-     * Получение необходимых полей для Grid
-     *
      * @return array
      */
-    public function toArray()
+    public function toArray(): array
     {
         $columns = [];
-        foreach($this->_columns as $column) {
+        foreach ($this->_columns as $column) {
             $columns[] = $column->toArray();
         }
+
         return $columns;
     }
 
     /**
      * @return array
      */
-    public function toFields()
+    public function toFields(): array
     {
-        if(count($this->_fields)) {
+        if (count($this->_fields)) {
             return $this->_fields;
         }
         $columns = [];
         $pregMatch = config('amigrid.pregMatchForFields', "/[<]+/i");
-        foreach($this->_columns as $column) {
+        foreach ($this->_columns as $column) {
             $key = $column->getValue();
-            if(preg_match($pregMatch, $key)) {
+            if (preg_match($pregMatch, $key)) {
                 continue;
             }
             $value = ($column->isHandler()) ? $column->getHandler() : $column->getKey();
 
             $columns[$key] = $value;
         }
+
         return $columns;
     }
 
     /**
-     * Получение количества колонок
-     *
      * @return int
      */
-    public function count()
+    public function count(): int
     {
         return count($this->_columns);
     }

@@ -1,19 +1,19 @@
-<?php
-/**
- * @var \Assurrussa\GridView\Helpers\GridViewResult $data
- */
-?>
+@php
+    /**
+     * @var \Assurrussa\GridView\Helpers\GridViewResult $data
+     */
+@endphp
 <div class="row">
     <div class="col-md-12">
-        <?php foreach($data->inputCustoms as $inputCustom) { ?>
-            <?= $inputCustom; ?>
-        <?php } ?>
+        @foreach($data->inputCustoms as $inputCustom)
+            {!! $inputCustom !!}
+        @endforeach
     </div>
 </div>
 <div class="row">
     <div class="col-md-12">
-        <?php foreach($data->buttonCustoms as $buttonCustom) { ?>
-            <?= $buttonCustom; ?>
-        <?php } ?>
+        @foreach($data->buttonCustoms as $buttonCustom)
+            {!! $buttonCustom !!}
+        @endforeach
     </div>
 </div>

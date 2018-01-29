@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Assurrussa\GridView\Support;
 
 use Assurrussa\GridView\Interfaces\ButtonInterface;
@@ -24,106 +26,124 @@ use Assurrussa\GridView\Interfaces\ButtonsInterface;
  */
 class Buttons implements ButtonsInterface
 {
-    /** @var ButtonItem[] */
+    /** @var \Assurrussa\GridView\Interfaces\ButtonInterface[] */
     private $_buttons = [];
 
     /**
-     * Добавление необходимых полей для Grid
+     * @param ButtonInterface $button
      *
-     * @param \Closure|ButtonInterface $buttons
-     * @return $this
+     * @return ButtonsInterface
      */
-    public function setButton($button)
+    public function setButton(\Assurrussa\GridView\Interfaces\ButtonInterface $button): ButtonsInterface
     {
         $this->_buttons[] = $button;
+
         return $this;
     }
 
     /**
-     * Получение необходимых полей для Grid
-     *
-     * @return Button[]
+     * @return array|\Assurrussa\GridView\Interfaces\ButtonInterface[]
      */
-    public function getButtons()
+    public function getButtons(): array
     {
         return $this->_buttons;
     }
 
     /**
-     * Получение необходимых полей для Grid
-     *
-     * @return array
-     */
-    public function toArray()
-    {
-        $buttons = [];
-        foreach($this->_buttons as $button) {
-            $buttons[] = $button->toArray();
-        }
-        return $buttons;
-    }
-
-    /**
-     * Получение необходимых полей для Grid
-     *
-     * @return array
-     */
-    public function render()
-    {
-        $buttons = [];
-        foreach($this->_buttons as $button) {
-            $buttons[] = $button->render();
-        }
-        return $buttons;
-    }
-
-    /**
-     * Получение количества колонок
-     *
      * @return int
      */
-    public function count()
+    public function count(): int
     {
         return count($this->_buttons);
     }
 
     /**
-     * Return button "Create +"
-     *
-     * @param bool $inArray
-     * @return array|\Illuminate\Contracts\View\Factory|\Illuminate\View\View|null
+     * @return null|string
      */
-    public function getButtonCreate($inArray = false)
+    public function getButtonCreate(): ?string
     {
-        foreach($this->_buttons as $key => $button) {
-            if($button->getType() == ButtonItem::TYPE_BUTTON_CREATE) {
+        foreach ($this->_buttons as $key => $button) {
+            if ($button->getType() == Button::TYPE_BUTTON_CREATE) {
                 unset($this->_buttons[$key]);
-                if($inArray) {
-                    return $button->toArray();
-                }
-                return $button->render();
+
+                return $button->render()->render();
             }
         }
+
         return null;
     }
 
     /**
-     * Return button "Export"
-     *
-     * @param bool $inArray
-     * @return array|\Illuminate\Contracts\View\Factory|\Illuminate\View\View|null
+     * @return array
      */
-    public function getButtonExport($inArray = false)
+    public function getButtonCreateToArray(): array
     {
-        foreach($this->_buttons as $key => $button) {
-            if($button->getType() == ButtonItem::TYPE_BUTTON_EXPORT) {
+        foreach ($this->_buttons as $key => $button) {
+            if ($button->getType() == Button::TYPE_BUTTON_CREATE) {
                 unset($this->_buttons[$key]);
-                if($inArray) {
-                    return $button->toArray();
-                }
-                return $button->render();
+
+                return $button->toArray();
             }
         }
+
+        return [];
+    }
+
+    /**
+     * @return null|string
+     */
+    public function getButtonExport(): ?string
+    {
+        foreach ($this->_buttons as $key => $button) {
+            if ($button->getType() == Button::TYPE_BUTTON_EXPORT) {
+                unset($this->_buttons[$key]);
+
+                return $button->render()->render();
+            }
+        }
+
         return null;
+    }
+
+    /**
+     * @return array
+     */
+    public function getButtonExportToArray(): array
+    {
+        foreach ($this->_buttons as $key => $button) {
+            if ($button->getType() == Button::TYPE_BUTTON_EXPORT) {
+                unset($this->_buttons[$key]);
+
+                return $button->toArray();
+            }
+        }
+
+        return [];
+    }
+
+    /**
+     * @return array
+     */
+    public function toArray(): array
+    {
+        $buttons = [];
+        foreach ($this->_buttons as $button) {
+            $buttons[] = $button->toArray();
+        }
+
+        return $buttons;
+    }
+
+    /**
+     * @return array
+     */
+    public function render(): array
+    {
+        $buttons = [];
+        foreach ($this->_buttons as $button) {
+            $buttons[] = $button->render();
+        }
+
+        return $buttons;
     }
 }

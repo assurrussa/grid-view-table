@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Assurrussa\GridView\Interfaces;
 
 /**
@@ -9,18 +11,21 @@ namespace Assurrussa\GridView\Interfaces;
  */
 interface ButtonsInterface
 {
-    /**
-     * @return int
-     */
-    public function count();
+    public function setButton(\Assurrussa\GridView\Interfaces\ButtonInterface $button): ButtonsInterface;
 
-    /**
-     * @return array
-     */
-    public function toArray();
+    public function getButtons(): array;
 
-    /**
-     * @return mixed
-     */
-    public function render();
+    public function count(): int;
+
+    public function getButtonCreate(): ?string;
+
+    public function getButtonCreateToArray(): array;
+
+    public function getButtonExport(): ?string;
+
+    public function getButtonExportToArray(): array;
+
+    public function toArray(): array;
+
+    public function render(): array;
 }

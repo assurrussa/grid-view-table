@@ -1,31 +1,18 @@
-# Mini grid view table for Laravel >= 5.4 #
+# Mini grid view table for Laravel >= 5.5 #
 
 ## Install packages ##
-1) `composer.json` and `composer update`
-```
-        ...
-        "require": {
-        ...
-            "assurrussa/grid-view-table": "^0.9.2"
-        ...
-```
-or `composer require assurrussa/grid-view-table`
+1) `composer require assurrussa/grid-view-table`
 
-2) Add to config `config/app.php`
+2) Add to config `config/app.php` 
 ```
     'providers' => [
-        ...
         Assurrussa\GridView\GridViewServiceProvider::class,
-        ...
     ],
-
     'aliases' => [
-        ...
         'AmiGridView' => Assurrussa\GridView\Facades\GridViewFacade::class,
-        ...
     ],
 ```
-3) Execute command `composer dump-autoload`
+3) If necessary, run the command `composer dump-autoload`
 ```
     php artisan vendor:publish --provider=Assurrussa\GridView\GridViewServiceProvider
 ```
@@ -35,13 +22,13 @@ or `composer require assurrussa/grid-view-table`
 
 ### Routes ###
 
-* If you do not need routing paths, then in the config `config/amigrid.php` just specify `FALSE`, for` routes`
+* If you do not need routing paths, then in the config `config/amigrid.php` just specify `FALSE`, for `routes`
 
 ### Include ###
 
 in template use
 ```
-{!! amiGrid()->render(['data' => $data]) !!}
+{!! app(\Assurrussa\GridView\GridView::NAME)->render(['data' => $data]) !!}
 or facade
 {!! \AmiGridView::render(['data' => $data]) !!}
 
@@ -62,7 +49,7 @@ or facade
         $query = $model->newQuery()->with('catalogs', 'brand');
 
         // create new model GridView
-        $gridView = amiGrid();
+        $gridView = app(\Assurrussa\GridView\GridView::NAME);
         // set Builder Query
         $gridView->query($query);
         

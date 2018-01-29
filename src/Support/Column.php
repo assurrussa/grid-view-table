@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Assurrussa\GridView\Support;
 
 use Assurrussa\GridView\Interfaces\ColumnInterface;
@@ -119,291 +121,41 @@ class Column implements ColumnInterface
      */
     public function __construct()
     {
-        $this->setDateFormat(config('amigrid.format'));
+        $this->setDateFormat(config('amigrid.format', ''));
     }
 
     /**
-     * Какое поле из таблицы вытащить
-     *
-     * @param string $key
+     * template for checkbox
      *
      * @return $this
      */
-    public function setKey($key)
+    public function setCheckbox(): ColumnInterface
     {
-        $this->key = $key;
+        return $this->setKey('checkbox')
+            ->setValue('<input type="checkbox" class="js-adminSelectAll">')
+            ->setSort(false)
+            ->setScreening(true)
+            ->setHandler(function ($data) {
+                if ($data && $data->id) {
+                    return '<input type="checkbox" class="js-adminCheckboxRow" value="' . $data->id . '">';
+                }
 
-        return $this;
+                return '';
+            });
     }
 
     /**
-     * Метод для отдельной колонки с действиями
+     * Value for the field
      *
-     * @return $this
+     * @param $value
+     *
+     * @return ColumnInterface
      */
-    public function setKeyAction()
-    {
-        $this->key = self::ACTION_NAME;
-        $this->setValue(self::ACTION_NAME);
-        $this->setSort(false);
-        $this->setScreening(true);
-
-        return $this;
-    }
-
-    /**
-     * Текст для поля
-     *
-     * @param string $value
-     *
-     * @return $this
-     */
-    public function setValue($value)
+    public function setValue($value): ColumnInterface
     {
         $this->value = $value;
 
         return $this;
-    }
-
-    /**
-     * Включить сортировку по колонке
-     *
-     * @param bool $sort
-     *
-     * @return $this
-     */
-    public function setSort($sort = false)
-    {
-        $this->sort = $sort;
-
-        return $this;
-    }
-
-    /**
-     * Разрешить полю выводить html как есть.
-     * Внимание!!! опасайтесь XSS атак
-     *
-     * @param bool $screening
-     *
-     * @return $this
-     */
-    public function setScreening($screening = false)
-    {
-        $this->screening = $screening;
-
-        return $this;
-    }
-
-    /**
-     * Если необходим свой обработчик для каждого поля колонки.
-     * * Пример:
-     * *  ->handler(function ($data) {
-     * *      ...
-     * *  }),
-     *
-     * @param \Closure $handler функция замыкания для своего условия принимает в себя $_instance модели.
-     *
-     * @return $this
-     */
-    public function setHandler($handler)
-    {
-        $this->handler = $handler;
-
-        return $this;
-    }
-
-    /**
-     * Filter for select
-     *
-     * @param string                               $field Имя поля которое будет фильтроваться
-     * @param array|\Illuminate\Support\Collection $array Массив вида [1 => 'name', ...], для селекта
-     * @param string                               $mode  Режим
-     * @param string                               $class
-     * @param string                               $style
-     *
-     * @return $this
-     */
-    public function setFilter($field, $array, $mode = self::FILTER_TYPE_SELECT, $class = '', $style = '')
-    {
-        if ($array instanceof \Illuminate\Support\Collection) {
-            $array = $array->toArray();
-        }
-        $this->filter = [
-            self::FILTER_KEY_NAME  => $field,
-            self::FILTER_KEY_DATA  => $array,
-            self::FILTER_KEY_MODE  => $mode,
-            self::FILTER_KEY_CLASS => $class,
-            self::FILTER_KEY_STYLE => $style,
-        ];
-
-        return $this;
-    }
-
-    /**
-     * Filter for select
-     *
-     * @param string                               $field Имя поля которое будет фильтроваться
-     * @param array|\Illuminate\Support\Collection $array Массив вида [1 => 'name', ...], для селекта
-     * @param string                               $mode  Режим
-     * @param string                               $class
-     * @param string                               $style
-     *
-     * @return $this
-     */
-    public function setFilterSelect($field, $array, $class = '', $style = '')
-    {
-        return $this->setFilter($field, $array, self::FILTER_TYPE_SELECT, $class, $style);
-    }
-
-    /**
-     * @param string $field
-     * @param string $string
-     * @param string $class
-     * @param string $style
-     *
-     * @return Column
-     */
-    public function setFilterString($field, $string = '', $class = '', $style = '')
-    {
-        return $this->setFilter($field, $string, self::FILTER_TYPE_STRING, $class, $style);
-    }
-
-    /**
-     * @param string $field
-     * @param string $string
-     * @param bool   $active
-     * @param string $format
-     * @param string $class
-     * @param string $style
-     *
-     * @return Column
-     */
-    public function setFilterDate($field, $string = '', $active = true, $format = null, $class = '', $style = '')
-    {
-        $this->setDateActive($active);
-        if ($format) {
-            $this->setDateFormat($format);
-        }
-
-        return $this->setFilter($field, $string, self::FILTER_TYPE_DATE, $class, $style);
-    }
-
-    /**
-     * @param $format
-     *
-     * @return $this
-     */
-    public function setDateFormat($format)
-    {
-        $this->dateFormat = $format;
-
-        return $this;
-    }
-
-    /**
-     * @param bool $date
-     *
-     * @return $this
-     */
-    public function setDateActive($bool = false)
-    {
-        $this->dateActive = $bool;
-
-        return $this;
-    }
-
-    /**
-     * @param Button[]|\Closure $action
-     *
-     * @return Column
-     */
-    public function setActions($action)
-    {
-        $this->setKeyAction();
-        $this->actions = $action;
-
-        return $this;
-    }
-
-    /**
-     * Если необходим свой обработчик для каждой строки таблицы.
-     * * Пример:
-     * *  ->setClass(function ($data) {
-     * *      ...
-     * *  }),
-     *
-     * @param \Closure $handler функция замыкания для своего условия принимает в себя $_instance модели.
-     *
-     * @return $this
-     */
-    public function setClassForString($handler)
-    {
-        $this->key = self::ACTION_STRING_TR;
-        $this->setHandler($handler);
-
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function isKeyAction()
-    {
-        return $this->key == self::ACTION_NAME;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isSort()
-    {
-        return $this->sort;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isScreening()
-    {
-        return $this->screening;
-    }
-
-    /**
-     * Проверяет является ли свойство Closure
-     *
-     * @return bool
-     * @see \Closure
-     */
-    public function isHandler()
-    {
-        return is_callable($this->handler);
-    }
-
-    /**
-     * Проверяет является ли свойство Closure
-     *
-     * @return bool
-     * @see \Closure
-     */
-    public function isStringTr()
-    {
-        return $this->key === self::ACTION_STRING_TR;
-    }
-
-    /**
-     * @return \Eloquent|null
-     */
-    public function getInstance()
-    {
-        return $this->instance;
-    }
-
-    /**
-     * @return string
-     */
-    public function getKey()
-    {
-        return $this->key;
     }
 
     /**
@@ -415,30 +167,23 @@ class Column implements ColumnInterface
     }
 
     /**
-     * @return callable|\Closure|mixed|null
+     * @return mixed|null
      */
     public function getHandler()
     {
-        if (is_callable($this->handler)) {
-            if ($this->getInstance()) {
-                return call_user_func($this->handler, $this->getInstance());
-            }
-
-            return $this->handler;
+        if ($this->isHandler() && $this->getInstance()) {
+            return call_user_func($this->handler, $this->getInstance());
         }
 
-        return null;
+        return $this->handler;
     }
 
     /**
-     * Взависимости от того какое поле пришло и присутствует ли Closure
+     * @param null $instance
      *
-     * @param object|null $instance
-     *
-     * @return bool|mixed
-     * @see \Closure
+     * @return mixed|null
      */
-    public function getValues($instance = null)
+    public function getValues(\Illuminate\Database\Eloquent\Model $instance = null)
     {
         if ($instance) {
             $this->setInstance($instance);
@@ -447,18 +192,20 @@ class Column implements ColumnInterface
             return $this->getHandler();
         }
 
-        return $this->getValueColumn($this->instance, $this->key);
+        if($this->instance) {
+            return $this->getValueColumn($this->instance, $this->key);
+        }
+
+        return null;
     }
 
     /**
-     * Get column value from instance
+     * @param \Illuminate\Database\Eloquent\Model $instance
+     * @param string                              $name
      *
-     * @param \Illuminate\Database\Eloquent\Collection|\Eloquent $instance
-     * @param string                                             $name
-     *
-     * @return mixed
+     * @return \Illuminate\Database\Eloquent\Model|null
      */
-    public function getValueColumn($instance, $name)
+    public function getValueColumn(\Illuminate\Database\Eloquent\Model $instance, string $name)
     {
         if (!$instance) {
             return null;
@@ -483,17 +230,270 @@ class Column implements ColumnInterface
     }
 
     /**
-     * @return array
+     * Необходимо устанавливать только в момент когда приходит инстанс модели!
+     *
+     * @param \Eloquent|null $instance
      */
-    public function getDateFormat()
+    public function setInstance(\Illuminate\Database\Eloquent\Model $instance): ColumnInterface
     {
-        return $this->dateFormat;
+        $this->instance = $instance;
+
+        return $this;
+    }
+
+    /**
+     * Which field from the table to pull out
+     *
+     * @param string $key
+     *
+     * @return ColumnInterface
+     */
+    public function setKey(string $key): ColumnInterface
+    {
+        $this->key = $key;
+
+        return $this;
+    }
+
+    /**
+     * Method for a single column with actions
+     *
+     * @return ColumnInterface
+     */
+    public function setKeyAction(): ColumnInterface
+    {
+        $this->key = self::ACTION_NAME;
+        $this->setValue(self::ACTION_NAME);
+        $this->setSort(false);
+        $this->setScreening(true);
+
+        return $this;
+    }
+
+    /**
+     * @param bool $sort
+     *
+     * @return ColumnInterface
+     */
+    public function setSort(bool $sort = false): ColumnInterface
+    {
+        $this->sort = $sort;
+
+        return $this;
+    }
+
+    /**
+     * @param bool $screening
+     *
+     * @return ColumnInterface
+     */
+    public function setScreening(bool $screening = false): ColumnInterface
+    {
+        $this->screening = $screening;
+
+        return $this;
+    }
+
+    /**
+     * @param callable $handler
+     *
+     * @return ColumnInterface
+     */
+    public function setHandler(Callable $handler): ColumnInterface
+    {
+        $this->handler = $handler;
+
+        return $this;
+    }
+
+    /**
+     * @param string $field
+     * @param array  $array
+     * @param string $mode
+     * @param string $class
+     * @param string $style
+     *
+     * @return ColumnInterface
+     */
+    public function setFilter(
+        string $field,
+        $array,
+        string $mode = null,
+        string $class = '',
+        string $style = ''
+    ): ColumnInterface {
+        $mode = $mode ? $mode : self::FILTER_TYPE_SELECT;
+        $this->filter = [
+            self::FILTER_KEY_NAME  => $field,
+            self::FILTER_KEY_DATA  => $array,
+            self::FILTER_KEY_MODE  => $mode,
+            self::FILTER_KEY_CLASS => $class,
+            self::FILTER_KEY_STYLE => $style,
+        ];
+
+        return $this;
+    }
+
+    /**
+     * @param string $field
+     * @param array  $array
+     * @param string $class
+     * @param string $style
+     *
+     * @return ColumnInterface
+     */
+    public function setFilterSelect(string $field, array $array, string $class = '', string $style = ''): ColumnInterface
+    {
+        return $this->setFilter($field, $array, self::FILTER_TYPE_SELECT, $class, $style);
+    }
+
+    /**
+     * @param string $field
+     * @param string $class
+     * @param string $style
+     *
+     * @return ColumnInterface
+     */
+    public function setFilterString(string $field, string $string = '', string $class = '', string $style = ''): ColumnInterface
+    {
+        return $this->setFilter($field, $string, self::FILTER_TYPE_STRING, $class, $style);
+    }
+
+    /**
+     * @param string      $field
+     * @param bool        $active
+     * @param string|null $format
+     * @param string      $class
+     * @param string      $style
+     *
+     * @return ColumnInterface
+     */
+    public function setFilterDate(
+        string $field,
+        string $string = '',
+        bool $active = true,
+        string $format = null,
+        string $class = '',
+        string $style = ''
+    ): ColumnInterface {
+        $this->setDateActive($active);
+        if ($format) {
+            $this->setDateFormat($format);
+        }
+
+        return $this->setFilter($field, $string, self::FILTER_TYPE_DATE, $class, $style);
+    }
+
+    /**
+     * @param string $format
+     *
+     * @return ColumnInterface
+     */
+    public function setDateFormat(string $format): ColumnInterface
+    {
+        $this->dateFormat = $format;
+
+        return $this;
+    }
+
+    /**
+     * @param bool $bool
+     *
+     * @return ColumnInterface
+     */
+    public function setDateActive(bool $bool = false): ColumnInterface
+    {
+        $this->dateActive = $bool;
+
+        return $this;
+    }
+
+    /**
+     * @param callable $action
+     *
+     * @return ColumnInterface
+     */
+    public function setActions(Callable $action): ColumnInterface
+    {
+        $this->setKeyAction();
+        $this->actions = $action;
+
+        return $this;
+    }
+
+    /**
+     * @param callable $handler
+     *
+     * @return ColumnInterface
+     */
+    public function setClassForString(Callable $handler): ColumnInterface
+    {
+        $this->key = self::ACTION_STRING_TR;
+        $this->setHandler($handler);
+
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isKeyAction(): bool
+    {
+        return $this->key == self::ACTION_NAME;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isSort(): bool
+    {
+        return $this->sort;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isScreening(): bool
+    {
+        return $this->screening;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isHandler(): bool
+    {
+        return is_callable($this->handler);
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Model|null
+     */
+    public function getInstance(): ?\Illuminate\Database\Eloquent\Model
+    {
+        return $this->instance;
     }
 
     /**
      * @return string
      */
-    public function getDateActive()
+    public function getKey(): string
+    {
+        return $this->key;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDateFormat(): string
+    {
+        return $this->dateFormat;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getDateActive(): bool
     {
         return $this->dateActive;
     }
@@ -501,7 +501,7 @@ class Column implements ColumnInterface
     /**
      * @return array
      */
-    public function getFilter()
+    public function getFilter(): array
     {
         return $this->filter;
     }
@@ -511,47 +511,19 @@ class Column implements ColumnInterface
      */
     public function getActions()
     {
-        if (is_callable($this->actions) && $this->getInstance()) {
-            return call_user_func($this->actions, $this->getInstance());
+        if (is_callable($this->actions)) {
+            if ($this->getInstance()) {
+                return call_user_func($this->actions, $this->getInstance());
+            }
         }
 
         return $this->actions;
     }
 
     /**
-     * Необходимо устанавливать только в момент когда приходит инстанс модели!
-     *
-     * @param \Eloquent|null $instance
-     */
-    public function setInstance($instance)
-    {
-        $this->instance = $instance;
-    }
-
-    /**
-     * шаблон для чекбокса
-     *
-     * @return $this
-     */
-    public function setCheckbox()
-    {
-        return $this->setKey('checkbox')
-            ->setValue('<input type="checkbox" class="js-adminSelectAll">')
-            ->setSort(false)
-            ->setScreening(true)
-            ->setHandler(function ($data) {
-                if ($data && $data->id) {
-                    return '<input type="checkbox" class="js-adminCheckboxRow" value="' . $data->id . '">';
-                }
-
-                return '';
-            });
-    }
-
-    /**
      * @return array
      */
-    public function toArray()
+    public function toArray(): array
     {
         return [
             'key'             => $this->getKey(),

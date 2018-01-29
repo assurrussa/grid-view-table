@@ -1,8 +1,8 @@
-<?php
-/**
- * @var \Assurrussa\GridView\Helpers\GridViewResult $data
- */
-?>
+@php
+    /**
+     * @var \Assurrussa\GridView\Helpers\GridViewResult $data
+     */
+@endphp
 <div class="box">
     <form action=""></form>
     @include('amiGrid::part.custom')

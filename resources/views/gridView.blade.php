@@ -1,9 +1,9 @@
-<?php
-/**
- * @var \Assurrussa\GridView\Helpers\GridViewResult $data
- */
-?>
-<form id="<?= $data->getElementName(); ?>" action="<?= $data->formAction; ?>">
+@php
+    /**
+     * @var \Assurrussa\GridView\Helpers\GridViewResult $data
+     */
+@endphp
+<form id="{{ $data->getElementName() }}" action="{{ $data->formAction }}">
     @include('amiGrid::part.grid', ['data' => $data])
     <div id="js-loadingNotification" class="position-fixed-center">
         <div class="cssload-loader"></div>
@@ -86,7 +86,7 @@
 
             window.AmiGridJS = {
                 gridId: 'js-amiGridList_1',
-                eventPopstate: true,
+                eventPopstate: false,
                 timer: null,
                 milliSeconds: 600,
                 /**
@@ -113,7 +113,7 @@
                         // Глобальные события
                         addEventListener("popstate", function (e) {
                             e.preventDefault();
-                            window.location = window.location.href;
+                            // window.location = window.location.href;
                         }, false);
                     }
                 },
@@ -154,6 +154,7 @@
                             data: dataResult,
                         }).done(function (data) {
                             AmiGridJS.loadingHide();
+                            data = JSON.parse(data);
                             window.history.pushState("", "", data.url);
                             $('#' + AmiGridJS.gridId + '').html(data.data);
                         }).fail(function () {
@@ -253,7 +254,7 @@
                     });
                 },
             };
-            AmiGridJS.gridId = '<?= $data->getElementName(); ?>';
+            AmiGridJS.gridId = '{{ $data->getElementName() }}';
             AmiGridJS.init();
         });
     </script>

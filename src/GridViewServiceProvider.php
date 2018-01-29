@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Assurrussa\GridView;
 
 use Illuminate\Contracts\Container\Container;
@@ -32,7 +34,7 @@ class GridViewServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function boot()
+    public function boot(): void
     {
         $this->mergeConfigFrom(__DIR__ . '/../config/amigrid.php', GridView::NAME);
         $this->loadTranslationsFrom(__DIR__ . '/../resources/lang', GridView::NAME);
@@ -53,7 +55,7 @@ class GridViewServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function register()
+    public function register(): void
     {
         $this->app->bind(\Assurrussa\GridView\Interfaces\GridInterface::class, function ($app) {
             /** @var Container $app */
@@ -66,7 +68,7 @@ class GridViewServiceProvider extends ServiceProvider
     /**
      * @return array
      */
-    public function provides()
+    public function provides(): array
     {
         return [GridView::NAME];
     }
@@ -74,7 +76,7 @@ class GridViewServiceProvider extends ServiceProvider
     /**
      * Register the providers.
      */
-    protected function registerProviders()
+    protected function registerProviders(): void
     {
         foreach($this->providers as $provider) {
             $this->app->register($provider);

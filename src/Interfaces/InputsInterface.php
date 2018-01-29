@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Assurrussa\GridView\Interfaces;
 
 /**
@@ -9,18 +11,13 @@ namespace Assurrussa\GridView\Interfaces;
  */
 interface InputsInterface
 {
-    /**
-     * @return int
-     */
-    public function count();
+    public function setInput(InputInterface $input): InputsInterface;
 
-    /**
-     * @return array
-     */
-    public function toArray();
+    public function getInputs(): array;
 
-    /**
-     * @return mixed
-     */
-    public function render();
+    public function count(): int;
+
+    public function toArray(): array;
+
+    public function render(): array;
 }

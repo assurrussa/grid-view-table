@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Assurrussa\GridView\Support;
 
 use Assurrussa\GridView\Interfaces\InputInterface;
@@ -17,45 +19,42 @@ class Inputs implements InputsInterface
     private $_inputs = [];
 
     /**
-     * Добавление необходимых полей для Grid
+     * @param InputInterface $input
      *
-     * @param \Closure|InputInterface $inputs
-     * @return $this
+     * @return InputsInterface
      */
-    public function setInput($input)
+    public function setInput(InputInterface $input): InputsInterface
     {
         $this->_inputs[] = $input;
+
         return $this;
     }
 
     /**
-     * @return Input[]
+     * @return array|Input[]
      */
-    public function getInputs()
+    public function getInputs(): array
     {
         return $this->_inputs;
     }
 
     /**
-     * Получение необходимых полей для Grid
-     *
      * @return array
      */
-    public function toArray()
+    public function toArray(): array
     {
         $inputs = [];
-        foreach($this->_inputs as $input) {
+        foreach ($this->_inputs as $input) {
             $inputs[] = $input->toArray();
         }
+
         return $inputs;
     }
 
     /**
-     * Получение количества колонок
-     *
      * @return int
      */
-    public function count()
+    public function count(): int
     {
         return count($this->_inputs);
     }
@@ -63,12 +62,13 @@ class Inputs implements InputsInterface
     /**
      * @return array
      */
-    public function render()
+    public function render(): array
     {
         $buttons = [];
-        foreach($this->_inputs as $button) {
+        foreach ($this->_inputs as $button) {
             $buttons[] = $button->render();
         }
+
         return $buttons;
     }
 }

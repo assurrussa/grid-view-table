@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Assurrussa\GridView\Providers;
 
 use Illuminate\Support\Facades\Route;
@@ -22,7 +24,7 @@ class RouteServiceProvider extends ServiceProvider
      * @param  \Illuminate\Routing\Router $router
      * @return void
      */
-    public function boot()
+    public function boot(): void
     {
         $this->registerPatterns();
         parent::boot();
@@ -34,7 +36,7 @@ class RouteServiceProvider extends ServiceProvider
      * @param  \Illuminate\Routing\Router $router
      * @return void
      */
-    public function map()
+    public function map(): void
     {
         $this->mapWebRoutes();
     }
@@ -45,7 +47,7 @@ class RouteServiceProvider extends ServiceProvider
      * @param  \Illuminate\Routing\Router $router
      * @return void
      */
-    protected function mapWebRoutes()
+    protected function mapWebRoutes(): void
     {
         Route::group([
             'namespace'  => $this->namespace,
@@ -63,7 +65,7 @@ class RouteServiceProvider extends ServiceProvider
     /**
      * All patterns url
      */
-    protected function registerPatterns()
+    protected function registerPatterns(): void
     {
         Route::pattern('id', '[0-9]+');
         Route::pattern('scope', '[A-za-z0-9-]+');

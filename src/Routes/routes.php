@@ -5,6 +5,8 @@
  * @var \Illuminate\Routing\Router $router
  */
 
+declare(strict_types=1);
+
 if(config('amigrid.routes')) {
     $router->get('{model}/create', ['as' => 'amigrid.create', 'uses' => 'ModelBaseGridController@create']);
     $router->get('{model}/{id}', ['as' => 'amigrid.show', 'uses' => 'ModelBaseGridController@show']);

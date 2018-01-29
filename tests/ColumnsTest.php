@@ -2,6 +2,10 @@
 
 use Assurrussa\GridView\Support\Columns;
 
+use Tests\TestCase;
+use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
+
 class ColumnsTest extends TestCase
 {
 
@@ -23,7 +27,7 @@ class ColumnsTest extends TestCase
         $column = (new \Assurrussa\GridView\Support\Column());
         $columns->setColumn(
             $column->setActions(function ($data) {
-                $this->assertTrue($data instanceof stdClass);
+                $this->assertTrue($data instanceof \Assurrussa\GridView\Models\Model);
                 $this->assertEquals(2, $data->action);
                 return [
                     (new \Assurrussa\GridView\Support\Button())->setActionEdit(),
@@ -33,7 +37,7 @@ class ColumnsTest extends TestCase
                 ];
             })
         );
-        $object = new stdClass();
+        $object = new \Assurrussa\GridView\Models\Model();
         $object->action = 2;
         $column->setInstance($object);
 
