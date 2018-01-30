@@ -43,4 +43,4 @@
         $listTitle[] = $fnGetString($data);
     }
 @endphp
-{{ implode($delimiter, $listTitle) }}
+{!! implode($delimiter, $listTitle) !!}

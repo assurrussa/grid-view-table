@@ -210,9 +210,9 @@ class GridView implements GridInterface
      */
     public function render(array $data = [], string $path = 'gridView', array $mergeData = []): string
     {
-        $path = $path === 'gridView' ? 'part.grid' : $path;
-
         if (request()->ajax() || request()->wantsJson()) {
+            $path = $path === 'gridView' ? 'part.grid' : $path;
+
             return json_encode([
                 'url'  => $data['data']->location . '?' . http_build_query($data['data']->requestParams),
                 'data' => static::view($path, $data, $mergeData)->render(),

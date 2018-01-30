@@ -26,7 +26,7 @@ $orderBy = $data->orderBy;
                     @if($header->screening && ($header->key === 'checkbox'))
                         {!! $header->value !!}
                     @else
-                        {{ $header->value }}
+                        {{ e($header->value) }}
                     @endif
                     <span class="{{ $orderByResult }}"></span>
                 </th>
@@ -51,7 +51,7 @@ $orderBy = $data->orderBy;
                         @if($header->screening)
                             {!! $item[$header->key] !!}
                         @else
-                            {{ $item[$header->key] }}
+                            {{ e($item[$header->key]) }}
                         @endif
                     </td>
                 @endforeach
