@@ -63,13 +63,18 @@ class ButtonItemTest extends TestCase
         $button = new Button();
         $button->setActionEdit();
         $this->assertEquals('<a href="#"
-   class=" btn btn-default btn-sm flat"
-   id=""
-   data-toggle="tooltip"
-   title="Edit"
->
-        <i class="fa fa-pencil"></i>
-        </a>
+       class=" btn btn-default btn-sm flat"
+       id=""
+       data-confirm="Are you sure you want to delete this post?"
+       data-btn-ok-text="ok"
+       data-btn-ok-color="btn-primary"
+       data-btn-cancel-text="cancel"
+       data-btn-cancel-color="btn-default"
+       data-toggle="tooltip"
+       title="Edit" >
+                    <i class="fa fa-pencil"></i>
+                
+    </a>
 ', (string)$button);
         $button = new Button();
         $button->setActionEdit()
@@ -83,13 +88,18 @@ class ButtonItemTest extends TestCase
                 return $data == null;
             });
         $this->assertEquals('<a href="#"
-   class="test-js-class test-class"
-   id="test-id"
-   data-toggle="tooltip"
-   title="title"
->
-        <i class="fa fa-pencil"></i>
-        label</a>
+       class="test-js-class test-class"
+       id="test-id"
+       data-confirm="confirm-text"
+       data-btn-ok-text="ok"
+       data-btn-ok-color="btn-primary"
+       data-btn-cancel-text="cancel"
+       data-btn-cancel-color="btn-default"
+       data-toggle="tooltip"
+       title="title" >
+                    <i class="fa fa-pencil"></i>
+                label
+    </a>
 ', (string)$button);
 
     }

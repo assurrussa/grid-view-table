@@ -24,6 +24,10 @@ use Illuminate\View\View;
  * @property string $title
  * @property string $url
  * @property string $confirmText
+ * @property string $confirmColorOk
+ * @property string $confirmColorCancel
+ * @property string $confirmTextOk
+ * @property string $confirmTextCancel
  * @property array  $options
  * @property array  $strings
  * @property bool   $visibility
@@ -38,14 +42,16 @@ class Button implements ButtonInterface, Renderable, Arrayable
     const TYPE_ACTION_EDIT = 'edit';
     const TYPE_ACTION_RESTORE = 'restore';
     const TYPE_ACTION_CUSTOM = 'custom';
+    const TYPE_ACTION_CREATE = 'create';
+    const TYPE_ACTION_EXPORT = 'export';
 
-    const TYPE_BUTTON_CREATE = 'create';
-    const TYPE_BUTTON_EXPORT = 'export';
+    const TYPE_LINK = 'link';
+    const TYPE_FORM = 'form';
 
     /**
      * @var string
      */
-    public $type = self::TYPE_ACTION_CUSTOM;
+    public $type = self::TYPE_LINK;
 
     /**
      * @var string
@@ -87,6 +93,10 @@ class Button implements ButtonInterface, Renderable, Arrayable
      * @var string
      */
     protected $confirmText = '';
+    protected $confirmColorOk = 'btn-primary';
+    protected $confirmColorCancel = 'btn-default';
+    protected $confirmTextOk = 'ok';
+    protected $confirmTextCancel = 'cancel';
     /**
      * @var array
      */
@@ -130,6 +140,7 @@ class Button implements ButtonInterface, Renderable, Arrayable
         string $icon = 'fa fa-times'
     ): ButtonInterface {
         $this->setAction(self::TYPE_ACTION_DELETE)
+            ->setTypeForm()
             ->setLabel($label)
             ->setTitle($title)
             ->setRoute($route, $params)
@@ -158,6 +169,7 @@ class Button implements ButtonInterface, Renderable, Arrayable
         string $icon = 'fa fa-reply'
     ): ButtonInterface {
         $this->setAction(self::TYPE_ACTION_RESTORE)
+            ->setTypeForm()
             ->setRoute($route, $params)
             ->setLabel($label)
             ->setTitle($title)
@@ -264,7 +276,7 @@ class Button implements ButtonInterface, Renderable, Arrayable
         $text = GridView::trans('grid.export');
 
         return $this->setActionCustom($url . $addUrl, $text, 'btn btn-default', 'fa fa-upload')
-            ->setType(self::TYPE_BUTTON_EXPORT)
+            ->setAction(self::TYPE_ACTION_EXPORT)
             ->setId('js-amiExportButton');
     }
 
@@ -278,7 +290,7 @@ class Button implements ButtonInterface, Renderable, Arrayable
         $text = GridView::trans('grid.create');
 
         return $this->setActionCustom($url, $text, 'btn btn-primary', 'fa fa-plus')
-            ->setType(self::TYPE_BUTTON_CREATE);
+            ->setAction(self::TYPE_ACTION_CREATE);
     }
 
     /**
@@ -466,13 +478,36 @@ class Button implements ButtonInterface, Renderable, Arrayable
 
     /**
      * @param string|null $text
+     * @param string|null $colorOk
+     * @param string|null $colorCancel
+     * @param string|null $textOk
+     * @param string|null $textCancel
      *
      * @return ButtonInterface
      */
-    public function setConfirmText(string $text = null): ButtonInterface
-    {
+    public function setConfirmText(
+        string $text = null,
+        string $colorOk = null,
+        string $colorCancel = null,
+        string $textOk = null,
+        string $textCancel = null
+    ): ButtonInterface {
         if ($this->isVisibility()) {
-            $this->confirmText = $text;
+            if ($text) {
+                $this->confirmText = $text;
+            }
+            if ($colorOk) {
+                $this->confirmColorOk = $colorOk;
+            }
+            if ($colorCancel) {
+                $this->confirmColorCancel = $colorCancel;
+            }
+            if ($textOk) {
+                $this->confirmTextOk = $textOk;
+            }
+            if ($textCancel) {
+                $this->confirmTextCancel = $textCancel;
+            }
         }
 
         return $this;
@@ -534,6 +569,22 @@ class Button implements ButtonInterface, Renderable, Arrayable
         }
 
         return $this;
+    }
+
+    /**
+     * @return ButtonInterface
+     */
+    public function setTypeLink(): ButtonInterface
+    {
+        return $this->setType(self::TYPE_LINK);
+    }
+
+    /**
+     * @return ButtonInterface
+     */
+    public function setTypeForm(): ButtonInterface
+    {
+        return $this->setType(self::TYPE_FORM);
     }
 
     /**
@@ -713,19 +764,23 @@ class Button implements ButtonInterface, Renderable, Arrayable
         }
 
         return [
-            'type'        => $this->getType(),
-            'action'      => $this->getAction(),
-            'method'      => $this->getMethod(),
-            'icon'        => $this->getIcon(),
-            'label'       => $this->getLabel(),
-            'title'       => $this->getTitle(),
-            'url'         => $this->getUrl(),
-            'id'          => $this->getId(),
-            'class'       => $this->getClass(),
-            'jsClass'     => $this->getJsClass(),
-            'confirmText' => $this->getConfirmText(),
-            'options'     => $this->getOptions(),
-            'strings'     => $this->getStrings(),
+            'type'               => $this->getType(),
+            'action'             => $this->getAction(),
+            'method'             => $this->getMethod(),
+            'icon'               => $this->getIcon(),
+            'label'              => $this->getLabel(),
+            'title'              => $this->getTitle(),
+            'url'                => $this->getUrl(),
+            'id'                 => $this->getId(),
+            'class'              => $this->getClass(),
+            'jsClass'            => $this->getJsClass(),
+            'confirmText'        => $this->getConfirmText(),
+            'confirmColorOk'     => $this->confirmColorOk,
+            'confirmColorCancel' => $this->confirmColorCancel,
+            'confirmTextOk'      => $this->confirmTextOk,
+            'confirmTextCancel'  => $this->confirmTextCancel,
+            'options'            => $this->getOptions(),
+            'strings'            => $this->getStrings(),
         ];
     }
 

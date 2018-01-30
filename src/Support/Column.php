@@ -192,7 +192,7 @@ class Column implements ColumnInterface
             return $this->getHandler();
         }
 
-        if($this->instance) {
+        if ($this->instance) {
             return $this->getValueColumn($this->instance, $this->key);
         }
 
@@ -409,14 +409,18 @@ class Column implements ColumnInterface
     }
 
     /**
-     * @param callable $action
+     * @param callable    $action
+     * @param string|null $value
      *
      * @return ColumnInterface
      */
-    public function setActions(Callable $action): ColumnInterface
+    public function setActions(Callable $action, string $value = null): ColumnInterface
     {
         $this->setKeyAction();
         $this->actions = $action;
+        if ($value !== null) {
+            $this->setValue($value);
+        }
 
         return $this;
     }

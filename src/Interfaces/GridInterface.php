@@ -40,13 +40,15 @@ interface GridInterface
 
     public function input(): \Assurrussa\GridView\Support\Input;
 
-    public function columnActions(Callable $action): ColumnInterface;
+    public function columnActions(Callable $action, string $value = null): ColumnInterface;
 
     public function columnAction(): \Assurrussa\GridView\Support\Button;
 
     public static function columnCeil(): \Assurrussa\GridView\Support\ColumnCeil;
 
     public function get(): \Assurrussa\GridView\Helpers\GridViewResult;
+
+    public function first(): \Assurrussa\GridView\Helpers\GridViewResult;
 
     public function setId(string $id): GridInterface;
 
@@ -86,4 +88,13 @@ interface GridInterface
      * @return mixed
      */
     public function render(array $data = [], string $path = 'gridView', array $mergeData = []): string;
+
+    /**
+     * @param array  $data
+     * @param string $path
+     * @param array  $mergeData
+     *
+     * @return mixed
+     */
+    public function renderFirst(array $data = [], string $path = 'gridView', array $mergeData = []): string;
 }

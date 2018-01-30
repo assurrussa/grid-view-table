@@ -62,7 +62,7 @@ interface ColumnInterface
 
     public function setDateActive(bool $bool = false): ColumnInterface;
 
-    public function setActions(Callable $action): ColumnInterface;
+    public function setActions(Callable $action, string $value = null): ColumnInterface;
 
     public function setInstance(\Illuminate\Database\Eloquent\Model $instance): ColumnInterface;
 

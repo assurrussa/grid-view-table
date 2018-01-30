@@ -94,7 +94,7 @@ class ColumnCeil
      */
     public function filterButton(
         string $name,
-        string $id = null,
+        string $id,
         string $class = null,
         string $icon = null,
         string $title = null,
@@ -105,7 +105,7 @@ class ColumnCeil
         $class = $class ? $class : 'btn btn-xs btn-default';
         $title = $title ? $title : '';
         $originTitle = $originTitle ? $originTitle : GridView::trans('grid.showSimilar');
-        $view = $view ?: 'column.listToString';
+        $view = $view ?: 'column.filterButton';
 
         return GridView::view($view, [
             'id'          => $id,

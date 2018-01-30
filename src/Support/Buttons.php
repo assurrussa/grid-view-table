@@ -63,7 +63,7 @@ class Buttons implements ButtonsInterface
     public function getButtonCreate(): ?string
     {
         foreach ($this->_buttons as $key => $button) {
-            if ($button->getType() == Button::TYPE_BUTTON_CREATE) {
+            if ($button->getAction() == Button::TYPE_ACTION_CREATE) {
                 unset($this->_buttons[$key]);
 
                 return $button->render()->render();
@@ -79,7 +79,7 @@ class Buttons implements ButtonsInterface
     public function getButtonCreateToArray(): array
     {
         foreach ($this->_buttons as $key => $button) {
-            if ($button->getType() == Button::TYPE_BUTTON_CREATE) {
+            if ($button->getAction() == Button::TYPE_ACTION_CREATE) {
                 unset($this->_buttons[$key]);
 
                 return $button->toArray();
@@ -95,7 +95,7 @@ class Buttons implements ButtonsInterface
     public function getButtonExport(): ?string
     {
         foreach ($this->_buttons as $key => $button) {
-            if ($button->getType() == Button::TYPE_BUTTON_EXPORT) {
+            if ($button->getAction() == Button::TYPE_ACTION_EXPORT) {
                 unset($this->_buttons[$key]);
 
                 return $button->render()->render();
@@ -111,7 +111,7 @@ class Buttons implements ButtonsInterface
     public function getButtonExportToArray(): array
     {
         foreach ($this->_buttons as $key => $button) {
-            if ($button->getType() == Button::TYPE_BUTTON_EXPORT) {
+            if ($button->getAction() == Button::TYPE_ACTION_EXPORT) {
                 unset($this->_buttons[$key]);
 
                 return $button->toArray();

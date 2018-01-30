@@ -174,13 +174,14 @@ class GridView implements GridInterface
     }
 
     /**
-     * @param callable $action
+     * @param callable    $action
+     * @param string|null $value
      *
      * @return ColumnInterface
      */
-    public function columnActions(Callable $action): ColumnInterface
+    public function columnActions(Callable $action, string $value = null): ColumnInterface
     {
-        return $this->column()->setActions($action);
+        return $this->column()->setActions($action, $value);
     }
 
     /**
@@ -209,9 +210,9 @@ class GridView implements GridInterface
      */
     public function render(array $data = [], string $path = 'gridView', array $mergeData = []): string
     {
-        if (request()->ajax() || request()->wantsJson()) {
-            $path = $path === 'gridView' ? 'part.grid' : $path;
+        $path = $path === 'gridView' ? 'part.grid' : $path;
 
+        if (request()->ajax() || request()->wantsJson()) {
             return json_encode([
                 'url'  => $data['data']->location . '?' . http_build_query($data['data']->requestParams),
                 'data' => static::view($path, $data, $mergeData)->render(),
@@ -219,6 +220,27 @@ class GridView implements GridInterface
         }
 
         return static::view($path, $data, $mergeData)->render();
+    }
+
+    /**
+     * @param array  $data
+     * @param string $path
+     * @param array  $mergeData
+     *
+     * @return string
+     * @throws \Throwable
+     */
+    public function renderFirst(array $data = [], string $path = 'gridView', array $mergeData = []): string
+    {
+        $path = $path === 'gridView' ? 'part.tableTrItem' : $path;
+
+        $headers = $data['data']->headers;
+        $item = (array)$data['data']->data;
+
+        return static::view($path, [
+            'headers' => $headers,
+            'item'    => $item,
+        ], $mergeData)->render();
     }
 
     /**
@@ -281,6 +303,33 @@ class GridView implements GridInterface
         $gridViewResult->sortName = $this->sortName;
         $gridViewResult->counts = $this->counts;
         $gridViewResult->searchInput = $this->searchInput;
+
+        return $gridViewResult;
+    }
+
+    /**
+     * @return \Assurrussa\GridView\Helpers\GridViewResult
+     * @throws ColumnsException
+     * @throws QueryException
+     */
+    public function first(): \Assurrussa\GridView\Helpers\GridViewResult
+    {
+        $this->fetch();
+
+        $_listRow = [];
+        if ($instance = $this->_query->first()) {
+            foreach ($this->columns->getColumns() as $column) {
+                $_listRow[$column->getKey()] = $column->getValues($instance);
+            }
+            $buttons = $this->columns->filterActions($instance);
+            if (count($buttons)) {
+                $_listRow = array_merge($_listRow, [Column::ACTION_NAME => implode('', $buttons)]);
+            }
+        }
+
+        $gridViewResult = new \Assurrussa\GridView\Helpers\GridViewResult();
+        $gridViewResult->headers = $this->columns->toArray();
+        $gridViewResult->data = $_listRow;
 
         return $gridViewResult;
     }
@@ -687,7 +736,7 @@ class GridView implements GridInterface
         }
         $this->columnActions(function ($data) {
             $buttons = [];
-            if($this->getConfig('routes')) {
+            if ($this->getConfig('routes')) {
                 $pathNameForModel = strtolower(str_plural(camel_case(class_basename($data))));
                 $buttons[] = $this->columnAction()->setActionDelete('amigrid.delete', [$pathNameForModel, $data->id]);
                 $buttons[] = $this->columnAction()->setActionShow('amigrid.show',
@@ -699,7 +748,7 @@ class GridView implements GridInterface
 
             return $buttons;
         });
-        if($this->getConfig('routes')) {
+        if ($this->getConfig('routes')) {
             $pathNameForModel = strtolower(str_plural(camel_case(class_basename($model))));
             $this->button()->setButtonCreate(route('amigrid.create', [$pathNameForModel]));
         }

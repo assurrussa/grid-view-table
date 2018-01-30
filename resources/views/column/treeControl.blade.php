@@ -9,6 +9,10 @@
      * @var string $url
      * @var string $method
      * @var string $confirmText
+     * @var string $confirmTextOk
+     * @var string $confirmTextCancel
+     * @var string $confirmColorOk
+     * @var string $confirmColorCancel
      * @var string $type
      * @var array  $options
      * @var array  $strings
@@ -37,18 +41,16 @@
             $attributes[] = $attribute . '="' . e($value) . '"';
         }
     }
-    $linkButton = (
-        $action === Button::TYPE_ACTION_SHOW
-        || $action === Button::TYPE_ACTION_EDIT
-        || $type === Button::TYPE_ACTION_CUSTOM
-        || $type === Button::TYPE_BUTTON_CREATE
-        || $type === Button::TYPE_BUTTON_EXPORT
-    );
 @endphp
-@if($linkButton)
+@if($type === Button::TYPE_LINK)
     <a href="{{ $url }}"
        class="{{ $jsClass }} {{ $class }}"
        id="{{ $id }}"
+       data-confirm="{{ $confirmText }}"
+       data-btn-ok-text="{{ $confirmTextOk }}"
+       data-btn-ok-color="{{ $confirmColorOk }}"
+       data-btn-cancel-text="{{ $confirmTextCancel }}"
+       data-btn-cancel-color="{{ $confirmColorCancel }}"
        data-toggle="tooltip"
        title="{{ $title }}" {{ implode(' ', $attributes) }}>
         @if($icon)
@@ -66,10 +68,10 @@
         <button id="{{ $id }}"
                 class="{{ !empty($jsClass) ? $jsClass : 'js-btnDelete' }} {{ $class }}"
                 data-confirm="{{ $confirmText }}"
-                data-text-ok="{{ $confirmTextOk }}"
-                data-text-cancel="{{ $confirmTextCancel }}"
-                data-color-ok="{{ $confirmColorOk }}"
-                data-color-cancel="{{ $confirmColorCancel }}"
+                data-btn-ok-text="{{ $confirmTextOk }}"
+                data-btn-ok-color="{{ $confirmColorOk }}"
+                data-btn-cancel-text="{{ $confirmTextCancel }}"
+                data-btn-cancel-color="{{ $confirmColorCancel }}"
                 data-toggle="tooltip"
                 title="{{ $title }}">
             @if($icon)
@@ -98,10 +100,10 @@
         <button id="{{ $id }}"
                 class="{{ $jsClass }} {{ $class }}"
                 data-confirm="{{ $confirmText }}"
-                data-text-ok="{{ $confirmTextOk }}"
-                data-text-cancel="{{ $confirmTextCancel }}"
-                data-color-ok="{{ $confirmColorOk }}"
-                data-color-cancel="{{ $confirmColorCancel }}"
+                data-btn-ok-text="{{ $confirmTextOk }}"
+                data-btn-ok-color="{{ $confirmColorOk }}"
+                data-btn-cancel-text="{{ $confirmTextCancel }}"
+                data-btn-cancel-color="{{ $confirmColorCancel }}"
                 data-toggle="tooltip"
                 title="{{ $title }}">
             <?php if($icon) { ?>

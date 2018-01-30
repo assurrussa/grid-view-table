@@ -30,13 +30,17 @@ interface ButtonInterface
 
     public function setTitle(string $text = null): ButtonInterface;
 
-    public function setConfirmText(string $text = null): ButtonInterface;
+    public function setConfirmText(string $text = null, string $colorOk = null, string $colorCancel = null, string $textOk = null, string $textCancel = null): ButtonInterface;
 
     public function setUrl(string $url = '#'): ButtonInterface;
 
     public function setRoute(string $route = null, array $params = []): ButtonInterface;
 
     public function setType(string $type): ButtonInterface;
+
+    public function setTypeLink(): ButtonInterface;
+
+    public function setTypeForm(): ButtonInterface;
 
     public function setOptions(array $array = []): ButtonInterface;
 
