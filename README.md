@@ -45,19 +45,17 @@ or facade
      */
     public function index()
     {
-        $model = new Entity();
-        $query = $model->newQuery()->with('catalogs', 'brand');
-
-        // create new model GridView
-        $gridView = app(\Assurrussa\GridView\GridView::NAME);
-        // set Builder Query
-        $gridView->query($query);
-        
-        // search input for table
-        $gridView->setSearchInput(false);
-
         $catalogs = Catalog::pluck('title', 'id');
         $brands = Brand::pluck('name', 'id');
+        $query = (new Entity())->newQuery()->with('catalogs', 'brand');
+
+        /** @var \Assurrussa\GridView\GridView $gridView */
+        $gridView = app(\Assurrussa\GridView\GridView::NAME); // create new model GridView
+        $gridView->setQuery($query); // set Builder Query
+        $gridView->column()->setClassForString(function ($data) {
+            return '';
+        });
+        $gridView->setSearchInput(false); // search input for table
 
         // added column
         $gridView->column()->setKey('id')->setValue(trans('app.label.id'))->setSort(true);
@@ -79,9 +77,8 @@ or facade
         $gridView->column()->setKey('preview')->setValue(trans('app.label.preview'))->setSort(false)
             ->setScreening(true)->setHandler(function ($data) {
                 /** @var Entity $data */
-                return amiGridColumnCeil()->image($data->entityInfo->preview, $data->entityInfo->title);    
+                return amiGridColumnCeil()->image($data->entityInfo->preview, $data->entityInfo->title);
             });
-
 
         // added column actions
         $gridView->columnActions(function ($data) use ($gridView) {
@@ -94,7 +91,7 @@ or facade
             });
             $buttons[] = $gridView->columnAction()->setActionEdit('admin.entity.edit', [$data->id]);
             return $buttons;
-        });
+        }, 'actions');
 
         // added buttons for table
         $gridView->button()->setButtonCreate(route('admin.entity.create'));
