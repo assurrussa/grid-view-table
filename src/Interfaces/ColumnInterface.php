@@ -24,9 +24,9 @@ interface ColumnInterface
 
     public function getHandler();
 
-    public function getValues(\Illuminate\Database\Eloquent\Model $instance = null);
+    public function getValues($instance = null);
 
-    public function getValueColumn(\Illuminate\Database\Eloquent\Model $instance, string $name);
+    public function getValueColumn($instance, string $name);
 
     public function getActions();
 

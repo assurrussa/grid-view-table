@@ -183,7 +183,7 @@ class Column implements ColumnInterface
      *
      * @return mixed|null
      */
-    public function getValues(\Illuminate\Database\Eloquent\Model $instance = null)
+    public function getValues($instance = null)
     {
         if ($instance) {
             $this->setInstance($instance);
@@ -200,12 +200,12 @@ class Column implements ColumnInterface
     }
 
     /**
-     * @param \Illuminate\Database\Eloquent\Model $instance
-     * @param string                              $name
+     * @param mixed  $instance
+     * @param string $name
      *
-     * @return \Illuminate\Database\Eloquent\Model|null
+     * @return mixed
      */
-    public function getValueColumn(\Illuminate\Database\Eloquent\Model $instance, string $name)
+    public function getValueColumn($instance, string $name)
     {
         if (!$instance) {
             return null;
