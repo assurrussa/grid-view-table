@@ -587,11 +587,12 @@ class GridView implements GridInterface
         if (count($this->_request) > 0) {
             foreach ($this->_request as $scope => $value) {
                 if (!empty($value) || $value === 0 || $value === '0') {
+                    $value = (string)$value;
                     //checked scope method for model
                     if (method_exists($this->_query->getModel(), 'scope' . camel_case($scope))) {
                         $this->_query->{camel_case($scope)}($value);
                     } else {
-                        $values = explode(',', (string)$value);
+                        $values = explode(',', $value);
                         if (count($values) > 1) {
                             $this->filterSearch($scope, $values[0], '>');
                             $this->filterSearch($scope, $values[1], '<');
@@ -619,7 +620,7 @@ class GridView implements GridInterface
      */
     protected function filterSearch(
         string $search,
-        $value = null,
+        string $value = null,
         string $operator = '=',
         string $beforeValue = '',
         string $afterValue = ''
