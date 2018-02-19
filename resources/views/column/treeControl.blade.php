@@ -17,8 +17,6 @@
      * @var array  $options
      * @var array  $strings
      */
-    use \Assurrussa\GridView\Support\Button;
-
     $type = !empty($type) ? $type : null;
     $method = !empty($method) ? $method : 'POST';
     $confirmText = !empty($confirmText) ? $confirmText : \Assurrussa\GridView\GridView::trans('grid.clickDelete');
@@ -38,11 +36,19 @@
     $attributes = [];
     if (isset($options)) {
         foreach ($options as $attribute => $value) {
-            $attributes[] = $attribute . '="' . e($value) . '"';
+            if (is_numeric($attribute)) {
+                $attributes[] = $value;
+            }
+            if (is_bool($value) && $attribute !== 'value') {
+                $attributes[] = ($value ? $attribute : '');
+            }
+            if (! is_null($value)) {
+                $attributes[] = $attribute . '="' . e($value, false) . '"';
+            }
         }
     }
 @endphp
-@if($type === Button::TYPE_LINK)
+@if($type === \Assurrussa\GridView\Support\Button::TYPE_LINK)
     <a href="{{ $url }}"
        class="{{ $jsClass }} {{ $class }}"
        id="{{ $id }}"
@@ -52,7 +58,7 @@
        data-btn-cancel-text="{{ $confirmTextCancel }}"
        data-btn-cancel-color="{{ $confirmColorCancel }}"
        data-toggle="tooltip"
-       title="{{ $title }}" {{ implode(' ', $attributes) }}>
+       title="{{ $title }}" {!! implode(' ', $attributes) !!}>
         @if($icon)
             <i class="{{ $icon }}"></i>
         @endif
@@ -73,7 +79,7 @@
                 data-btn-cancel-text="{{ $confirmTextCancel }}"
                 data-btn-cancel-color="{{ $confirmColorCancel }}"
                 data-toggle="tooltip"
-                title="{{ $title }}">
+                title="{{ $title }}" {!! implode(' ', $attributes) !!}>
             @if($icon)
                 <i class="{{ $icon }}"></i>
             @endif
@@ -105,7 +111,7 @@
                 data-btn-cancel-text="{{ $confirmTextCancel }}"
                 data-btn-cancel-color="{{ $confirmColorCancel }}"
                 data-toggle="tooltip"
-                title="{{ $title }}">
+                title="{{ $title }}" {!! implode(' ', $attributes) !!}>
             <?php if($icon) { ?>
             <i class="{{ $icon }}"></i>
             <?php } ?>
