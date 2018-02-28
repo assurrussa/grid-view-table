@@ -15,7 +15,7 @@ interface GridInterface
 
     public static function view(string $view = null, array $data = [], array $mergeData = []): \Illuminate\Contracts\Support\Renderable;
 
-    public static function trans(string $id = null, array $parameters = [], string $domain = 'messages', string $locale = null): string;
+    public static function trans(string $id = null, array $parameters = [], string $locale = null): string;
 
     public function setQuery(\Illuminate\Database\Eloquent\Builder $query): GridInterface;
 

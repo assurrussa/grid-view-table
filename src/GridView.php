@@ -269,9 +269,9 @@ class GridView implements GridInterface
      *
      * @return \Symfony\Component\Translation\TranslatorInterface|string
      */
-    public static function trans(string $id = null, array $parameters = [], string $domain = 'messages', string $locale = null): string
+    public static function trans(string $id = null, array $parameters = [], string $locale = null): string
     {
-        return trans(self::NAME . '::' . $id, $parameters, $domain, $locale);
+        return trans(self::NAME . '::' . $id, $parameters, $locale);
     }
 
     /**
