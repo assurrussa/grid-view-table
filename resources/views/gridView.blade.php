@@ -254,6 +254,7 @@
                     });
                 },
             };
+            AmiGridJS.milliSeconds = parseInt('{{ $data->milliSeconds }}');
             AmiGridJS.gridId = '{{ $data->getElementName() }}';
             AmiGridJS.init();
         });

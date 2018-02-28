@@ -31,6 +31,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
  * @property string                                      $sortName
  * @property array                                       $counts
  * @property bool                                        $searchInput
+ * @property int                                         $milliSeconds
  *
  * Class GridViewResult
  */

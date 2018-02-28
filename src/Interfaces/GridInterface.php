@@ -54,6 +54,10 @@ interface GridInterface
 
     public function getId(): string;
 
+    public function setCounts(array $array): GridInterface;
+
+    public function setMilliSeconds(int $int): GridInterface;
+
     public function setVisibleColumn(bool $visibleColumn): GridInterface;
 
     public function setDefaultCountItems(int $defaultCountItems): GridInterface;

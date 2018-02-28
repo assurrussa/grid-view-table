@@ -52,6 +52,8 @@ class GridView implements GridInterface
     public $defaultCountItems = 10;
     /** @var array */
     public $counts;
+    /** @var int */
+    public $milliSeconds = 600;
     /** @var array */
     public $filter;
     /** @var bool */
@@ -303,6 +305,7 @@ class GridView implements GridInterface
         $gridViewResult->sortName = $this->sortName;
         $gridViewResult->counts = $this->counts;
         $gridViewResult->searchInput = $this->searchInput;
+        $gridViewResult->milliSeconds = $this->milliSeconds;
 
         return $gridViewResult;
     }
@@ -359,9 +362,33 @@ class GridView implements GridInterface
     }
 
     /**
-     * @param boolean $visibleColumn
+     * @param array $array
+     *
+     * @return GridInterface
+     */
+    public function setCounts(array $array): GridInterface
+    {
+        $this->counts = $array;
+
+        return $this;
+    }
+
+    /**
+     * @param int $int
      *
      * @return GridView
+     */
+    public function setMilliSeconds(int $int): GridInterface
+    {
+        $this->milliSeconds = $int;
+
+        return $this;
+    }
+
+    /**
+     * @param bool $visibleColumn
+     *
+     * @return GridInterface
      */
     public function setVisibleColumn(bool $visibleColumn): GridInterface
     {
