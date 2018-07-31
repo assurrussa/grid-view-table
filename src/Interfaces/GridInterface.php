@@ -36,7 +36,7 @@ interface GridInterface
 
     public function button(): \Assurrussa\GridView\Support\Button;
 
-    public function column(): \Assurrussa\GridView\Support\Column;
+    public function column(string $name, string $title = ''): \Assurrussa\GridView\Support\Column;
 
     public function input(): \Assurrussa\GridView\Support\Input;
 
@@ -58,7 +58,7 @@ interface GridInterface
 
     public function setVisibleColumn(bool $visibleColumn): GridInterface;
 
-    public function setDefaultCountItems(int $defaultCountItems): GridInterface;
+    public function setStrictMode(bool $strictMode): GridInterface;
 
     public function setSearchInput(bool $searchInput = false): GridInterface;
 
@@ -81,6 +81,8 @@ interface GridInterface
     public function isVisibleColumn(): bool;
 
     public function isSearchInput(): bool;
+
+    public function isStrictMode(): bool;
 
     /**
      * @param array  $data

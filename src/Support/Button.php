@@ -605,7 +605,7 @@ class Button implements ButtonInterface, Renderable, Arrayable
     public function getHandler(): bool
     {
         if (is_callable($this->_handler) && $this->getInstance()) {
-            return call_user_func($this->_handler, $this->getInstance());
+            return (bool)call_user_func($this->_handler, $this->getInstance());
         }
 
         return true;

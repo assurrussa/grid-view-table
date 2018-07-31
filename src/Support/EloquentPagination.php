@@ -86,6 +86,44 @@ class EloquentPagination implements PaginationInterface
     }
 
     /**
+     * Returns a collection in view of pagination
+     *
+     * @param int $page
+     * @param int $limit
+     *
+     * @return \Illuminate\Contracts\Pagination\Paginator
+     */
+    public function getSimple(int $page, int $limit = 10, bool $isClount = false): \Illuminate\Contracts\Pagination\Paginator
+    {
+        if (!$this->_columns && !$this->_query) {
+            return null;
+        }
+        if($isClount) {
+            $countTotal = $this->_query->count();
+        }
+        $this->_query->skip(($page - 1) * $page)->take($page + 1);
+        $this->_data = $this->_query->simplePaginate($limit);
+        if($isClount) {
+            $this->_data->totalCount = $countTotal;
+        }
+        foreach ( $this->_data->items() as $key => $instance) {
+            $_listRow = [];
+            foreach ($this->_columns->getColumns() as $column) {
+                $_listRow[$column->getKey()] = $column->getValues($instance);
+                if($column->getKey() === 'preview') {
+                }
+            }
+            $buttons = $this->_columns->filterActions($instance);
+            if (count($buttons)) {
+                $_listRow = array_merge($_listRow, [Column::ACTION_NAME => implode('', $buttons)]);
+            }
+            $this->_data->offsetSet($key, $_listRow);
+        }
+
+        return $this->_data;
+    }
+
+    /**
      * @param string|null $view
      * @param array       $data
      * @param string      $formAction
@@ -122,7 +160,7 @@ class EloquentPagination implements PaginationInterface
             ];
 
             if ($url = $this->_data->previousPageUrl() ?: '') {
-                $list[] = $this->getItemForPagination('', '&laquo;', $url, 'prev', $this->_data->currentPage() - 1);
+                $list[] = $this->getItemForPagination('', '&laquo;', $url, 'prev', (string)($this->_data->currentPage() - 1));
             };
             foreach ($elements as $item) {
                 if (is_string($item)) {
@@ -139,7 +177,7 @@ class EloquentPagination implements PaginationInterface
                 }
             }
             if ($this->_data->hasMorePages()) {
-                $list[] = $this->getItemForPagination('', '&raquo;', $this->_data->nextPageUrl(), 'next', $this->_data->currentPage() + 1);
+                $list[] = $this->getItemForPagination('', '&raquo;', $this->_data->nextPageUrl(), 'next', (string)($this->_data->currentPage() + 1));
             };
         }
 

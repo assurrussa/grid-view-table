@@ -15,8 +15,8 @@ class GridViewTest extends TestCase
     {
         /** @var \Assurrussa\GridView\GridView $gridView */
         $gridView = $this->app->make(\Assurrussa\GridView\GridView::NAME);
-        $gridView->column()->setKey('id')->setValue('ID')->setSort(true);
-        $gridView->column()->setKey('name')->setValue('name label')->setSort(true)->setHandler(function ($data) {
+        $gridView->column('id','ID')->setSort(true);
+        $gridView->column('name','name label')->setSort(true)->setHandler(function ($data) {
             return $data->name . ' ' . $data->name;
         });
         $gridView->columnActions(function ($data) use ($gridView) {

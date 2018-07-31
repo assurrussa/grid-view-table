@@ -17,6 +17,8 @@ interface PaginationInterface
 
     public function get(int $page, int $limit = 10): \Illuminate\Pagination\LengthAwarePaginator;
 
+    public function getSimple(int $page, int $limit = 10): \Illuminate\Contracts\Pagination\Paginator;
+
     public function render(string $view = null, array $data = [], string $formAction = ''): string;
 
     public function toArray(): array;

@@ -6,11 +6,19 @@
 <div class="row">
     <div class="col-sm-6">
         <span class="pagination-fromToInfoHeader">
-        {{ \Assurrussa\GridView\GridView::trans('grid.gridCounts', [
-                'from'  => $data->data->firstItem(),
-                'to'    => $data->data->lastItem(),
-                'total' => $data->data->total(),
-        ]) }}
+            @if(method_exists($data->data, 'total'))
+                {{ \Assurrussa\GridView\GridView::trans('grid.gridCounts', [
+                        'from'  => $data->data->firstItem(),
+                        'to'    => $data->data->lastItem(),
+                        'total' => $data->data->total(),
+                ]) }}
+            @elseif(property_exists($data->data, 'totalCount'))
+                {{ \Assurrussa\GridView\GridView::trans('grid.gridCounts', [
+                        'from'  => $data->data->firstItem(),
+                        'to'    => $data->data->lastItem(),
+                        'total' => $data->data->totalCount,
+                ]) }}
+            @endif
         </span>
         <label>
             <select id="js-amiSelectCount" name="count" class="input-sm">
