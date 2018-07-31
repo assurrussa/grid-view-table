@@ -61,6 +61,7 @@ class Column implements ColumnInterface
     const FILTER_KEY_MODE = 'mode';
     const FILTER_KEY_CLASS = 'class';
     const FILTER_KEY_STYLE = 'style';
+    const FILTER_KEY_PLACEHOLDER = 'placeholder';
 
     /**
      * @property string
@@ -320,15 +321,17 @@ class Column implements ColumnInterface
         $array,
         string $mode = null,
         string $class = '',
-        string $style = ''
+        string $style = '',
+        string $placeholder = ''
     ): ColumnInterface {
         $mode = $mode ? $mode : self::FILTER_TYPE_SELECT;
         $this->filter = [
-            self::FILTER_KEY_NAME  => $field,
-            self::FILTER_KEY_DATA  => $array,
-            self::FILTER_KEY_MODE  => $mode,
-            self::FILTER_KEY_CLASS => $class,
-            self::FILTER_KEY_STYLE => $style,
+            self::FILTER_KEY_NAME        => $field,
+            self::FILTER_KEY_DATA        => $array,
+            self::FILTER_KEY_MODE        => $mode,
+            self::FILTER_KEY_CLASS       => $class,
+            self::FILTER_KEY_STYLE       => $style,
+            self::FILTER_KEY_PLACEHOLDER => $placeholder,
         ];
 
         return $this;

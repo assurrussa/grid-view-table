@@ -39,6 +39,7 @@ class GridView implements GridInterface
     public $limit;
     /** @var string */
     public $orderBy;
+    /** @var string */
     public $orderByDefault = Column::FILTER_ORDER_BY_ASC;
     /** @var string */
     public $search;
@@ -52,8 +53,6 @@ class GridView implements GridInterface
     public $defaultCountItems = 10;
     /** @var array */
     public $counts;
-    /** @var int */
-    public $milliSeconds = 600;
     /** @var array */
     public $filter;
     /** @var bool */
@@ -107,6 +106,7 @@ class GridView implements GridInterface
             'afterValue'  => '%',
         ]);
         $this->setVisibleColumn((bool)$this->getConfig('visibleColumn', true));
+        dd($this);
     }
 
     /**
@@ -305,7 +305,6 @@ class GridView implements GridInterface
         $gridViewResult->sortName = $this->sortName;
         $gridViewResult->counts = $this->counts;
         $gridViewResult->searchInput = $this->searchInput;
-        $gridViewResult->milliSeconds = $this->milliSeconds;
 
         return $gridViewResult;
     }
@@ -369,18 +368,6 @@ class GridView implements GridInterface
     public function setCounts(array $array): GridInterface
     {
         $this->counts = $array;
-
-        return $this;
-    }
-
-    /**
-     * @param int $int
-     *
-     * @return GridView
-     */
-    public function setMilliSeconds(int $int): GridInterface
-    {
-        $this->milliSeconds = $int;
 
         return $this;
     }
@@ -639,21 +626,23 @@ class GridView implements GridInterface
     /**
      * The method filters the data according
      *
-     * @param string|int $search
-     * @param mixed|null $value       word
-     * @param string     $operator    equal sign - '=', 'like' ...
-     * @param string     $beforeValue First sign before value
-     * @param string     $afterValue  Last sign after value
+     * @param string|int|null $search
+     * @param mixed|null      $value       word
+     * @param string          $operator    equal sign - '=', 'like' ...
+     * @param string          $beforeValue First sign before value
+     * @param string          $afterValue  Last sign after value
      */
     protected function filterSearch(
-        string $search,
+        string $search = null,
         string $value = null,
         string $operator = '=',
         string $beforeValue = '',
         string $afterValue = ''
     ): void {
         if ($search) {
-            $value = trim($value);
+            if ($value) {
+                $value = trim($value);
+            }
             $search = trim($search);
             /** @var Model $model */
             $model = $this->_query->getModel();
@@ -671,8 +660,7 @@ class GridView implements GridInterface
                     $tableName = $model->getTable();
                     if ($value) {
                         if (Model::hasColumn($model, $search)) {
-                            $query->orWhere($tableName . '.' . $search, $operator,
-                                $beforeValue . $value . $afterValue);
+                            $query->orWhere($tableName . '.' . $search, $operator, $beforeValue . $value . $afterValue);
                         }
                     } else {
                         foreach (\Schema::getColumnListing($tableName) as $column) {

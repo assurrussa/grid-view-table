@@ -1,0 +1,50 @@
+.content-box {
+  overflow: auto;
+}
+
+.tableBox {
+  & > thead > tr > th {
+    vertical-align: middle;
+  }
+  th {
+    font-weight: 300 !important;
+    width: auto;
+    background-color: #f4f4f4;
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    position: relative;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-right: 15px;
+    &.active {
+      background-color: #e5e5e5;
+    }
+    &.active .arrow {
+      opacity: 1;
+    }
+  }
+
+  tr {
+    max-height: 200px;
+    overflow: hidden;
+  }
+
+  .arrow {
+    display: inline-block;
+    vertical-align: middle;
+    position: absolute;
+    right: 5px;
+    top: 17px;
+    &.asc {
+      border-left: 5px solid transparent;
+      border-right: 5px solid transparent;
+      border-bottom: 5px solid #333;
+    }
+    &.desc {
+      border-left: 5px solid transparent;
+      border-right: 5px solid transparent;
+      border-top: 5px solid #333;
+    }
+  }
+}

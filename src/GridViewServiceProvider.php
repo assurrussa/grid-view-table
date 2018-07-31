@@ -26,7 +26,6 @@ class GridViewServiceProvider extends ServiceProvider
      * The providers package
      */
     protected $providers = [
-        \Assurrussa\GridView\Providers\RouteServiceProvider::class,
     ];
 
     /**

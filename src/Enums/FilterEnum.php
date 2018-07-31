@@ -18,7 +18,7 @@ class FilterEnum
      * @var array
      */
     public static $filterExecuteForCyrillicColumn = [
-        '_at',
+        '_at' => true,
     ];
 
     /**
@@ -39,6 +39,7 @@ class FilterEnum
      */
     public static function hasFilterExecuteForCyrillicColumn($column)
     {
-        return in_array(mb_substr($column, -3), static::getFilterExecuteForCyrillicColumn());
+        dd(22222222222222222222222222222222222222222222222222222, mb_substr($column, -3));
+        return isset(static::getFilterExecuteForCyrillicColumn()[mb_substr($column, -3)]);
     }
 }

@@ -8,7 +8,7 @@ $orderBy = $data->orderBy;
 <div class="content-box">
     <input type="hidden" id="js-amiOrderBy" name="by" value="{{ $orderBy }}">
     <input type="hidden" id="js-amiSortName" name="sort" value="{{ $sortName }}">
-    <table class="table table-stripped table-bordered table-hover table-condensed">
+    <table class="table table-stripped table-condensed table-bordered table-hover tableBox">
         <thead>
         <tr>
             @foreach($data->headers as $header)

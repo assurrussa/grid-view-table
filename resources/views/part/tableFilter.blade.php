@@ -16,6 +16,7 @@
                                id="js-textFilter_{{ $header->filter[\Assurrussa\GridView\Support\Column::FILTER_KEY_NAME] }}"
                                class="form-control {{ $header->filter[\Assurrussa\GridView\Support\Column::FILTER_KEY_CLASS] }}"
                                style="{{ $header->filter[\Assurrussa\GridView\Support\Column::FILTER_KEY_STYLE] }}"
+                               placeholder="{{ $header->filter[\Assurrussa\GridView\Support\Column::FILTER_KEY_PLACEHOLDER] }}"
                                data-mode="{{ $header->filter[\Assurrussa\GridView\Support\Column::FILTER_KEY_MODE] }}">
                     </div>
                 @elseif($header->filter[\Assurrussa\GridView\Support\Column::FILTER_KEY_MODE] === \Assurrussa\GridView\Support\Column::FILTER_TYPE_DATE)
@@ -25,6 +26,7 @@
                                value="{{ request()->get($header->filter[\Assurrussa\GridView\Support\Column::FILTER_KEY_NAME]) }}"
                                id="js-textFilter_{{ $header->filter[\Assurrussa\GridView\Support\Column::FILTER_KEY_NAME] }}"
                                class="form-control {{ $header->filter[\Assurrussa\GridView\Support\Column::FILTER_KEY_CLASS] }}"
+                               placeholder="{{ $header->filter[\Assurrussa\GridView\Support\Column::FILTER_KEY_PLACEHOLDER] }}"
                                style="{{ $header->filter[\Assurrussa\GridView\Support\Column::FILTER_KEY_STYLE] }}"
                                data-mode="{{ $header->filter[\Assurrussa\GridView\Support\Column::FILTER_KEY_MODE] }}">
                         <span class="input-group-addon">
@@ -38,6 +40,7 @@
                     <select name="{{ $header->filter[\Assurrussa\GridView\Support\Column::FILTER_KEY_NAME] }}"
                             id="js-selectFilter_{{ $header->filter[\Assurrussa\GridView\Support\Column::FILTER_KEY_NAME] }}"
                             class="js-selectFilter form-control {{ $header->filter[\Assurrussa\GridView\Support\Column::FILTER_KEY_CLASS] }}"
+                            placeholder="{{ $header->filter[\Assurrussa\GridView\Support\Column::FILTER_KEY_PLACEHOLDER] }}"
                             style="{{ $header->filter[\Assurrussa\GridView\Support\Column::FILTER_KEY_STYLE] }}"
                             data-mode="{{ $header->filter[\Assurrussa\GridView\Support\Column::FILTER_KEY_MODE] }}">
                         <option disabled>{{ \Assurrussa\GridView\GridView::trans('grid.selectFilter') }}</option>
