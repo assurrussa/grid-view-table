@@ -27,7 +27,7 @@
         </div>
     </div>
     <div class="col-sm-6">
-        <ul class="js-filterSearchPagination pagination-sm no-padding no-margin pull-right">
+        <ul class="js_filterSearchPagination pagination-sm no-padding no-margin pull-right float-right">
             {!! $data->pagination !!}
         </ul>
     </div>

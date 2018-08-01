@@ -277,7 +277,7 @@ class Button implements ButtonInterface, Renderable, Arrayable
 
         return $this->setActionCustom($url . $addUrl, $text, 'btn btn-default', 'fa fa-upload')
             ->setAction(self::TYPE_ACTION_EXPORT)
-            ->setId('js-amiExportButton');
+            ->setId('js_amiExportButton');
     }
 
     /**
@@ -313,7 +313,7 @@ class Button implements ButtonInterface, Renderable, Arrayable
         string $icon = ''
     ): ButtonInterface {
         $addPostUrl = $addPostUrl ?: '?deleted=';
-        $class = $class ?: 'btn btn-default js-btnCustomAction js-linkDelete';
+        $class = $class ?: 'btn btn-default js_btnCustomAction js_linkDelete';
         $text = $text ?: GridView::trans('grid.selectDelete');
         $confirmText = $confirmText ?: GridView::trans('grid.clickDelete');
 

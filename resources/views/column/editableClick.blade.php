@@ -30,7 +30,7 @@
      */
     $id = isset($id) ? $id : null;
     $initJsEvent = isset($initJsEvent) ? $initJsEvent : 'ready change';
-    $initJsClass = isset($initJsClass) ? $initJsClass : 'js-editableClick';
+    $initJsClass = isset($initJsClass) ? $initJsClass : 'js_editableClick';
     $class = isset($class) ? $class : 'inline-editable editable editable-click editable-empty';
     $name = isset($name) ? $name : 'name';
     $value = isset($value) ? $value : null;
@@ -95,7 +95,7 @@
     $(function () {
         $(document).on('ready change click', function () {
             setTimeout(function () {
-                $('.js-editableClick').editable({
+                $('.js_editableClick').editable({
                     validate: function (value) {
                         if ($.trim(value) == '') {
                             return 'This field is required';

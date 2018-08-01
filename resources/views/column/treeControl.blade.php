@@ -89,10 +89,12 @@
 @else
     @php
         $addString = false;
-        if (($method !== 'POST') && ($method !== 'GET')) {
-        $addString = true;
-        $addMethod = $method;
-        $method = 'POST';
+        if($method === 'PUT') {
+            $addString = true;
+            $addMethod = $method;
+            $method = 'GET';
+        } elseif (($method !== 'POST') && ($method !== 'GET')) {
+            $method = 'POST';
         }
     @endphp
     <form action="{{ $url }}" method="{{ $method }}" style="display:inline-block;">

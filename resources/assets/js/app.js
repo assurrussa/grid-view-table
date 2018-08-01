@@ -1,15 +1,5 @@
-require('./bootstrap');
-window.Vue = require('vue');
+// mix.js('packages/assurrussa/grid-view-table/resources/js/app.js', 'public/js/amigrid.js');
+import './bootstrap';
+import './amigrid';
 
-Vue.component('ami-grid', require('./components/Grid.vue'));
-
-const amiGrid = new Vue({
-    el: '#ami-grid',
-    component: [
-        'ami-grid'
-    ],
-    data: {
-        list: [],
-    },
-});
-window.amiGrid = amiGrid;
+window.test = new AmiGridJS();

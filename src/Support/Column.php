@@ -133,12 +133,12 @@ class Column implements ColumnInterface
     public function setCheckbox(): ColumnInterface
     {
         return $this->setKey('checkbox')
-            ->setValue('<input type="checkbox" class="js-adminSelectAll">')
+            ->setValue('<input type="checkbox" class="js_adminSelectAll">')
             ->setSort(false)
             ->setScreening(true)
             ->setHandler(function ($data) {
                 if ($data && $data->id) {
-                    return '<input type="checkbox" class="js-adminCheckboxRow" value="' . $data->id . '">';
+                    return '<input type="checkbox" class="js_adminCheckboxRow" value="' . $data->id . '">';
                 }
 
                 return '';

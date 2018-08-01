@@ -81,14 +81,14 @@ class ButtonItemTest extends TestCase
             ->setTitle('title')
             ->setLabel('label')
             ->setClass('test-class')
-            ->setJsClass('test-js-class')
+            ->setJsClass('test-js_class')
             ->setId('test-id')
             ->setConfirmText('confirm-text')
             ->setHandler(function ($data) {
                 return $data == null;
             });
         $this->assertEquals('<a href="#"
-       class="test-js-class test-class"
+       class="test-js_class test-class"
        id="test-id"
        data-confirm="confirm-text"
        data-btn-ok-text="ok"

@@ -83,7 +83,7 @@ class GridViewResult
             return '_' . $text;
         }
 
-        return 'js-amiGridList_' . $this->id;
+        return 'js_amiGridList_' . $this->id;
     }
 
     /**

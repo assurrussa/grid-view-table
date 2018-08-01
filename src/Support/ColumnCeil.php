@@ -149,7 +149,7 @@ class ColumnCeil
     {
         $view = $view ?: 'column.editableClick';
         $initJsEvent = isset($options['initJsEvent']) ? $options['initJsEvent'] : 'ready change';
-        $initJsClass = isset($options['initJsClass']) ? $options['initJsClass'] : 'js-editableClick';
+        $initJsClass = isset($options['initJsClass']) ? $options['initJsClass'] : 'js_editableClick';
         $escape = isset($options['escape']) ? $options['escape'] : true;
         $class = isset($options['class']) ? $options['class'] : 'inline-editable editable editable-click editable-empty';
         $pk = isset($options['pk']) ? $options['pk'] : 1;

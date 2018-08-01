@@ -1,5 +1,5 @@
-// mix.js('packages/assurrussa/grid-view-table/resources/js/app.js', 'public/js/amigrid.js');
-window.axios = require('axios');
+import axios from 'axios';
+window.axios = axios;
 window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 let token = document.head.querySelector('meta[name="csrf-token"]');
 if (token) {
@@ -7,3 +7,6 @@ if (token) {
 } else {
     console.error('CSRF token not found: https://laravel.com/docs/csrf#csrf-x-csrf-token');
 }
+
+import FormSerialize from 'form-serialize';
+window.FormSerialize = FormSerialize;

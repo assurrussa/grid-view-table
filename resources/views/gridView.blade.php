@@ -3,10 +3,15 @@
      * @var \Assurrussa\GridView\Helpers\GridViewResult $data
      */
 @endphp
-<form id="{{ $data->getElementName() }}" action="{{ $data->formAction }}">
+<form id="{{ $data->getElementName() }}" action="{{ $data->formAction }}" class="AmiTableBox">
+    <div class="js_amiProgressBar AmiTableBox_progress"></div>
     @include('amiGrid::part.grid', ['data' => $data])
-    <div id="js-loadingNotification" class="position-fixed-center">
-        <div class="cssload-loader"></div>
+    <div id="js_loadingNotification" class="position-fixed-center" style="display: none">
+        <div class="spinner" style="margin: 100px auto;">
+            <div class="bounce1"></div>
+            <div class="bounce2"></div>
+            <div class="bounce3"></div>
+        </div>
     </div>
 </form>
 {{--@push('scripts')--}}
@@ -15,7 +20,7 @@
             {{--'use strict';--}}
 
             {{--window.AmiGridJS = {--}}
-                {{--gridId: 'js-amiGridList_1',--}}
+                {{--gridId: 'js_amiGridList_1',--}}
                 {{--eventPopstate: false,--}}
                 {{--timer: null,--}}
                 {{--milliSeconds: 600,--}}
@@ -24,16 +29,16 @@
                  {{--*/--}}
                 {{--init: function () {--}}
                     {{--this.initEventPopstate();--}}
-                    {{--$(document).on('click', '#' + this.gridId + ' .js-amiTableHeader', this.filterTableHeader);--}}
-                    {{--$(document).on('input', '#' + this.gridId + ' #js-amiSearchInput', this.filterCheckedChanged);--}}
-                    {{--$(document).on('input', '#' + this.gridId + ' .js-textFilter > input[type="text"]', this.filterCheckedChanged);--}}
-                    {{--$(document).on('change', '#' + this.gridId + ' .js-selectFilter', this.filterCheckedChanged);--}}
-                    {{--$(document).on('change', '#' + this.gridId + ' #js-amiSelectCount', this.filterCheckedChanged);--}}
-                    {{--$(document).on('click', '#' + this.gridId + ' .js-filterSearchPagination .pagination a', this.filterPagination);--}}
-                    {{--$(document).on('click', '#' + this.gridId + ' #js-filterSearchClearSubmit', this.filterSearchClearSubmit);--}}
-                    {{--$(document).on('click', '#' + this.gridId + ' #js-filterButtonSubmitForm', this.filterSubmitForm);--}}
-                    {{--$(document).on('change', '#' + this.gridId + ' .js-adminSelectAll', this.filterSelectCheckedInput);--}}
-                    {{--$(document).delegate('#' + this.gridId + ' .js-adminCheckboxRow', 'change', this.filterCheckboxArrow);--}}
+                    {{--$(document).on('click', '#' + this.gridId + ' .js_amiTableHeader', this.filterTableHeader);--}}
+                    {{--$(document).on('input', '#' + this.gridId + ' #js_amiSearchInput', this.filterCheckedChanged);--}}
+                    {{--$(document).on('input', '#' + this.gridId + ' .js_textFilter > input[type="text"]', this.filterCheckedChanged);--}}
+                    {{--$(document).on('change', '#' + this.gridId + ' .js_selectFilter', this.filterCheckedChanged);--}}
+                    {{--$(document).on('change', '#' + this.gridId + ' #js_amiSelectCount', this.filterCheckedChanged);--}}
+                    {{--$(document).on('click', '#' + this.gridId + ' .js_filterSearchPagination .pagination a', this.filterPagination);--}}
+                    {{--$(document).on('click', '#' + this.gridId + ' #js_filterSearchClearSubmit', this.filterSearchClearSubmit);--}}
+                    {{--$(document).on('click', '#' + this.gridId + ' #js_filterButtonSubmitForm', this.filterSubmitForm);--}}
+                    {{--$(document).on('change', '#' + this.gridId + ' .js_adminSelectAll', this.filterSelectCheckedInput);--}}
+                    {{--$(document).delegate('#' + this.gridId + ' .js_adminCheckboxRow', 'change', this.filterCheckboxArrow);--}}
                 {{--},--}}
                 {{--/**--}}
                  {{--*--}}
@@ -51,14 +56,14 @@
                  {{--*--}}
                  {{--*/--}}
                 {{--loadingShow: function () {--}}
-                    {{--$('#js-loadingNotification').show();--}}
-                    {{--$('#js-loadCatalogItems').find('.js-loaderBody').css('opacity', 0.3);--}}
+                    {{--$('#js_loadingNotification').show();--}}
+                    {{--$('#js_loadCatalogItems').find('.js_loaderBody').css('opacity', 0.3);--}}
                 {{--},--}}
                 {{--/**--}}
                  {{--*--}}
                  {{--*/--}}
                 {{--loadingHide: function () {--}}
-                    {{--$('#js-loadingNotification').hide();--}}
+                    {{--$('#js_loadingNotification').hide();--}}
                 {{--},--}}
                 {{--/**--}}
                  {{--*--}}
@@ -107,21 +112,21 @@
                         {{--$children.removeClass('asc').addClass('desc');--}}
                         {{--$that.siblings().removeClass('active');--}}
                         {{--$that.removeClass('active');--}}
-                        {{--$('#js-amiOrderBy').val('desc');--}}
+                        {{--$('#js_amiOrderBy').val('desc');--}}
                     {{--} else if ($children.hasClass('desc')) {--}}
-                        {{--$('#js-amiOrderBy').val('asc');--}}
+                        {{--$('#js_amiOrderBy').val('asc');--}}
                         {{--$children.removeClass('desc').addClass('asc');--}}
                         {{--$that.siblings().removeClass('active');--}}
                         {{--$that.removeClass('active');--}}
                     {{--} else {--}}
                         {{--return;--}}
                     {{--}--}}
-                    {{--$('#js-amiSortName').val($that.data('name'));--}}
+                    {{--$('#js_amiSortName').val($that.data('name'));--}}
                     {{--$that.addClass('active');--}}
 
                     {{--clearTimeout(this.timer);--}}
                     {{--this.timer = setTimeout(function () {--}}
-                        {{--$('#' + AmiGridJS.gridId + ' #js-filterButtonSubmitForm').click();--}}
+                        {{--$('#' + AmiGridJS.gridId + ' #js_filterButtonSubmitForm').click();--}}
                     {{--}, this.milliSeconds);--}}
                 {{--},--}}
                 {{--/**--}}
@@ -131,7 +136,7 @@
                     {{--e.preventDefault();--}}
                     {{--clearTimeout(this.timer);--}}
                     {{--this.timer = setTimeout(function () {--}}
-                        {{--$('#' + AmiGridJS.gridId + ' #js-filterButtonSubmitForm').click();--}}
+                        {{--$('#' + AmiGridJS.gridId + ' #js_filterButtonSubmitForm').click();--}}
                     {{--}, this.milliSeconds);--}}
                 {{--},--}}
                 {{--/**--}}
@@ -167,17 +172,17 @@
                  {{--*/--}}
                 {{--filterSelectCheckedInput: function () {--}}
                     {{--var checked = $(this).is(':checked');--}}
-                    {{--$('.js-adminCheckboxRow').prop('checked', checked).filter(':first').change();--}}
+                    {{--$('.js_adminCheckboxRow').prop('checked', checked).filter(':first').change();--}}
                 {{--},--}}
                 {{--/**--}}
                  {{--*--}}
                  {{--*/--}}
                 {{--filterCheckboxArrow: function () {--}}
                     {{--var selected = [];--}}
-                    {{--$('.js-adminCheckboxRow:checked').each(function () {--}}
+                    {{--$('.js_adminCheckboxRow:checked').each(function () {--}}
                         {{--selected.push($(this).val());--}}
                     {{--});--}}
-                    {{--$('.js-btnCustomAction').each(function () {--}}
+                    {{--$('.js_btnCustomAction').each(function () {--}}
                         {{--var $this = $(this);--}}
                         {{--var url = $this.data('href') + selected.join(',');--}}
                         {{--$this.attr('href', url);--}}

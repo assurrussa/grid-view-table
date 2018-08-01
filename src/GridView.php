@@ -607,7 +607,7 @@ class GridView implements GridInterface
 
         $this->filterScopes();
         if ($this->isSearchInput()) {
-            $this->filterSearch($this->search, $this->filter['operator'], $this->filter['beforeValue'], $this->filter['afterValue']);
+            $this->filterSearch($this->search, null, $this->filter['operator'], $this->filter['beforeValue'], $this->filter['afterValue']);
         }
         $this->filterOrderBy($this->sortName, $this->orderBy);
 

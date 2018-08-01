@@ -21,7 +21,7 @@
             @endif
         </span>
         <label>
-            <select id="js-amiSelectCount" name="count" class="input-sm">
+            <select id="js_amiSelectCount" name="count" class="input-sm form-control">
                 @foreach($data->counts as $key => $value)
                     <option {{ request()->get('count') == $key ? 'selected' : '' }} value="{{ $key }}">
                         {{ $value }}
@@ -33,8 +33,8 @@
         {!! $data->buttonExport  !!}
     </div>
     <div class="col-sm-6">
-        <div class="pull-right">
-            <a id="js-filterSearchClearSubmit"
+        <div class="pull-right float-right">
+            <a id="js_filterSearchClearSubmit"
                class="btn btn-default btn-sm"
                data-toggle="tooltip"
                data-original-title="{{ \Assurrussa\GridView\GridView::trans('grid.clearFilter') }}"
@@ -45,7 +45,7 @@
             @if($data->searchInput)
                 <label>
                     <input type="text"
-                           id="js-amiSearchInput"
+                           id="js_amiSearchInput"
                            name="search"
                            value="{{ request()->get('search') }}"
                            class="form-control input-sm"
