@@ -92,7 +92,7 @@
         if($method === 'PUT') {
             $addString = true;
             $addMethod = $method;
-            $method = 'GET';
+            $method = 'POST';
         } elseif (($method !== 'POST') && ($method !== 'GET')) {
             $method = 'POST';
         }

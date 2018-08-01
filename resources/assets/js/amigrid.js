@@ -6,7 +6,7 @@ class AmiGridJS {
              */
             id: 'js_amiGridList_amiGrid_1',
             timer: null,
-            milliSeconds: 600,
+            milliSeconds: 400,
         };
         Object.assign(defaults, opts || {});
         this.options = defaults;
@@ -30,6 +30,7 @@ class AmiGridJS {
      * Initialize
      */
     initComponent() {
+        this.newInstanceEvent('click', '.js_amiGridFilterTable', this.filterSubmitForm);
         this.newInstanceEvent('click', '.js_amiTableHeader', this.filterTableHeader);
         this.newInstanceEvent('enter', '#js_amiSearchInput', this.filterSubmitForm);
         this.newInstanceEvent('enter', '.js_textFilter > input[type="text"]', this.filterSubmitForm);
@@ -58,16 +59,24 @@ class AmiGridJS {
 
     /**
      *
+     * @param e
+     * @returns {Promise<any>}
      */
     filterTableHeader(e) {
-        e.preventDefault();
-
         let $that = e.target,
             $childrens = $that.querySelectorAll('span'),
             allTh = this.$el.querySelectorAll('.js_amiTableHeader');
-        if ($that.querySelectorAll('input').length == 1) {
+        if ($that.type === 'checkbox') {
             return;
         }
+        if ($that.querySelectorAll('input').length === 1) {
+            return;
+        }
+        if ($that.querySelectorAll('span.asc, span.desc').length === 0) {
+            return;
+        }
+
+        e.preventDefault();
 
 
         for (let i = 0, di = allTh.length; i < di; i++) {
@@ -94,64 +103,75 @@ class AmiGridJS {
         this.$el.querySelector('#js_amiSortName').value = $that.getAttribute('data-name');
         $that.classList.add('active');
 
-        this.filterSubmitForm(e);
+        return this.onSend();
     }
 
     /**
      *
+     * @param e
+     * @returns {Promise<any>}
      */
     filterPagination(e) {
         e.preventDefault();
-        this.onSend(e.target.getAttribute('href'));
+        return this.onSend(e.target.getAttribute('href'), '');
     }
 
     /**
      *
+     * @param e
+     * @returns {Promise<any>}
      */
     filterSearchClearSubmit(e) {
         e.preventDefault();
-        this.onSend(window.location.pathname);
+        return this.onSend(window.location.pathname, '');
     }
 
     /**
      *
+     * @param e
+     * @returns {Promise<any>}
      */
     filterSubmitForm(e) {
         e.preventDefault();
-        let form = this.$el,
-            url = form.getAttribute('action'),
-            formLocation = form.querySelector('#js_amiLocation');
-        if (formLocation) {
-            formLocation.value = window.location.pathname;
-        }
-        setTimeout(() => {
-            let formData = FormSerialize(form, {hash: true}),
-                formDataString = FormSerialize(form, {hash: false});
-            this.onSend(url, formDataString);
-        }, 10);
+        return this.onSend();
     }
 
     /**
      *
      */
     filterSelectCheckedInput() {
-        // let checked = $(this).is(':checked');
-        // $('.js_adminCheckboxRow').prop('checked', checked).filter(':first').change();
+        let checkboxAll = this.$el.querySelectorAll('.js_adminCheckboxRow');
+        for (let i = 0, di = checkboxAll.length; i < di; i++) {
+            let checkbox = checkboxAll[i];
+            if (checkbox) {
+                if (checkbox.checked) {
+                    checkbox.checked = false;
+                } else {
+                    checkbox.checked = true;
+                }
+            }
+        }
+        this.filterCheckboxArrow();
     }
 
     /**
      *
      */
     filterCheckboxArrow() {
-        // let selected = [];
-        // $('.js_adminCheckboxRow:checked').each(function () {
-        //     selected.push($(this).val());
-        // });
-        // $('.js_btnCustomAction').each(function () {
-        //     let $this = $(this);
-        //     let url = $this.data('href') + selected.join(',');
-        //     $this.attr('href', url);
-        // });
+        let btnCustom = this.$el.querySelector('.js_btnCustomAction');
+        if (btnCustom) {
+            let selected = [],
+                checkboxAll = this.$el.querySelectorAll('.js_adminCheckboxRow');
+            for (let i = 0, di = checkboxAll.length; i < di; i++) {
+                let checkbox = checkboxAll[i];
+                if (checkbox) {
+                    if (checkbox.checked) {
+                        selected.push(checkbox.value);
+                    }
+                }
+            }
+            btnCustom.setAttribute('href', btnCustom.getAttribute('data-href') + selected.join(','));
+        }
     }
 
     /**
@@ -188,18 +208,42 @@ class AmiGridJS {
      *
      * @param {string} url
      * @param {string} data
+     * @returns {Promise<any>}
      */
-    onSend(url, data) {
-        data = ((data === 'undefined') || (data === undefined)) ? '' : '?' + data;
+    onSend(url = null, data = null) {
+        let form = this.$el,
+            formLocation = form.querySelector('#js_amiLocation');
+        if (formLocation) {
+            formLocation.value = window.location.pathname;
+        }
+
+        url = url ? url : form.getAttribute('action');
+        if (data === null) {
+            let formData = FormSerialize(form, {hash: true}),
+                formDataString = FormSerialize(form, {hash: false});
+
+            data = '?' + formDataString;
+        } else {
+            data = data ? '?' + data : '';
+        }
+
         this.loadingShow();
-        clearTimeout(this.options.timer);
-        this.options.timer = setTimeout(() => {
-            axios.get(url + data).then((response) => {
-                this.history.push({url: response.data.url, data: response.data});
-                window.history.pushState(this.history, null, response.data.url);
-                this.onSuccess(response.data);
-            }).catch((error) => this.onError(error));
-        }, this.options.milliSeconds);
+        return new Promise((resolve, reject) => {
+            clearTimeout(this.options.timer);
+            this.options.timer = setTimeout(() => {
+                axios.get(url + data)
+                    .then((response) => {
+                        this.history.push({url: response.data.url, data: response.data});
+                        window.history.pushState(this.history, null, response.data.url);
+                        this.onSuccess(response.data);
+                        resolve(response.data);
+                    })
+                    .catch((error) => {
+                        this.onError(error);
+                        reject(error);
+                    });
+            }, this.options.milliSeconds);
+        });
     }
 
     /**
@@ -221,6 +265,8 @@ class AmiGridJS {
     }
 
     /**
+     * TODO
+     *
      * Initialize
      */
     onPopState() {
@@ -239,7 +285,7 @@ class AmiGridJS {
                     setTimeout(() => this.loadingHide(), 300);
                 } else if (state == null) {
                     setTimeout(() => this.loadingHide(), 300);
-                } else if(state.length === 0) {
+                } else if (state.length === 0) {
                     setTimeout(() => this.loadingHide(), 300);
                 } else {
                     setTimeout(() => this.onSuccess(state), 300);
@@ -249,4 +295,4 @@ class AmiGridJS {
     }
 }
 
-window.AmiGridJS = AmiGridJS;
+export default AmiGridJS;

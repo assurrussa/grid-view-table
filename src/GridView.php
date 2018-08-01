@@ -164,13 +164,17 @@ class GridView implements GridInterface
      *
      * @return Column
      */
-    public function column(string $name, string $title = null): Column
+    public function column(string $name = null, string $title = null): Column
     {
         $column = new Column();
         $this->columns->setColumn($column);
 
-        $column->setKey($name);
-        $column->setValue($title);
+        if($name) {
+            $column->setKey($name);
+        }
+        if($title) {
+            $column->setValue($title);
+        }
 
         return $column;
     }
@@ -225,9 +229,13 @@ class GridView implements GridInterface
     {
         if (request()->ajax() || request()->wantsJson()) {
             $path = $path === 'gridView' ? 'part.grid' : $path;
-
+            if($requestParams = http_build_query($data['data']->requestParams)) {
+                $requestParams = '?' . $requestParams;
+            } else {
+                $requestParams = '';
+            }
             return json_encode([
-                'url'  => $data['data']->location . '?' . http_build_query($data['data']->requestParams),
+                'url'  => $data['data']->location . $requestParams,
                 'data' => static::view($path, $data, $mergeData)->render(),
             ]);
         }
@@ -596,7 +604,7 @@ class GridView implements GridInterface
             throw new ColumnsException();
         }
 
-        $this->locationUrl = $this->_request->pull('location');
+        $this->locationUrl = $this->_request->pull('location', url()->current());
         $this->requestParams = $this->_request->all();
         $this->page = (int)$this->_request->pull('page', 1);
         $this->orderBy = $this->_request->pull('by', $this->getOrderBy());
@@ -743,6 +751,10 @@ class GridView implements GridInterface
     protected function filterOrderBy(string $sortName, string $orderBy): void
     {
         if ($sortName) {
+            if (!Model::hasColumn($this->_model, $sortName)) {
+                $sortName = $this->sortNameDefault;
+                $this->sortName = $this->sortNameDefault;
+            }
             $this->_query->orderBy($this->_query->getModel()->getTable() . '.' . $sortName, $orderBy);
         }
     }

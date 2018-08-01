@@ -264,7 +264,7 @@ class Column implements ColumnInterface
     public function setKeyAction(): ColumnInterface
     {
         $this->key = self::ACTION_NAME;
-        $this->setValue(self::ACTION_NAME);
+        $this->setValue('');
         $this->setSort(false);
         $this->setScreening(true);
 

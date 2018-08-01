@@ -174,7 +174,9 @@ class Button implements ButtonInterface, Renderable, Arrayable
             ->setLabel($label)
             ->setTitle($title)
             ->setClass($class)
-            ->setIcon($icon);
+            ->setIcon($icon)
+//            ->setMethod('PUT')
+        ;
 
         return $this;
     }
@@ -246,7 +248,7 @@ class Button implements ButtonInterface, Renderable, Arrayable
     public function setActionCustom(
         string $url = null,
         string $label = '',
-        string $class = 'btn btn-primary btn-sm flat',
+        string $class = 'btn btn-primary btn-outline-primary btn-sm flat',
         string $icon = 'fa fa-paw'
     ): ButtonInterface {
         $this->setAction(self::TYPE_ACTION_CUSTOM)
@@ -275,7 +277,7 @@ class Button implements ButtonInterface, Renderable, Arrayable
         $addUrl = str_is('*?*', $url) ? '&' . $addUrl : '?' . $addUrl;
         $text = GridView::trans('grid.export');
 
-        return $this->setActionCustom($url . $addUrl, $text, 'btn btn-default', 'fa fa-upload')
+        return $this->setActionCustom($url . $addUrl, $text, 'btn btn-default btn-outline-primary', 'fa fa-download')
             ->setAction(self::TYPE_ACTION_EXPORT)
             ->setId('js_amiExportButton');
     }
@@ -289,7 +291,7 @@ class Button implements ButtonInterface, Renderable, Arrayable
     {
         $text = GridView::trans('grid.create');
 
-        return $this->setActionCustom($url, $text, 'btn btn-primary', 'fa fa-plus')
+        return $this->setActionCustom($url, $text, 'btn btn-primary btn-outline-primary', 'fa fa-plus')
             ->setAction(self::TYPE_ACTION_CREATE);
     }
 
@@ -313,7 +315,7 @@ class Button implements ButtonInterface, Renderable, Arrayable
         string $icon = ''
     ): ButtonInterface {
         $addPostUrl = $addPostUrl ?: '?deleted=';
-        $class = $class ?: 'btn btn-default js_btnCustomAction js_linkDelete';
+        $class = $class ?: 'btn btn-default btn-outline-primary js_btnCustomAction js_linkDelete';
         $text = $text ?: GridView::trans('grid.selectDelete');
         $confirmText = $confirmText ?: GridView::trans('grid.clickDelete');
 

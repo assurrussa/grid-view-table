@@ -7,7 +7,11 @@
     @foreach($data->headers as $header)
         @continue($header->key === \Assurrussa\GridView\Support\Column::ACTION_STRING_TR)
         <td>
-            @if(count($header->filter))
+            @if($header->key === \Assurrussa\GridView\Support\Column::ACTION_NAME)
+                <button type="submit" class="js_amiGridFilterTable btn btn-default btn-outline-primary btn-sm pull-right float-right">
+                    {{ \Assurrussa\GridView\GridView::trans('grid.filter') }} <i class="fa fa-filter"></i>
+                </button>
+            @elseif(count($header->filter))
                 @if($header->filter[\Assurrussa\GridView\Support\Column::FILTER_KEY_MODE] === \Assurrussa\GridView\Support\Column::FILTER_TYPE_STRING)
                     <div class="js_textFilter input-group">
                         <input type="text"

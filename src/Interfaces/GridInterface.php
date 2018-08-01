@@ -36,7 +36,7 @@ interface GridInterface
 
     public function button(): \Assurrussa\GridView\Support\Button;
 
-    public function column(string $name, string $title = ''): \Assurrussa\GridView\Support\Column;
+    public function column(string $name = null, string $title = null): \Assurrussa\GridView\Support\Column;
 
     public function input(): \Assurrussa\GridView\Support\Input;
 

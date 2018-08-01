@@ -35,11 +35,11 @@
     <div class="col-sm-6">
         <div class="pull-right float-right">
             <a id="js_filterSearchClearSubmit"
-               class="btn btn-default btn-sm"
+               class="btn btn-default btn-outline-primary btn-sm"
                data-toggle="tooltip"
                data-original-title="{{ \Assurrussa\GridView\GridView::trans('grid.clearFilter') }}"
                href="">
-                <i class="fa fa-times"></i>
+                <i class="fa fa-refresh"></i>
                 {{ \Assurrussa\GridView\GridView::trans('grid.clear') }}
             </a>
             @if($data->searchInput)

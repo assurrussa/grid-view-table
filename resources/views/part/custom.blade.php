@@ -7,7 +7,9 @@ $showHr = false;
 <div class="row">
     <div class="col-md-12">
         @foreach($data->inputCustoms as $inputCustom)
-            {{ $showHr = true }}
+            @php
+                $showHr = true;
+            @endphp
             {!! $inputCustom !!}
         @endforeach
     </div>
@@ -15,7 +17,9 @@ $showHr = false;
 <div class="row">
     <div class="col-md-12">
         @foreach($data->buttonCustoms as $buttonCustom)
-            {{ $showHr = true }}
+            @php
+                $showHr = true;
+            @endphp
             {!! $buttonCustom !!}
         @endforeach
     </div>
