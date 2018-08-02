@@ -19,6 +19,10 @@ in template use
 or facade
 {!! \AmiGridView::render(['data' => $data]) !!}
 
+<!-- AmiGridView -->
+<link href="{{ asset('vendor/grid-view/css/amigrid.css') }}" rel="stylesheet">
+<script src="{{ asset('vendor/grid-view/js/amigrid.js') }}"></script>
+<!-- AmiGridView -->
 @stack('scripts')
 ```
 

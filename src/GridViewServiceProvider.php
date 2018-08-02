@@ -42,6 +42,7 @@ class GridViewServiceProvider extends ServiceProvider
             __DIR__ . '/../config/amigrid.php' => config_path('amigrid.php'),
         ], 'configs');
         $this->publishes([
+            __DIR__ . '/../public/css' => base_path('public/vendor/grid-view/css'),
             __DIR__ . '/../public/js' => base_path('public/vendor/grid-view/js'),
         ], 'views');
 
