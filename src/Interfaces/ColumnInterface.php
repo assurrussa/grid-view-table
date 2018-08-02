@@ -50,9 +50,13 @@ interface ColumnInterface
 
     public function setHandler(Callable $handler): ColumnInterface;
 
-    public function setFilter(string $field, $array, string $mode = null, string $class = '', string $style = ''): ColumnInterface;
+    public function setFilter(string $field, $data, string $mode = null, array $selected = [], string $class = '', string $style = ''): ColumnInterface;
 
     public function setFilterSelect(string $field, array $array, string $class = '', string $style = ''): ColumnInterface;
+
+    public function setFilterSelectAjax(string $field, array $array, array $selected, string $url, string $class = '', string $style = ''): ColumnInterface;
+
+    public function setFilterSelectNotAjax(string $field, array $array, array $selected = [], string $url = '', string $class = '', string $style = ''): ColumnInterface;
 
     public function setFilterString(string $field, string $string = '', string $class = '', string $style = ''): ColumnInterface;
 

@@ -23,6 +23,7 @@ class AmiGridJS {
     init() {
         this.onPopState();
         this.initComponent();
+        this.initVueComponent();
     }
 
 
@@ -41,6 +42,10 @@ class AmiGridJS {
         this.newInstanceEvent('click', '#js_filterButtonSubmitForm', this.filterSubmitForm);
         this.newInstanceEvent('change', '.js_adminSelectAll', this.filterSelectCheckedInput);
         this.newInstanceEvent('change', '.js_adminCheckboxRow', this.filterCheckboxArrow);
+    }
+
+    initVueComponent() {
+        this.newVueInstanceByClassName('js_InitComponent', true);
     }
 
     /**
@@ -193,6 +198,42 @@ class AmiGridJS {
     }
 
     /**
+     *
+     * @param {String} name
+     * @param {Boolean} circleBool
+     * @returns false
+     */
+    newVueInstanceByClassName(name, circleBool) {
+        circleBool = circleBool || false;
+        let items = document.getElementsByClassName(name);
+        if (circleBool) {
+            if (items.length) {
+                for (let i = 0, dl = items.length; i < dl; i++) {
+                    let item = items[i];
+                    if (item) {
+                        setTimeout(() => {
+                            item.classList.remove(name);
+                            new Vue({
+                                el: item,
+                            });
+                        }, 10);
+                    }
+                }
+            }
+        } else if (items.length) {
+            if (items[0]) {
+                setTimeout(() => {
+                    new Vue({
+                        el: items[0],
+                    });
+                }, 10);
+            }
+        }
+
+        return false;
+    }
+
+    /**
      *  Поиск родительсткого элемента по tag
      *
      * @param {Object} el
@@ -253,7 +294,10 @@ class AmiGridJS {
     onSuccess(response) {
         this.loadingHide();
         this.$el.innerHTML = response.data;
-        setTimeout(() => this.initComponent(), 10);
+        setTimeout(() => {
+            this.initComponent();
+            this.initVueComponent();
+        }, 10);
     }
 
     /**

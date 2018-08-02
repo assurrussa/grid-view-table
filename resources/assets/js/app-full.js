@@ -1,4 +1,6 @@
-// mix.js('packages/assurrussa/grid-view-table/resources/js/app.js', 'public/js/amigrid.js');
+// mix.js('packages/assurrussa/grid-view-table/resources/js/app-full.js', 'public/js/amigrid-full.js');
+import './bootstrap';
+
 import FormSerialize from 'form-serialize';
 window.FormSerialize = FormSerialize;
 

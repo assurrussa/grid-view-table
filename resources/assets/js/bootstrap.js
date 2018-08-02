@@ -8,5 +8,5 @@ if (token) {
     console.error('CSRF token not found: https://laravel.com/docs/csrf#csrf-x-csrf-token');
 }
 
-import FormSerialize from 'form-serialize';
-window.FormSerialize = FormSerialize;
+import Vue from 'vue';
+window.Vue = Vue;

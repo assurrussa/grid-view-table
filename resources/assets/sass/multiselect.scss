@@ -1,0 +1,51 @@
+@import '~vue-multiselect/dist/vue-multiselect.min.css';
+.multiselect {
+  .multiselect-icon {
+    position: absolute;
+    width: 40px;
+    height: 38px;
+    right: 1px;
+    top: 12px;
+    text-align: center;
+    -webkit-transition: -webkit-transform .2s ease;
+    transition: -webkit-transform .2s ease;
+    transition: transform .2s ease;
+    transition: transform .2s ease, -webkit-transform .2s ease;
+  }
+
+  .multiselect__option--highlight {
+    background: #fc5900;
+    outline: none;
+    color: #fff;
+  }
+
+  .multiselect--placeholder {
+    .multiselect {
+      .multiselect__single {
+        color: #999;
+      }
+    }
+  }
+
+  .multiselect__input, .multiselect__single {
+    position: relative;
+    display: inline-block;
+    line-height: 22px;
+    border: none;
+    border-radius: 5px;
+    background: #fff;
+    width: 100%;
+  }
+
+  .multiselect__clear {
+    position: absolute;
+    width: 40px;
+    height: 38px;
+    right: 1px;
+    top: 3px;
+    text-align: center;
+    cursor: pointer;
+    font-size: 22px;
+    color: #db3727;
+  }
+}

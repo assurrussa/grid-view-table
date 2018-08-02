@@ -11,6 +11,7 @@ use Assurrussa\GridView\Interfaces\ColumnInterface;
  *
  * @property string                 $key
  * @property string                 $value
+ * @property string                 $url
  * @property bool                   $sort
  * @property bool                   $screening
  * @property array                  $filter
@@ -52,12 +53,15 @@ class Column implements ColumnInterface
     const FILTER_TYPE_DATE = 'date';
     /** type array for filter */
     const FILTER_TYPE_SELECT = 'select';
+    const FILTER_TYPE_SELECT_AJAX = 'select_ajax';
+    const FILTER_TYPE_SELECT_NOT_AJAX = 'select_not_ajax';
 
     const FILTER_ORDER_BY_ASC = 'asc';
     const FILTER_ORDER_BY_DESC = 'desc';
 
     const FILTER_KEY_NAME = 'name';
     const FILTER_KEY_DATA = 'data';
+    const FILTER_KEY_SELECTED = 'selected';
     const FILTER_KEY_MODE = 'mode';
     const FILTER_KEY_CLASS = 'class';
     const FILTER_KEY_STYLE = 'style';
@@ -72,6 +76,11 @@ class Column implements ColumnInterface
      * @property string
      */
     public $value = '';
+
+    /**
+     * @property string
+     */
+    public $url = '';
 
     /**
      * @property bool
@@ -122,7 +131,7 @@ class Column implements ColumnInterface
      */
     public function __construct()
     {
-        $this->setDateFormat(config('amigrid.format', ''));
+        $this->setDateFormat((string)config('amigrid.format', ''));
     }
 
     /**
@@ -308,31 +317,38 @@ class Column implements ColumnInterface
     }
 
     /**
-     * @param string $field
-     * @param array  $array
-     * @param string $mode
-     * @param string $class
-     * @param string $style
+     * @param string       $field
+     * @param string|array $data
+     * @param string|null  $mode
+     * @param array        $selected
+     * @param string       $class
+     * @param string       $style
+     * @param string       $placeholder
+     * @param string       $url
      *
      * @return ColumnInterface
      */
     public function setFilter(
         string $field,
-        $array,
+        $data,
         string $mode = null,
+        array $selected = [],
         string $class = '',
         string $style = '',
-        string $placeholder = ''
+        string $placeholder = '',
+        string $url = ''
     ): ColumnInterface {
         $mode = $mode ? $mode : self::FILTER_TYPE_SELECT;
         $this->filter = [
             self::FILTER_KEY_NAME        => $field,
-            self::FILTER_KEY_DATA        => $array,
+            self::FILTER_KEY_DATA        => $data,
             self::FILTER_KEY_MODE        => $mode,
+            self::FILTER_KEY_SELECTED    => $selected,
             self::FILTER_KEY_CLASS       => $class,
             self::FILTER_KEY_STYLE       => $style,
             self::FILTER_KEY_PLACEHOLDER => $placeholder,
         ];
+        $this->setUrl($url);
 
         return $this;
     }
@@ -342,32 +358,91 @@ class Column implements ColumnInterface
      * @param array  $array
      * @param string $class
      * @param string $style
+     * @param string $placeholder
      *
      * @return ColumnInterface
      */
-    public function setFilterSelect(string $field, array $array, string $class = '', string $style = ''): ColumnInterface
-    {
-        return $this->setFilter($field, $array, self::FILTER_TYPE_SELECT, $class, $style);
+    public function setFilterSelect(
+        string $field,
+        array $array,
+        string $class = '',
+        string $style = '',
+        string $placeholder = ''
+    ): ColumnInterface {
+        return $this->setFilter($field, $array,self::FILTER_TYPE_SELECT, [], $class, $style, $placeholder);
     }
 
     /**
      * @param string $field
+     * @param array  $array
+     * @param string $url
      * @param string $class
      * @param string $style
+     * @param string $placeholder
      *
      * @return ColumnInterface
      */
-    public function setFilterString(string $field, string $string = '', string $class = '', string $style = ''): ColumnInterface
-    {
-        return $this->setFilter($field, $string, self::FILTER_TYPE_STRING, $class, $style);
+    public function setFilterSelectAjax(
+        string $field,
+        array $array,
+        array $selected,
+        string $url,
+        string $class = '',
+        string $style = '',
+        string $placeholder = ''
+    ): ColumnInterface {
+        return $this->setFilter($field, $array, self::FILTER_TYPE_SELECT_AJAX, $selected, $class, $style, $placeholder, $url);
+    }
+
+    /**
+     * @param string $field
+     * @param array  $array
+     * @param string $url
+     * @param string $class
+     * @param string $style
+     * @param string $placeholder
+     *
+     * @return ColumnInterface
+     */
+    public function setFilterSelectNotAjax(
+        string $field,
+        array $array,
+        array $selected = [],
+        string $url = '',
+        string $class = '',
+        string $style = '',
+        string $placeholder = ''
+    ): ColumnInterface {
+        return $this->setFilter($field, $array, self::FILTER_TYPE_SELECT_NOT_AJAX, $selected, $class, $style, $placeholder, $url);
+    }
+
+    /**
+     * @param string $field
+     * @param string $string
+     * @param string $class
+     * @param string $style
+     * @param string $placeholder
+     *
+     * @return ColumnInterface
+     */
+    public function setFilterString(
+        string $field,
+        string $string = '',
+        string $class = '',
+        string $style = '',
+        string $placeholder = ''
+    ): ColumnInterface {
+        return $this->setFilter($field, $string, self::FILTER_TYPE_STRING, [], $class, $style, $placeholder);
     }
 
     /**
      * @param string      $field
+     * @param string      $string
      * @param bool        $active
      * @param string|null $format
      * @param string      $class
      * @param string      $style
+     * @param string      $placeholder
      *
      * @return ColumnInterface
      */
@@ -377,14 +452,15 @@ class Column implements ColumnInterface
         bool $active = true,
         string $format = null,
         string $class = '',
-        string $style = ''
+        string $style = '',
+        string $placeholder = ''
     ): ColumnInterface {
         $this->setDateActive($active);
         if ($format) {
             $this->setDateFormat($format);
         }
 
-        return $this->setFilter($field, $string, self::FILTER_TYPE_DATE, $class, $style);
+        return $this->setFilter($field, $string, self::FILTER_TYPE_DATE, [], $class, $style, $placeholder);
     }
 
     /**
@@ -437,6 +513,18 @@ class Column implements ColumnInterface
     {
         $this->key = self::ACTION_STRING_TR;
         $this->setHandler($handler);
+
+        return $this;
+    }
+
+    /**
+     * @param callable $handler
+     *
+     * @return ColumnInterface
+     */
+    public function setUrl(string $url): ColumnInterface
+    {
+        $this->url = $url;
 
         return $this;
     }
@@ -498,6 +586,14 @@ class Column implements ColumnInterface
     }
 
     /**
+     * @return string
+     */
+    public function getUrl(): string
+    {
+        return $this->url;
+    }
+
+    /**
      * @return bool
      */
     public function getDateActive(): bool
@@ -541,6 +637,7 @@ class Column implements ColumnInterface
             'handler'         => $this->getHandler(),
             'date'            => $this->getDateActive(),
             'format'          => $this->getDateFormat(),
+            'url'             => $this->getUrl(),
             self::ACTION_NAME => $this->getActions(),
         ];
     }

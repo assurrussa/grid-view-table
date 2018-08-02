@@ -37,7 +37,36 @@
                                 <span class="glyphicon glyphicon-time"></span>
                             </span>
                     </div>
-                @else
+                @elseif($header->filter[\Assurrussa\GridView\Support\Column::FILTER_KEY_MODE] === \Assurrussa\GridView\Support\Column::FILTER_TYPE_SELECT_AJAX)
+                    @php
+                        $filterData = json_encode($header->filter[\Assurrussa\GridView\Support\Column::FILTER_KEY_DATA]);
+                        $filterSelected = json_encode($header->filter[\Assurrussa\GridView\Support\Column::FILTER_KEY_SELECTED]);
+                    @endphp
+                    <div class="js_InitComponent">
+                        <v-select-ajax data='{{ $filterData }}'
+                                       clear="1"
+                                       search-ajax="1"
+                                       placeholder="{{ $header->filter[\Assurrussa\GridView\Support\Column::FILTER_KEY_PLACEHOLDER] }}"
+                                       js-init-submit="{{ $data->getElementName() }}"
+                                       name="{{ $header->filter[\Assurrussa\GridView\Support\Column::FILTER_KEY_NAME] }}"
+                                       action="{{ $header->url }}"
+                                       selected='{{ $filterSelected }}'></v-select-ajax>
+                    </div>
+                @elseif($header->filter[\Assurrussa\GridView\Support\Column::FILTER_KEY_MODE] === \Assurrussa\GridView\Support\Column::FILTER_TYPE_SELECT_NOT_AJAX)
+                    @php
+                        $filterData = json_encode($header->filter[\Assurrussa\GridView\Support\Column::FILTER_KEY_DATA]);
+                        $filterSelected = json_encode($header->filter[\Assurrussa\GridView\Support\Column::FILTER_KEY_SELECTED]);
+                    @endphp
+                    <div class="js_InitComponent">
+                        <v-select-ajax data='{{ $filterData }}'
+                                       clear="1"
+                                       placeholder="{{ $header->filter[\Assurrussa\GridView\Support\Column::FILTER_KEY_PLACEHOLDER] }}"
+                                       js-init-submit="{{ $data->getElementName() }}"
+                                       name="{{ $header->filter[\Assurrussa\GridView\Support\Column::FILTER_KEY_NAME] }}"
+                                       action="{{ $header->url }}"
+                                       selected='{{ $filterSelected }}'></v-select-ajax>
+                    </div>
+                @elseif($header->filter[\Assurrussa\GridView\Support\Column::FILTER_KEY_MODE] === \Assurrussa\GridView\Support\Column::FILTER_TYPE_SELECT)
                     @php
                         $filterValue = request()->get($header->filter[\Assurrussa\GridView\Support\Column::FILTER_KEY_NAME], null);
                     @endphp
