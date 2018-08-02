@@ -3,15 +3,6 @@
 ## Install packages ##
 1) `composer require assurrussa/grid-view-table`
 
-2) Add to config `config/app.php` 
-```
-    'providers' => [
-        Assurrussa\GridView\GridViewServiceProvider::class,
-    ],
-    'aliases' => [
-        'AmiGridView' => Assurrussa\GridView\Facades\GridViewFacade::class,
-    ],
-```
 3) If necessary, run the command `composer dump-autoload`
 ```
     php artisan vendor:publish --provider=Assurrussa\GridView\GridViewServiceProvider
@@ -37,73 +28,10 @@ or facade
 
 ### Done! ###
 
-### Example ###
+## AmiGridView DEMO
 
-```
-    /**
-     * @return array
-     */
-    public function index()
-    {
-        $catalogs = Catalog::pluck('title', 'id');
-        $brands = Brand::pluck('name', 'id');
-        $query = (new Entity())->newQuery()->with('catalogs', 'brand');
+This is a sample app developed to showcase how the [assurrussa/grid-view-table](https://github.com/assurrussa/grid-view-table) package works
 
-        /** @var \Assurrussa\GridView\GridView $gridView */
-        $gridView = app(\Assurrussa\GridView\GridView::NAME); // create new model GridView
-        $gridView->setQuery($query); // set Builder Query
-        $gridView->column()->setClassForString(function ($data) {
-            return '';
-        });
-        $gridView->setSearchInput(false); // search input for table
+Check it out on heroku
 
-        // added column
-        $gridView->column()->setKey('id')->setValue(trans('app.label.id'))->setSort(true);
-        $gridView->column()->setCheckbox();
-        $gridView->column()->setKey('catalogs.title')->setValue(trans('app.menu.catalog'))
-            ->setSort(false)->setScreening(true)->setFilter('catalog_id', $catalogs)->setHandler(function ($data) {
-                /** @var Entity $data */
-                return amiGridColumnCeil()->listToString($data->catalogs);
-            });
-        $gridView->column()->setKey('brands.name')->setValue(trans('app.menu.brand'))
-            ->setSort(false)->setScreening(true)->setFilter('brand_id', $brands)->setHandler(function ($data) {
-                /** @var Entity $data */
-                $brand = $data->brand->name;
-                $link = amiGridColumnCeil()->filterButton($data->brand->id, 'brand_id');
-                return $brand . ' ' . $link;
-            });
-        $gridView->column()->setKey('title')->setValue(trans('app.label.title'))->setSort(true);
-        $gridView->column()->setKey('slug')->setValue(trans('app.label.slug'))->setSort(true);
-        $gridView->column()->setKey('preview')->setValue(trans('app.label.preview'))->setSort(false)
-            ->setScreening(true)->setHandler(function ($data) {
-                /** @var Entity $data */
-                return amiGridColumnCeil()->image($data->entityInfo->preview, $data->entityInfo->title);
-            });
-
-        // added column actions
-        $gridView->columnActions(function ($data) use ($gridView) {
-            /** @var Entity $data */
-            $buttons = [];
-            $buttons[] = $gridView->columnAction()->setActionDelete('admin.entity.delete', [$data->id]);
-            $buttons[] = $gridView->columnAction()->setActionShow('admin.entity.show', [$data->id])->setHandler(function ($data) {
-                /** @var Entity $data */
-                return false;
-            });
-            $buttons[] = $gridView->columnAction()->setActionEdit('admin.entity.edit', [$data->id]);
-            return $buttons;
-        }, 'actions');
-
-        // added buttons for table
-        $gridView->button()->setButtonCreate(route('admin.entity.create'));
-        $gridView->button()->setButtonExport();
-        $gridView->button()->setButtonCheckboxAction(route('admin.entity.custom'));
-
-        // return result
-        $data = $gridView->get();
-        if(request()->ajax() || request()->wantsJson()) {
-            return amiGrid()->render(compact('data'));
-        }
-        return view('index', compact('data'));
-    }
-```
-![exapmle](https://github.com/assurrussa/grid-view-vue/blob/master/example.png)
+- [DEMO](http://grid-view-table.herokuapp.com).
