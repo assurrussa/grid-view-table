@@ -323,7 +323,7 @@ class Button implements ButtonInterface, Renderable, Arrayable
             ->setAction(self::TYPE_ACTION_CUSTOM)
             ->setConfirmText($confirmText)
             ->setOptions([
-                'data-href'    => $this->getUrl(),
+                'data-url'    => $this->getUrl(),
                 'data-confirm' => $confirmText,
             ]);
     }
