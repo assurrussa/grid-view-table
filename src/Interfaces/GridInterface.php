@@ -48,6 +48,8 @@ interface GridInterface
 
     public function get(): \Assurrussa\GridView\Helpers\GridViewResult;
 
+    public function getSimple(bool $isCount = false): \Assurrussa\GridView\Helpers\GridViewResult;
+
     public function first(): \Assurrussa\GridView\Helpers\GridViewResult;
 
     public function setId(string $id): GridInterface;

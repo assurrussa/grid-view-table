@@ -329,13 +329,13 @@ class GridView implements GridInterface
     }
 
     /**
-     * @param bool $isClount
+     * @param bool $isCount
      *
      * @return Helpers\GridViewResult
      * @throws ColumnsException
      * @throws QueryException
      */
-    public function getSimple(bool $isClount = false): \Assurrussa\GridView\Helpers\GridViewResult
+    public function getSimple(bool $isCount = false): \Assurrussa\GridView\Helpers\GridViewResult
     {
         $this->fetch();
 
@@ -344,7 +344,7 @@ class GridView implements GridInterface
         $gridViewResult->formAction = $this->formAction;
         $gridViewResult->location = $this->locationUrl;
         $gridViewResult->requestParams = $this->requestParams;
-        $gridViewResult->data = $this->pagination->getSimple($this->page, $this->limit, $isClount);
+        $gridViewResult->data = $this->pagination->getSimple($this->page, $this->limit, $isCount);
         $gridViewResult->simple = true;
         $gridViewResult->pagination = $this->getPaginationRender();
         $gridViewResult->headers = $this->columns->toArray();
