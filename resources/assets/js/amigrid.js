@@ -339,4 +339,20 @@ class AmiGridJS {
     }
 }
 
+/**
+ * @param  {string} $jsNameProperty
+ *
+ * @returns  {Promise<any>}
+ */
+window.amiGridOnSend = function ($jsNameProperty) {
+    if(window[$jsNameProperty]) {
+        return window[$jsNameProperty].onSend();
+    } else {
+        console.warn('not found window property "' + $jsNameProperty + '" for AmiGridJS');
+        return new Promise((resolve, reject) => {
+            reject();
+        });
+    }
+};
+
 export default AmiGridJS;
