@@ -175,7 +175,7 @@ class AmiGridJS {
                     }
                 }
             }
-            btnCustom.setAttribute('href', btnCustom.getAttribute('data-href') + selected.join(','));
+            btnCustom.setAttribute('href', btnCustom.getAttribute('data-url') + selected.join(','));
         }
     }
 
