@@ -11,10 +11,6 @@
 ### Setting ###
 * In file `config/amigrid.php` required settings
 
-### Routes ###
-
-* If you do not need routing paths, then in the config `config/amigrid.php` just specify `FALSE`, for `routes`
-
 ### Include ###
 
 in template use
