@@ -39,7 +39,6 @@ class FilterEnum
      */
     public static function hasFilterExecuteForCyrillicColumn($column)
     {
-        dd(22222222222222222222222222222222222222222222222222222, mb_substr($column, -3));
         return isset(static::getFilterExecuteForCyrillicColumn()[mb_substr($column, -3)]);
     }
 }
