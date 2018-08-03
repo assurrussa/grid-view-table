@@ -66,6 +66,8 @@ class Column implements ColumnInterface
     const FILTER_KEY_CLASS = 'class';
     const FILTER_KEY_STYLE = 'style';
     const FILTER_KEY_PLACEHOLDER = 'placeholder';
+    const FILTER_KEY_WIDTH = 'width';
+    const FILTER_KEY_FORMAT = 'format';
 
     /**
      * @property string
@@ -347,8 +349,34 @@ class Column implements ColumnInterface
             self::FILTER_KEY_CLASS       => $class,
             self::FILTER_KEY_STYLE       => $style,
             self::FILTER_KEY_PLACEHOLDER => $placeholder,
+            self::FILTER_KEY_WIDTH       => '180px',
+            self::FILTER_KEY_FORMAT      => 'DD MMM YY',
         ];
         $this->setUrl($url);
+
+        return $this;
+    }
+
+    /**
+     * @param string $width
+     *
+     * @return ColumnInterface
+     */
+    public function setFilterFormat(string $format = 'DD MMM YY'): ColumnInterface
+    {
+        $this->filter[self::FILTER_KEY_FORMAT] = $format;
+
+        return $this;
+    }
+
+    /**
+     * @param string $width
+     *
+     * @return ColumnInterface
+     */
+    public function setFilterWidth(string $width = '180px'): ColumnInterface
+    {
+        $this->filter[self::FILTER_KEY_WIDTH] = $width;
 
         return $this;
     }
@@ -369,7 +397,7 @@ class Column implements ColumnInterface
         string $style = '',
         string $placeholder = ''
     ): ColumnInterface {
-        return $this->setFilter($field, $array,self::FILTER_TYPE_SELECT, [], $class, $style, $placeholder);
+        return $this->setFilter($field, $array, self::FILTER_TYPE_SELECT, [], $class, $style, $placeholder);
     }
 
     /**
