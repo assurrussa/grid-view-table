@@ -15,9 +15,7 @@
 
 in template use
 ```
-{!! app(\Assurrussa\GridView\GridView::NAME)->render(['data' => $data]) !!}
-or facade
-{!! \AmiGridView::render(['data' => $data]) !!}
+{!! $data !!}
 
 <!-- AmiGridView -->
 <link href="{{ asset('vendor/grid-view/css/amigrid.css') }}" rel="stylesheet">
@@ -25,6 +23,7 @@ or facade
 <!-- AmiGridView -->
 @stack('scripts')
 ```
+and ajax response - `$data->toHtml()`
 
 ### Done! ###
 

@@ -42,6 +42,22 @@ class GridViewResult
     public $simple = false;
 
     /**
+     * @param string|null $text
+     *
+     * @return string
+     */
+    public function getElementName(string $text = null): string
+    {
+        if ($text) {
+            $text = str_replace('.', '_', $text);
+
+            return '_' . $text;
+        }
+
+        return 'js_amiGridList_' . $this->id;
+    }
+
+    /**
      * @return array
      */
     public function toArray(): array
@@ -71,19 +87,19 @@ class GridViewResult
     }
 
     /**
-     * @param string|null $text
-     *
      * @return string
      */
-    public function getElementName(string $text = null): string
+    public function toHtml(): string
     {
-        if ($text) {
-            $text = str_replace('.', '_', $text);
+        return app(\Assurrussa\GridView\GridView::NAME)->render(['data' => $this]);
+    }
 
-            return '_' . $text;
-        }
-
-        return 'js_amiGridList_' . $this->id;
+    /**
+     * @return string
+     */
+    public function __toString(): string
+    {
+        return $this->toHtml();
     }
 
     /**
