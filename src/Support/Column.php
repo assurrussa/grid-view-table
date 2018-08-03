@@ -51,6 +51,7 @@ class Column implements ColumnInterface
     const FILTER_TYPE_STRING = 'string';
     /** type date for filter */
     const FILTER_TYPE_DATE = 'date';
+    const FILTER_TYPE_DATE_RANGE = 'date_range';
     /** type array for filter */
     const FILTER_TYPE_SELECT = 'select';
     const FILTER_TYPE_SELECT_AJAX = 'select_ajax';
@@ -489,6 +490,34 @@ class Column implements ColumnInterface
         }
 
         return $this->setFilter($field, $string, self::FILTER_TYPE_DATE, [], $class, $style, $placeholder);
+    }
+
+    /**
+     * @param string      $field
+     * @param string      $string
+     * @param bool        $active
+     * @param string|null $format
+     * @param string      $class
+     * @param string      $style
+     * @param string      $placeholder
+     *
+     * @return ColumnInterface
+     */
+    public function setFilterDateRange(
+        string $field,
+        string $string = '',
+        bool $active = true,
+        string $format = null,
+        string $class = '',
+        string $style = '',
+        string $placeholder = ''
+    ): ColumnInterface {
+        $this->setDateActive($active);
+        if ($format) {
+            $this->setDateFormat($format);
+        }
+
+        return $this->setFilter($field, $string, self::FILTER_TYPE_DATE_RANGE, [], $class, $style, $placeholder);
     }
 
     /**

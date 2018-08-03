@@ -27,6 +27,22 @@ $gridId = $data->getElementName();
                 @elseif($header->filter[\Assurrussa\GridView\Support\Column::FILTER_KEY_MODE] === \Assurrussa\GridView\Support\Column::FILTER_TYPE_DATE)
                     @php
                         $placeholder = $header->filter[\Assurrussa\GridView\Support\Column::FILTER_KEY_PLACEHOLDER];
+                        $placeholder = $placeholder ? $placeholder : '-- date --';
+                    @endphp
+                    <div class="js_InitComponent">
+                        <ami-datepicker name="{{ $header->filter[\Assurrussa\GridView\Support\Column::FILTER_KEY_NAME] }}"
+                                        value="{{ request()->get($header->filter[\Assurrussa\GridView\Support\Column::FILTER_KEY_NAME]) }}"
+                                        class="{{ $header->filter[\Assurrussa\GridView\Support\Column::FILTER_KEY_CLASS] }}"
+                                        grid-id="{{ $gridId }}"
+                                        placeholder="{{ $placeholder }}"
+                                        width="{{ $header->filter[\Assurrussa\GridView\Support\Column::FILTER_KEY_WIDTH] }}"
+                                        format="{{ $header->filter[\Assurrussa\GridView\Support\Column::FILTER_KEY_FORMAT] }}"
+                                        i18n="{{ config('app.locale') ?? 'EN' }}">
+                        </ami-datepicker>
+                    </div>
+                @elseif($header->filter[\Assurrussa\GridView\Support\Column::FILTER_KEY_MODE] === \Assurrussa\GridView\Support\Column::FILTER_TYPE_DATE_RANGE)
+                    @php
+                        $placeholder = $header->filter[\Assurrussa\GridView\Support\Column::FILTER_KEY_PLACEHOLDER];
                         $placeholder = $placeholder ? $placeholder : '-- range --';
                     @endphp
                     <div class="js_InitComponent">

@@ -62,6 +62,8 @@ interface ColumnInterface
 
     public function setFilterDate(string $field, string $string = '', bool $active = true, string $format = null, string $class = '', string $style = ''): ColumnInterface;
 
+    public function setFilterDateRange(string $field, string $string = '', bool $active = true, string $format = null, string $class = '', string $style = ''): ColumnInterface;
+
     public function setFilterFormat(string $format = 'DD MMM YY'): ColumnInterface;
 
     public function setFilterWidth(string $width = '180px'): ColumnInterface;
