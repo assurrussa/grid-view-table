@@ -352,7 +352,6 @@
         },
         computed: {
             styleInputDate: function () {
-                console.log(this.width);
                 return 'width: ' + (this.width ? this.width : '200px');
             },
             onGetDateStringRender: function () {
