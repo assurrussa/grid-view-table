@@ -19,8 +19,8 @@
 </template>
 
 <script>
+    import fecha from 'fecha';
     import VDatepicker from 'vuejs-datepicker';
-    import moment from 'moment';
     import {en, ru} from 'vuejs-datepicker/dist/locale';
     export default {
         props: {
@@ -74,10 +74,14 @@
         },
         methods: {
             customFormatter(date) {
-                return moment(date).format(this.format);
+                if (!date) {
+                    return null;
+                }
+                let dateparse = new Date(Date.parse(date));
+                return fecha.format(new Date(dateparse.getFullYear(), dateparse.getMonth(), dateparse.getDate()), this.format)
             },
             onSelected(event) {
-                this.model = event.toISOString();
+                this.model = event ? event.toISOString() : '';
                 this.$emit('selected', event);
                 this.onSend();
             },
@@ -88,9 +92,7 @@
                 this.$emit('closed', event);
             },
             onCleared(event) {
-                this.model = '';
                 this.$emit('cleared', event);
-                this.onSend();
             },
             onSend() {
                 setTimeout(() => {
