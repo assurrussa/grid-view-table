@@ -725,7 +725,7 @@
     }
 
     .calendar_preset li.calendar_preset-ranges {
-        padding: 0 30px 0 10px;
+        padding: 0 10px 0 10px;
         margin-bottom: 1px;
         cursor: pointer;
         margin-top: 1px;
