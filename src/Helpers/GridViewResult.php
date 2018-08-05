@@ -12,33 +12,31 @@ use Illuminate\Pagination\LengthAwarePaginator;
 
 
 /**
- * @property string                                                                                 $id
- * @property boolean                                                                                $simple
- * @property string                                                                                 $location
- * @property string                                                                                 $formAction
- * @property string                                                                                 $requestParams
- * @property \Illuminate\Pagination\LengthAwarePaginator|\Illuminate\Contracts\Pagination\Paginator $data
- * @property array                                                                                  $pagination
- * @property Column[]                                                                               $headers
- * @property string|array|Button                                                                    $buttonCreate
- * @property string|array|Button                                                                    $buttonExport
- * @property array|Button[]                                                                         $buttonCustoms
- * @property array|Input[]                                                                          $inputCustoms
- * @property array                                                                                  $filter
- * @property int                                                                                    $page
- * @property string                                                                                 $orderBy
- * @property string                                                                                 $search
- * @property int                                                                                    $limit
- * @property string                                                                                 $sortName
- * @property array                                                                                  $counts
- * @property bool                                                                                   $searchInput
- * @property int                                                                                    $milliSeconds
+ * @property string                                                                                       $id
+ * @property boolean                                                                                      $simple
+ * @property string                                                                                       $location
+ * @property string                                                                                       $formAction
+ * @property array                                                                                        $requestParams
+ * @property \Illuminate\Pagination\LengthAwarePaginator|\Illuminate\Contracts\Pagination\Paginator|array $data
+ * @property string                                                                                       $pagination
+ * @property Column[]                                                                                     $headers
+ * @property string|array|Button                                                                          $buttonCreate
+ * @property string|array|Button                                                                          $buttonExport
+ * @property array|Button[]                                                                               $buttonCustoms
+ * @property array|Input[]                                                                                $inputCustoms
+ * @property array                                                                                        $filter
+ * @property int                                                                                          $page
+ * @property string                                                                                       $orderBy
+ * @property string                                                                                       $search
+ * @property int                                                                                          $limit
+ * @property string                                                                                       $sortName
+ * @property array                                                                                        $counts
+ * @property bool                                                                                         $searchInput
  *
  * Class GridViewResult
  */
 class GridViewResult
 {
-
     public $simple = false;
 
     /**
