@@ -34,3 +34,4 @@ This is a sample app developed to showcase how the [assurrussa/grid-view-table](
 Check it out on heroku
 
 - [DEMO](http://grid-view-table.herokuapp.com).
+- [Documentation](https://github.com/assurrussa/grid-view-table/tree/master/docs).
