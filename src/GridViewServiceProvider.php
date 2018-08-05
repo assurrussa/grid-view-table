@@ -44,7 +44,7 @@ class GridViewServiceProvider extends ServiceProvider
         $this->publishes([
             __DIR__ . '/../public/css' => base_path('public/vendor/grid-view/css'),
             __DIR__ . '/../public/js'  => base_path('public/vendor/grid-view/js'),
-        ], 'views');
+        ], 'assets');
 
         $this->registerProviders();
     }
