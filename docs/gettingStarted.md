@@ -13,7 +13,7 @@ Live demo: [here](http://grid-view-table.herokuapp.com)
 
 1 - Install
 ```
-    composer require assurrussa/grid-view-table`
+    composer require assurrussa/grid-view-table
 ```
 
 2 - Publish assets
