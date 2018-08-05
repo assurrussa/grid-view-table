@@ -35,6 +35,7 @@ class FilterEnum
      * Проверка существует ли имя в массиве
      *
      * @param string $column
+     *
      * @return bool
      */
     public static function hasFilterExecuteForCyrillicColumn($column)

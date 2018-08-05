@@ -43,7 +43,7 @@ class GridViewServiceProvider extends ServiceProvider
         ], 'configs');
         $this->publishes([
             __DIR__ . '/../public/css' => base_path('public/vendor/grid-view/css'),
-            __DIR__ . '/../public/js' => base_path('public/vendor/grid-view/js'),
+            __DIR__ . '/../public/js'  => base_path('public/vendor/grid-view/js'),
         ], 'views');
 
         $this->registerProviders();
@@ -78,7 +78,7 @@ class GridViewServiceProvider extends ServiceProvider
      */
     protected function registerProviders(): void
     {
-        foreach($this->providers as $provider) {
+        foreach ($this->providers as $provider) {
             $this->app->register($provider);
         }
     }

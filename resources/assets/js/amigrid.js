@@ -345,7 +345,7 @@ class AmiGridJS {
  * @returns  {Promise<any>}
  */
 window.amiGridOnSend = function ($jsNameProperty) {
-    if(window[$jsNameProperty]) {
+    if (window[$jsNameProperty]) {
         return window[$jsNameProperty].onSend();
     } else {
         console.warn('not found window property "' + $jsNameProperty + '" for AmiGridJS');

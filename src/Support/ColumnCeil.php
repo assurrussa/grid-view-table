@@ -145,7 +145,7 @@ class ColumnCeil
      *
      * @return string
      */
-    public function editable(array $options = [], string $view = null)
+    public function editable(array $options = [], string $view = null): string
     {
         $view = $view ?: 'column.editableClick';
         $initJsEvent = isset($options['initJsEvent']) ? $options['initJsEvent'] : 'ready change';

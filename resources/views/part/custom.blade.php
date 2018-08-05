@@ -26,5 +26,5 @@ $showHr = false;
 </div>
 <div class="clearfix"></div>
 @if($showHr)
-<hr>
+    <hr>
 @endif

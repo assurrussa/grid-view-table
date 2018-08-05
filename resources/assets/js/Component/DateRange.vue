@@ -1,7 +1,9 @@
 <template>
     <div class="calendar-root">
         <div class="input-date" :style="styleInputDate" @click="toggleCalendar()"> {{ onGetDateStringRender }}</div>
-        <div class="calendar" :class="{'calendar-mobile ': isCompact, 'calendar-right-to-left': isRighttoLeft, 'calendar-right-to-left-mobile': isCompact}" v-if="isOpen">
+        <div class="calendar"
+             :class="{'calendar-mobile ': isCompact, 'calendar-right-to-left': isRighttoLeft, 'calendar-right-to-left-mobile': isCompact}"
+             v-if="isOpen">
             <div class="calendar-head" v-if="!isCompact">
                 <h2>{{captionsLocale.title}}</h2>
                 <i class="close" @click="toggleCalendar()">&times</i>
@@ -24,7 +26,8 @@
                             v-html="getDayCell(r, i, startMonthDay, endMonthDate)"
                             @click="selectFirstItem(r, i)"></li>
                     </ul>
-                    <button v-if="isCompact" class="calendar-btn-clear" @click.prevent="showCalendar()">{{captionsLocale.hide_calendar}}</button>
+                    <button v-if="isCompact" class="calendar-btn-clear" @click.prevent="showCalendar()">{{captionsLocale.hide_calendar}}
+                    </button>
                 </div>
                 <div class="calendar_month_right" v-if="!isCompact">
                     <div class="months-text">
@@ -333,12 +336,12 @@
             this.subtractYearLastNumber = !isNaN(parseInt(this.subtractYearLast)) ? parseInt(this.subtractYearLast) : this.subtractYearLastNumber;
             if (this.activeMonthStart === 11) this.activeYearEnd = this.activeYearStart + 1;
             let dateTmp = new Date();
-            if(this.start || this.end) {
+            if (this.start || this.end) {
                 this.dateRange = {
                     start: (this.start ? new Date(this.start) : new Date(dateTmp.getFullYear(), dateTmp.getMonth(), 1)),
                     end: (this.end ? new Date(this.end) : new Date(dateTmp.getFullYear(), dateTmp.getMonth(), this.getLastDayOfMonth(dateTmp.getFullYear(), dateTmp.getMonth()))),
                 }
-            } else if(this.isCreateDate) {
+            } else if (this.isCreateDate) {
                 this.dateRange = {
                     start: new Date(dateTmp.getFullYear(), dateTmp.getMonth(), 1),
                     end: new Date(dateTmp.getFullYear(), dateTmp.getMonth(), this.getLastDayOfMonth(dateTmp.getFullYear(), dateTmp.getMonth())),
@@ -355,7 +358,7 @@
                 return 'width: ' + (this.width ? this.width : '200px');
             },
             onGetDateStringRender: function () {
-                if(this.dateRange.start) {
+                if (this.dateRange.start) {
                     return this.getDateString(this.dateRange.start) + ' - ' + this.getDateString(this.dateRange.end);
                 }
                 return this.placeholder;

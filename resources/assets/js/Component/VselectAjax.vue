@@ -133,7 +133,7 @@
         },
         computed: {
             isSelected() {
-                if(typeof this.value === 'object') {
+                if (typeof this.value === 'object') {
                     return this.value && this.value[this.label] && this.value[this.label].length;
                 }
                 return false;
@@ -143,14 +143,14 @@
             onSelect(value) {
                 this.$el.querySelector('input[name="' + this.name + '"]').value = value[this.fieldSelect];
                 this.$emit('select', value);
-                if(this.jsInitSubmit && window[this.jsInitSubmit]) {
+                if (this.jsInitSubmit && window[this.jsInitSubmit]) {
                     window[this.jsInitSubmit].onSend();
                 }
             },
             onRemove(value) {
                 this.$el.querySelector('input[name="' + this.name + '"]').value = '';
                 this.$emit('remove', value);
-                if(this.jsInitSubmit && window[this.jsInitSubmit]) {
+                if (this.jsInitSubmit && window[this.jsInitSubmit]) {
                     window[this.jsInitSubmit].onSend();
                 }
             },
@@ -158,7 +158,7 @@
                 this.$el.querySelector('input[name="' + this.name + '"]').value = '';
                 this.$emit('clear', this.value);
                 this.value = [];
-                if(this.jsInitSubmit && window[this.jsInitSubmit]) {
+                if (this.jsInitSubmit && window[this.jsInitSubmit]) {
                     window[this.jsInitSubmit].onSend();
                 }
             },
@@ -166,7 +166,7 @@
                 return `and ${count} other values`
             },
             asyncFind(query) {
-                if(this.isSearchAjax) {
+                if (this.isSearchAjax) {
                     this.isLoading = true;
                     this.search(query, this);
                 }
@@ -174,13 +174,13 @@
             search(search, vm) {
                 clearTimeout(this.timer);
                 this.timer = setTimeout(() => {
-                    if(search.length >= vm.minLength) {
-                        if(vm.method === 'get') {
+                    if (search.length >= vm.minLength) {
+                        if (vm.method === 'get') {
                             axios.get(vm.action + `?query=${search}${vm.paramsString}`).then(res => {
                                 vm.options = res.data.items;
                                 vm.isLoading = false;
                             }).catch(error => console.log(error));
-                        } else if(vm.method === 'post') {
+                        } else if (vm.method === 'post') {
                             axios.post(vm.action, {
                                 query: search,
                             }).then(res => {

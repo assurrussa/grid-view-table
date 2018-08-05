@@ -18,7 +18,7 @@ class ButtonItemTest extends TestCase
 
         $button->setAction('show')
             ->setLabel('show')
-            ->setRoute('amigrid.show', ['entity', 1])
+            ->setRoute('amigrid.show', ['entity', 1])// route not found
             ->setIcon('icon')
             ->setHandler(function ($data) {
                 return $data == null;
@@ -26,11 +26,16 @@ class ButtonItemTest extends TestCase
 
         $this->assertEquals('show', $button->getAction());
         $this->assertEquals('show', $button->getLabel());
-        $this->assertEquals('icon', $button->getIcon());
+        $this->assertEquals('', $button->getIcon());
+        $this->assertEquals(false, $button->isVisibility());
+        $this->assertEquals(false, strpos($button->getUrl(), '://'));
+        $button
+            ->setVisible(true)
+            ->setIcon('icon')
+            ->setUrl('https://test.com');
         $this->assertEquals(true, $button->isVisibility());
-        $this->assertEquals(true, strpos($button->getUrl(), '://'));
-        $button->setUrl('#');
-        $this->assertEquals('#', $button->getUrl());
+        $this->assertEquals('https://test.com', $button->getUrl());
+        $this->assertEquals('icon', $button->getIcon());
         $button->setVisible(false);
         $this->assertEquals(false, $button->isVisibility());
 

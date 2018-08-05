@@ -19,7 +19,6 @@ use Assurrussa\GridView\Support\EloquentPagination;
 use Assurrussa\GridView\Support\Input;
 use Assurrussa\GridView\Support\Inputs;
 use Illuminate\Contracts\Support\Renderable;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 /**
  * Class GridView
@@ -35,7 +34,7 @@ class GridView implements GridInterface
     private $_config;
     /** @var \Illuminate\Support\Collection $_request */
     private $_request;
-    /** @var \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder|static */
+    /** @var \Illuminate\Database\Eloquent\Builder */
     private $_query;
     /** @var \Illuminate\Database\Eloquent\Model */
     private $_model;
@@ -114,7 +113,7 @@ class GridView implements GridInterface
     }
 
     /**
-     * @param \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder|static $query
+     * @param \Illuminate\Database\Eloquent\Builder $query
      *
      * @return GridInterface
      */
@@ -169,10 +168,10 @@ class GridView implements GridInterface
         $column = new Column();
         $this->columns->setColumn($column);
 
-        if($name) {
+        if ($name) {
             $column->setKey($name);
         }
-        if($title) {
+        if ($title) {
             $column->setValue($title);
         }
 
@@ -229,7 +228,7 @@ class GridView implements GridInterface
     {
         if (request()->ajax() || request()->wantsJson()) {
             $path = $path === 'gridView' ? 'part.grid' : $path;
-            if($requestParams = http_build_query($data['data']->requestParams)) {
+            if ($requestParams = http_build_query($data['data']->requestParams)) {
                 $requestParams = '?' . $requestParams;
             } else {
                 $requestParams = '';
@@ -267,11 +266,11 @@ class GridView implements GridInterface
     /**
      * Get the evaluated view contents for the given view.
      *
-     * @param  string $view
-     * @param  array  $data
-     * @param  array  $mergeData
+     * @param string|null $view
+     * @param array       $data
+     * @param array       $mergeData
      *
-     * @return \Illuminate\View\View|\Illuminate\Contracts\View\Factory
+     * @return Renderable
      */
     public static function view(string $view = null, array $data = [], array $mergeData = []): Renderable
     {
@@ -281,16 +280,15 @@ class GridView implements GridInterface
     /**
      * Translate the given message.
      *
-     * @param  string $id
-     * @param  array  $parameters
-     * @param  string $domain
-     * @param  string $locale
+     * @param string|null $id
+     * @param array       $parameters
+     * @param string|null $locale
      *
-     * @return \Symfony\Component\Translation\TranslatorInterface|string
+     * @return string
      */
     public static function trans(string $id = null, array $parameters = [], string $locale = null): string
     {
-        return trans(self::NAME . '::' . $id, $parameters, $locale);
+        return (string)trans(self::NAME . '::' . $id, $parameters, $locale);
     }
 
     /**
@@ -375,12 +373,14 @@ class GridView implements GridInterface
 
         $_listRow = [];
         if ($instance = $this->_query->first()) {
-            foreach ($this->columns->getColumns() as $column) {
-                $_listRow[$column->getKey()] = $column->getValues($instance);
-            }
-            $buttons = $this->columns->filterActions($instance);
-            if (count($buttons)) {
-                $_listRow = array_merge($_listRow, [Column::ACTION_NAME => implode('', $buttons)]);
+            if ($instance instanceof \Illuminate\Database\Eloquent\Model) {
+                foreach ($this->columns->getColumns() as $column) {
+                    $_listRow[$column->getKey()] = $column->getValues($instance);
+                }
+                $buttons = $this->columns->filterActions($instance);
+                if (count($buttons)) {
+                    $_listRow = array_merge($_listRow, [Column::ACTION_NAME => implode('', $buttons)]);
+                }
             }
         }
 
@@ -526,8 +526,6 @@ class GridView implements GridInterface
     }
 
     /**
-     * @param null $text
-     *
      * @return string
      */
     public function getFormAction(): string
@@ -568,12 +566,12 @@ class GridView implements GridInterface
     }
 
     /**
-     * @param string $key
-     * @param null   $default
+     * @param string     $key
+     * @param mixed|null $default
      *
      * @return mixed|null
      */
-    protected function getConfig($key, $default = null)
+    protected function getConfig(string $key, $default = null)
     {
         if (isset($this->_config[$key])) {
             return $this->_config[$key];
@@ -593,7 +591,7 @@ class GridView implements GridInterface
             throw new QueryException();
         }
         if (!$this->_model) {
-            throw new ModelNotFoundException();
+            throw new \Illuminate\Database\Eloquent\ModelNotFoundException();
         }
         $this->_setRequest()
             ->_hasColumns();
@@ -705,42 +703,40 @@ class GridView implements GridInterface
             }
             $search = trim($search);
             // поиск по словам
-            if (is_string($search) || is_numeric($search)) {
-                $this->_query->where(function ($query) use (
-                    $search,
-                    $value,
-                    $operator,
-                    $beforeValue,
-                    $afterValue
-                ) {
-                    /** @var \Illuminate\Database\Eloquent\Builder $query */
-                    $tableName = $this->_model->getTable();
-                    if ($value) {
-                        if (Model::hasColumn($this->_model, $search)) {
-                            $query->orWhere($tableName . '.' . $search, $operator, $beforeValue . $value . $afterValue);
-                        }
-                    } elseif ($this->isStrictMode()) {
-                        if (method_exists($this->_model, 'toFieldsAmiGrid')) {
-                            $list = $this->_model->toFieldsAmiGrid();
-                            foreach ($list as $column) {
-                                if (Model::hasColumn($this->_model, $column)) {
-                                    $query->orWhere($tableName . '.' . $column, $operator, $beforeValue . $search . $afterValue);
-                                }
-                            }
-                        }
-                    } else {
-                        $list = \Schema::getColumnListing($tableName);
+            $this->_query->where(function ($query) use (
+                $search,
+                $value,
+                $operator,
+                $beforeValue,
+                $afterValue
+            ) {
+                /** @var \Illuminate\Database\Eloquent\Builder $query */
+                $tableName = $this->_model->getTable();
+                if ($value) {
+                    if (Model::hasColumn($this->_model, $search)) {
+                        $query->orWhere($tableName . '.' . $search, $operator, $beforeValue . $value . $afterValue);
+                    }
+                } elseif ($this->isStrictMode()) {
+                    if (method_exists($this->_model, 'toFieldsAmiGrid')) {
+                        $list = $this->_model->toFieldsAmiGrid();
                         foreach ($list as $column) {
-                            if ($this->hasFilterExecuteForCyrillicColumn($search, $column)) {
-                                continue;
-                            }
                             if (Model::hasColumn($this->_model, $column)) {
                                 $query->orWhere($tableName . '.' . $column, $operator, $beforeValue . $search . $afterValue);
                             }
                         }
                     }
-                });
-            }
+                } else {
+                    $list = \Schema::getColumnListing($tableName);
+                    foreach ($list as $column) {
+                        if ($this->hasFilterExecuteForCyrillicColumn($search, $column)) {
+                            continue;
+                        }
+                        if (Model::hasColumn($this->_model, $column)) {
+                            $query->orWhere($tableName . '.' . $column, $operator, $beforeValue . $search . $afterValue);
+                        }
+                    }
+                }
+            });
         }
     }
 

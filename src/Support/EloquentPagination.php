@@ -67,15 +67,17 @@ class EloquentPagination implements PaginationInterface
         $this->_query->limit($limit);
         $data = collect();
         foreach ($this->_query->get() as $key => $instance) {
-            $_listRow = [];
-            foreach ($this->_columns->getColumns() as $column) {
-                $_listRow[$column->getKey()] = $column->getValues($instance);
+            if ($instance instanceof \Illuminate\Database\Eloquent\Model) {
+                $_listRow = [];
+                foreach ($this->_columns->getColumns() as $column) {
+                    $_listRow[$column->getKey()] = $column->getValues($instance);
+                }
+                $buttons = $this->_columns->filterActions($instance);
+                if (count($buttons)) {
+                    $_listRow = array_merge($_listRow, [Column::ACTION_NAME => implode('', $buttons)]);
+                }
+                $data->offsetSet($key, $_listRow);
             }
-            $buttons = $this->_columns->filterActions($instance);
-            if (count($buttons)) {
-                $_listRow = array_merge($_listRow, [Column::ACTION_NAME => implode('', $buttons)]);
-            }
-            $data->offsetSet($key, $_listRow);
         }
         $this->_data = new \Illuminate\Pagination\LengthAwarePaginator($data, $countTotal, $limit, $page, [
             'path'     => \Illuminate\Pagination\Paginator::resolveCurrentPath(),
@@ -98,26 +100,28 @@ class EloquentPagination implements PaginationInterface
         if (!$this->_columns && !$this->_query) {
             return null;
         }
-        if($isClount) {
+        if ($isClount) {
             $countTotal = $this->_query->count();
         }
         $this->_query->skip(($page - 1) * $page)->take($page + 1);
         $this->_data = $this->_query->simplePaginate($limit);
-        if($isClount) {
+        if ($isClount) {
             $this->_data->totalCount = $countTotal;
         }
-        foreach ( $this->_data->items() as $key => $instance) {
-            $_listRow = [];
-            foreach ($this->_columns->getColumns() as $column) {
-                $_listRow[$column->getKey()] = $column->getValues($instance);
-                if($column->getKey() === 'preview') {
+        foreach ($this->_data->items() as $key => $instance) {
+            if ($instance instanceof \Illuminate\Database\Eloquent\Model) {
+                $_listRow = [];
+                foreach ($this->_columns->getColumns() as $column) {
+                    $_listRow[$column->getKey()] = $column->getValues($instance);
+                    if ($column->getKey() === 'preview') {
+                    }
                 }
+                $buttons = $this->_columns->filterActions($instance);
+                if (count($buttons)) {
+                    $_listRow = array_merge($_listRow, [Column::ACTION_NAME => implode('', $buttons)]);
+                }
+                $this->_data->offsetSet($key, $_listRow);
             }
-            $buttons = $this->_columns->filterActions($instance);
-            if (count($buttons)) {
-                $_listRow = array_merge($_listRow, [Column::ACTION_NAME => implode('', $buttons)]);
-            }
-            $this->_data->offsetSet($key, $_listRow);
         }
 
         return $this->_data;
@@ -177,7 +181,8 @@ class EloquentPagination implements PaginationInterface
                 }
             }
             if ($this->_data->hasMorePages()) {
-                $list[] = $this->getItemForPagination('', '&raquo;', $this->_data->nextPageUrl(), 'next', (string)($this->_data->currentPage() + 1));
+                $list[] = $this->getItemForPagination('', '&raquo;', $this->_data->nextPageUrl(), 'next',
+                    (string)($this->_data->currentPage() + 1));
             };
         }
 

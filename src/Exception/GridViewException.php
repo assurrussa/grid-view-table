@@ -5,6 +5,7 @@ declare(strict_types=1);
 /**
  * This file is part of GridView package.
  */
+
 namespace Assurrussa\GridView\Exception;
 
 use Assurrussa\GridView\GridView;

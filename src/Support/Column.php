@@ -9,17 +9,18 @@ use Assurrussa\GridView\Interfaces\ColumnInterface;
 /**
  * Class Column
  *
- * @property string                 $key
- * @property string                 $value
- * @property string                 $url
- * @property bool                   $sort
- * @property bool                   $screening
- * @property array                  $filter
- * @property string                 $dateFormat
- * @property bool                   $dateActive
- * @property \Eloquent|null         $instance
- * @property \Closure               $handler
- * @property Button[]|\Closure|null $actions
+ * @property string                                   $key
+ * @property string                                   $value
+ * @property string                                   $url
+ * @property bool                                     $sort
+ * @property bool                                     $screening
+ * @property array                                    $filter
+ * @property string                                   $dateFormat
+ * @property bool                                     $dateActive
+ * @property \Illuminate\Database\Eloquent\Model|null $instance
+ * @property \Closure|null                            $handler
+ * @property \Closure|null                            $actions
+ * @property array                                    $buttons
  *
  * @package Assurrussa\GridView\Support
  */
@@ -115,12 +116,12 @@ class Column implements ColumnInterface
     public $dateActive = false;
 
     /**
-     * @property \Eloquent|null
+     * @property \Illuminate\Database\Eloquent\Model|null
      */
     public $instance = null;
 
     /**
-     * @property Button[]|\Closure|null
+     * @property \Closure|null
      */
     public $actions = null;
 
@@ -128,6 +129,11 @@ class Column implements ColumnInterface
      * @property \Closure
      */
     public $handler = null;
+
+    /**
+     * @property array
+     */
+    public $buttons = [];
 
     /**
      * Column constructor.
@@ -192,11 +198,11 @@ class Column implements ColumnInterface
     }
 
     /**
-     * @param null $instance
+     * @param \Illuminate\Database\Eloquent\Model|null $instance
      *
      * @return mixed|null
      */
-    public function getValues($instance = null)
+    public function getValues(\Illuminate\Database\Eloquent\Model $instance = null)
     {
         if ($instance) {
             $this->setInstance($instance);
@@ -245,7 +251,9 @@ class Column implements ColumnInterface
     /**
      * Необходимо устанавливать только в момент когда приходит инстанс модели!
      *
-     * @param \Eloquent|null $instance
+     * @param \Illuminate\Database\Eloquent\Model $instance
+     *
+     * @return ColumnInterface
      */
     public function setInstance(\Illuminate\Database\Eloquent\Model $instance): ColumnInterface
     {
@@ -667,17 +675,32 @@ class Column implements ColumnInterface
     }
 
     /**
-     * @return Button[]|null
+     * @return array|null
      */
-    public function getActions()
+    public function getActions(): array
     {
+        $this->buttons = [];
         if (is_callable($this->actions)) {
             if ($this->getInstance()) {
-                return call_user_func($this->actions, $this->getInstance());
+                $buttons = call_user_func($this->actions, $this->getInstance(), $this);
+                if ($buttons && is_array($buttons)) {
+                    return $buttons;
+                }
             }
         }
 
-        return $this->actions;
+        return $this->buttons;
+    }
+
+    /**
+     * @return Button
+     */
+    public function addButton(): Button
+    {
+        $button = new Button();
+        $this->buttons[] = $button;
+
+        return $button;
     }
 
     /**

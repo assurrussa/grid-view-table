@@ -15,8 +15,8 @@ class GridViewTest extends TestCase
     {
         /** @var \Assurrussa\GridView\GridView $gridView */
         $gridView = $this->app->make(\Assurrussa\GridView\GridView::NAME);
-        $gridView->column('id','ID')->setSort(true);
-        $gridView->column('name','name label')->setSort(true)->setHandler(function ($data) {
+        $gridView->column('id', 'ID')->setSort(true);
+        $gridView->column('name', 'name label')->setSort(true)->setHandler(function ($data) {
             return $data->name . ' ' . $data->name;
         });
         $gridView->columnActions(function ($data) use ($gridView) {
@@ -26,7 +26,7 @@ class GridViewTest extends TestCase
             $buttons[] = $gridView->columnAction()->setActionEdit();
             return $buttons;
         });
-        $gridView->button()->setButtonCreate(route('amigrid.create', ['test']));
+        $gridView->button()->setButtonCreate('http://test.com');
         $gridView->button()->setButtonExport();
         $gridView->button()->setButtonCheckboxAction('create');
         $this->assertEquals(true, is_array($gridView->buttons->getButtons()));

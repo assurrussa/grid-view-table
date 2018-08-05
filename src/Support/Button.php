@@ -174,8 +174,7 @@ class Button implements ButtonInterface, Renderable, Arrayable
             ->setLabel($label)
             ->setTitle($title)
             ->setClass($class)
-            ->setIcon($icon)
-//            ->setMethod('PUT')
+            ->setIcon($icon)//            ->setMethod('PUT')
         ;
 
         return $this;
@@ -251,6 +250,9 @@ class Button implements ButtonInterface, Renderable, Arrayable
         string $class = 'btn btn-primary btn-outline-primary btn-sm flat',
         string $icon = 'fa fa-paw'
     ): ButtonInterface {
+        if (!$url) {
+            $url = '#';
+        }
         $this->setAction(self::TYPE_ACTION_CUSTOM)
             ->setUrl($url)
             ->setLabel($label)
@@ -323,7 +325,7 @@ class Button implements ButtonInterface, Renderable, Arrayable
             ->setAction(self::TYPE_ACTION_CUSTOM)
             ->setConfirmText($confirmText)
             ->setOptions([
-                'data-url'    => $this->getUrl(),
+                'data-url'     => $this->getUrl(),
                 'data-confirm' => $confirmText,
             ]);
     }
@@ -535,6 +537,8 @@ class Button implements ButtonInterface, Renderable, Arrayable
     }
 
     /**
+     * If not found route, the button is not visible automatically
+     *
      * @param string|null $route
      * @param array       $params
      *

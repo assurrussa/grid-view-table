@@ -1,10 +1,10 @@
 @php
-/**
- * @var \Assurrussa\GridView\Helpers\GridViewResult $data
- */
-$sortName = $data->sortName;
-$orderBy = $data->orderBy;
-$location = $data->location;
+    /**
+     * @var \Assurrussa\GridView\Helpers\GridViewResult $data
+     */
+    $sortName = $data->sortName;
+    $orderBy = $data->orderBy;
+    $location = $data->location;
 @endphp
 <div class="content-box">
     <input type="hidden" id="js_amiOrderBy" name="by" value="{{ $orderBy }}">

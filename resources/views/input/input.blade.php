@@ -25,4 +25,4 @@
        value="{{ $value }}"
        id="{{ $id }}"
        class="{{ $class }}"
-{{ implode(' ', $attributes) }} />
+        {{ implode(' ', $attributes) }} />

@@ -2,6 +2,7 @@
 import './bootstrap';
 
 import FormSerialize from 'form-serialize';
+
 window.FormSerialize = FormSerialize;
 
 import VSelectAjax from './Component/VselectAjax';

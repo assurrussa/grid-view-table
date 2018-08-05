@@ -25,22 +25,23 @@ class A
      * @param               $array
      * @param callable|null $callback
      * @param null          $default
+     *
      * @return mixed
      */
     public static function first($array, callable $callback = null, $default = null)
     {
-        if(is_null($callback)) {
-            if(empty($array)) {
+        if (is_null($callback)) {
+            if (empty($array)) {
                 return $default;
             }
 
-            foreach($array as $item) {
+            foreach ($array as $item) {
                 return $item;
             }
         }
 
-        foreach($array as $key => $value) {
-            if(call_user_func($callback, $key, $value)) {
+        foreach ($array as $key => $value) {
+            if (call_user_func($callback, $key, $value)) {
                 return $value;
             }
         }
@@ -71,23 +72,24 @@ class A
      *                            are not supported by this method. Also note that numeric value is meaningless when
      *                            first parameter is object typed.
      * @param mixed $defaultValue the default value to return when the attribute does not exist.
+     *
      * @return mixed the attribute value.
      */
     public static function value($object, $attribute, $defaultValue = null)
     {
-        if(is_scalar($attribute)) {
-            foreach(explode(self::$pathDivider, $attribute) as $name) {
-                if(isset($object->$name)) {
+        if (is_scalar($attribute)) {
+            foreach (explode(self::$pathDivider, $attribute) as $name) {
+                if (isset($object->$name)) {
                     $object = $object->$name;
-                } elseif(isset($object[$name])) {
+                } elseif (isset($object[$name])) {
                     $object = $object[$name];
                 } else {
                     return $defaultValue;
                 }
             }
             return $object;
-        } elseif(is_callable($attribute)) {
-            if($attribute instanceof Closure) {
+        } elseif (is_callable($attribute)) {
+            if ($attribute instanceof Closure) {
                 $attribute = Closure::bind($attribute, $object);
             }
             return call_user_func($attribute, $object);
@@ -113,22 +115,23 @@ class A
      * @param string|array    $divider string value of divider OR array [$divider,$prefix,$postfix]
      * @param string          $prefix  add to start of value
      * @param string          $postfix add to end of  value
+     *
      * @return array
      * @uses array_walk()
      */
     public static function join($array, $divider = ',', $prefix = null, $postfix = null)
     {
-        if(is_array($divider)) {
+        if (is_array($divider)) {
             list($divider, $prefix, $postfix) = $divider;
         }
         array_walk($array, function (&$value) use ($divider, $prefix, $postfix) {
-            if(is_array($value)) {
+            if (is_array($value)) {
                 $value = self::join(self::createFlat($value), $divider, $prefix, $postfix);
             } else {
-                if(is_object($value)) {
-                    if(isset($value->id)) {
+                if (is_object($value)) {
+                    if (isset($value->id)) {
                         $value = $value->id;
-                    } elseif($value instanceof \Carbon\Carbon) {
+                    } elseif ($value instanceof \Carbon\Carbon) {
                         $value = $value->toDateTimeString();
                     } else {
                         $value = null;
@@ -150,6 +153,7 @@ class A
      * </code>
      *
      * @param  array|Arrayable $array
+     *
      * @return array
      * @uses array_walk_recursive()
      */

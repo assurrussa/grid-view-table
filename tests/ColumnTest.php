@@ -38,11 +38,15 @@ class ColumnTest extends TestCase
         $this->assertEquals(false, $column->isSort());
         $this->assertEquals(true, $column->isScreening());
         $this->assertEquals([
-            'name'  => 'field',
-            'data'  => ['key' => 'value'],
-            'mode'  => 'select',
-            'class' => '',
-            'style' => ''
+            'name'        => 'field',
+            'data'        => ['key' => 'value'],
+            'mode'        => 'select',
+            'class'       => '',
+            'style'       => '',
+            'selected'    => [],
+            'placeholder' => '',
+            'width'       => '180px',
+            'format'      => 'DD MMM YY',
         ], $column->getFilter());
         $this->assertEquals(true, $column->isHandler());
         $this->assertEquals(true, $column->getHandler() instanceof Closure);
@@ -57,18 +61,58 @@ class ColumnTest extends TestCase
         $column->setKey('test')
             ->setValue('name column')
             ->setFilter('field', []);
-        $this->assertEquals(['name' => 'field', 'data' => [], 'mode' => 'select', 'class' => '', 'style' => ''], $column->getFilter());
+        $this->assertEquals([
+            'name'        => 'field',
+            'data'        => [],
+            'mode'        => 'select',
+            'class'       => '',
+            'style'       => '',
+            'selected'    => [],
+            'placeholder' => '',
+            'width'       => '180px',
+            'format'      => 'DD MMM YY',
+        ], $column->getFilter());
         $this->assertEquals(false, $column->getDateActive());
         $this->assertEquals(Column::DEFAULT_TO_STRING_FORMAT, $column->getDateFormat());
 
         $column->setFilter('field1', 'text');
-        $this->assertEquals(['name' => 'field1', 'data' => 'text', 'mode' => 'select', 'class' => '', 'style' => ''], $column->getFilter());
+        $this->assertEquals([
+            'name'        => 'field1',
+            'data'        => 'text',
+            'mode'        => 'select',
+            'class'       => '',
+            'style'       => '',
+            'selected'    => [],
+            'placeholder' => '',
+            'width'       => '180px',
+            'format'      => 'DD MMM YY',
+        ], $column->getFilter());
 
         $column->setFilterString('field2');
-        $this->assertEquals(['name' => 'field2', 'data' => '', 'mode' => 'string', 'class' => '', 'style' => ''], $column->getFilter());
+        $this->assertEquals([
+            'name'        => 'field2',
+            'data'        => '',
+            'mode'        => 'string',
+            'class'       => '',
+            'style'       => '',
+            'selected'    => [],
+            'placeholder' => '',
+            'width'       => '180px',
+            'format'      => 'DD MMM YY',
+        ], $column->getFilter());
 
         $column->setFilterDate('field2', 'date', true, 'Y-m-d');
-        $this->assertEquals(['name' => 'field2', 'data' => 'date', 'mode' => 'date', 'class' => '', 'style' => ''], $column->getFilter());
+        $this->assertEquals([
+            'name'        => 'field2',
+            'data'        => 'date',
+            'mode'        => 'date',
+            'class'       => '',
+            'style'       => '',
+            'selected'    => [],
+            'placeholder' => '',
+            'width'       => '180px',
+            'format'      => 'DD MMM YY',
+        ], $column->getFilter());
         $this->assertEquals(true, $column->getDateActive());
         $this->assertEquals('Y-m-d', $column->getDateFormat());
     }
@@ -80,20 +124,35 @@ class ColumnTest extends TestCase
     {
         $column = new Column();
         $this->assertEquals(false, $column->isKeyAction());
-        $this->assertEquals(null, $column->getActions());
+        $this->assertEquals([], $column->getActions());
         $column->setKey('test')
             ->setValue('name column')
-            ->setActions(function ($data) {
-                return $data->id == 3;
+            ->setActions(function ($data, $columns) {
+                /**
+                 * @var \App\Post                           $data
+                 * @var \Assurrussa\GridView\Support\Column $columns
+                 */
+                $columns->addButton()
+                    ->setActionShow()
+                    ->setUrl('http://test.com')
+                    ->setHandler(function ($data) {
+                        return $data->id == 3;
+                    });
+                $columns->addButton()
+                    ->setActionShow()
+                    ->setUrl('http://test.com')
+                    ->setHandler(function ($data) {
+                        return false;
+                    });
             });
         $object = new \Assurrussa\GridView\Models\Model();
         $object->id = 3;
         $this->assertEquals(Column::ACTION_NAME, $column->getKey());
-        $this->assertEquals(Column::ACTION_NAME, $column->getValue());
+        $this->assertEquals('', $column->getValue());
         $this->assertEquals(true, $column->isKeyAction());
-        $this->assertEquals(true, $column->getActions() instanceof Closure);
+        $this->assertEquals([], $column->getActions());
         $column->setInstance($object);
-        $this->assertEquals(true, $column->getActions());
+        $this->assertEquals(2, count($column->getActions()));
     }
 
     /**

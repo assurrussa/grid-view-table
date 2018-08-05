@@ -1,5 +1,6 @@
 // mix.js('packages/assurrussa/grid-view-table/resources/js/app.js', 'public/js/amigrid.js');
 import FormSerialize from 'form-serialize';
+
 window.FormSerialize = FormSerialize;
 
 import Datepicker from './Component/Datepicker';

@@ -22,6 +22,7 @@
     import fecha from 'fecha';
     import VDatepicker from 'vuejs-datepicker';
     import {en, ru} from 'vuejs-datepicker/dist/locale';
+
     export default {
         props: {
             name: {
@@ -101,7 +102,7 @@
             },
             setLanguage() {
                 let lang = this.i18n.toLocaleLowerCase();
-                if(this[lang]) {
+                if (this[lang]) {
                     this.language = this[lang];
                 }
             },
