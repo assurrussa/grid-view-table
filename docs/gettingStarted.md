@@ -27,7 +27,7 @@ Live demo: [here](http://grid-view-table.herokuapp.com)
 ### Creating grids
 
 Example PostController:
-```
+```php
 <?php
 
 namespace App\Http\Controllers;
@@ -95,7 +95,7 @@ class PostController extends Controller
 #### Include in template
 
 example - layout.app:
-```
+```html
 <!DOCTYPE html>
 <html>
 <head>
@@ -114,7 +114,7 @@ example - layout.app:
 ```
 
 example - post.index:
-```
+```php
 @php
     /**
     * @see \App\Http\Controllers\PostController::index
@@ -124,9 +124,6 @@ example - post.index:
 @extends('layouts.app')
 
 @section('content')
-    {{--<div id="ami-grid">--}}
-    {{--<ami-grid data="[headers: []]"></ami-grid>--}}
-    {{--</div>--}}
     <div class="container-fluid">
         <div class="row justify-content-center">
             {!! $data !!}
@@ -137,20 +134,20 @@ example - post.index:
 
 ### Rendering the grid
 
-``` 
+```php
     {!! $data !!}
 ```
 For a quick demonstration, be sure to check out the demo [here](http://grid-view-table.herokuapp.com). The demo’s source code is also [available on github](https://github.com/assurrussa/grid-view-table-app).
 
 ### Updating local JS and CSS
 
-```
+```php
 php artisan vendor:publish --provider="Assurrussa\GridView\GridViewServiceProvider" --tag=assets --force
 ```
 You can also place this command in composer so that it is executed automatically on each update run.
 
 example - composer config:
-```
+```php
 "post-autoload-dump": [
     "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
     "@php artisan package:discover",
