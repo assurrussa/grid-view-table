@@ -625,7 +625,7 @@ class GridView implements GridInterface
      */
     private function _getExport(): bool
     {
-        return (new ExportData())->_fetch($this->_query, $this->columns->toFields());
+        return (new ExportData())->fetch($this->_query, $this->columns->toFields());
     }
 
     /**
