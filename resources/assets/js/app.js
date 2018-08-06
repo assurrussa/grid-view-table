@@ -1,5 +1,5 @@
 // mix.js('packages/assurrussa/grid-view-table/resources/js/app.js', 'public/js/amigrid.js');
-import './history';
+import './../../../../../../node_modules/historyjs/scripts/bundled-uncompressed/html4+html5/native.history.js'; // npm i historyjs --save-dev
 
 import FormSerialize from 'form-serialize';
 window.FormSerialize = FormSerialize;
