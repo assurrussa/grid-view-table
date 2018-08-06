@@ -4,12 +4,10 @@
      */
     $sortName = $data->sortName;
     $orderBy = $data->orderBy;
-    $location = $data->location;
 @endphp
 <div class="content-box">
     <input type="hidden" id="js_amiOrderBy" name="by" value="{{ $orderBy }}">
     <input type="hidden" id="js_amiSortName" name="sort" value="{{ $sortName }}">
-    <input type="hidden" id="js_amiLocation" name="location" value="{{ $location }}">
     <table class="table table-stripped table-condensed table-bordered table-hover">
         <thead>
         <tr>

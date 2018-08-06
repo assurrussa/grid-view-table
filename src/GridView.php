@@ -41,8 +41,6 @@ class GridView implements GridInterface
     /** @var bool */
     private $_isStrict;
 
-    /** @var string */
-    protected $locationUrl = '';
     /** @var array */
     protected $requestParams = [];
     /** @var string */
@@ -548,7 +546,6 @@ class GridView implements GridInterface
         $gridViewResult->id = $this->getId();
         $gridViewResult->ajax = $this->ajax;
         $gridViewResult->formAction = $this->getFormAction();
-        $gridViewResult->location = $this->locationUrl;
         $gridViewResult->requestParams = $this->requestParams;
         $gridViewResult->headers = $this->columns->toArray();
         $gridViewResult->buttonCreate = $this->buttons->getButtonCreate();
@@ -604,7 +601,6 @@ class GridView implements GridInterface
             throw new ColumnsException();
         }
 
-        $this->locationUrl = $this->_request->pull('location', url()->current());
         $this->requestParams = $this->_request->all();
         $this->page = (int)$this->_request->pull('page', 1);
         $this->orderBy = $this->_request->pull('by', $this->getOrderBy());

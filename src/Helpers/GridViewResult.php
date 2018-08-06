@@ -14,7 +14,6 @@ use Assurrussa\GridView\Support\Input;
  * @property string                                                                                       $id
  * @property boolean                                                                                      $ajax
  * @property boolean                                                                                      $simple
- * @property string                                                                                       $location
  * @property string                                                                                       $formAction
  * @property array                                                                                        $requestParams
  * @property \Illuminate\Pagination\LengthAwarePaginator|\Illuminate\Contracts\Pagination\Paginator|array $data

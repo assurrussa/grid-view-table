@@ -239,11 +239,7 @@ class AmiGridJS {
      * @returns {Promise<any>}
      */
     onSend(url = null, data = null) {
-        let form = this.$el,
-            formLocation = form.querySelector('#js_amiLocation');
-        if (formLocation) {
-            formLocation.value = window.location.pathname;
-        }
+        let form = this.$el;
 
         url = url ? url : form.getAttribute('action');
         if (data === null) {
