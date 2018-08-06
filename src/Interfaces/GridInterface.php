@@ -62,6 +62,8 @@ interface GridInterface
 
     public function setStrictMode(bool $strictMode): GridInterface;
 
+    public function setAjax(bool $isAjax): GridInterface;
+
     public function setSearchInput(bool $searchInput = false): GridInterface;
 
     public function setOrderByDesc(): GridInterface;

@@ -1,6 +1,7 @@
 // mix.js('packages/assurrussa/grid-view-table/resources/js/app.js', 'public/js/amigrid.js');
-import FormSerialize from 'form-serialize';
+import './history';
 
+import FormSerialize from 'form-serialize';
 window.FormSerialize = FormSerialize;
 
 import Datepicker from './Component/Datepicker';
@@ -13,6 +14,4 @@ Vue.component('ami-datepicker', Datepicker);
 Vue.component('ami-date-range', DateRange);
 Vue.component('ami-select-date-range', SelectDateRange);
 
-import AmiGridJS from './amigrid';
-
-window.AmiGridJS = AmiGridJS;
+import './amigrid';

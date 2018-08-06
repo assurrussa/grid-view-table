@@ -5,6 +5,7 @@ class AmiGridJS {
              * The ID of the html element containing the grid
              */
             id: 'js_amiGridList_amiGrid_1',
+            ajax: true,
             timer: null,
             milliSeconds: 400,
         };
@@ -12,7 +13,6 @@ class AmiGridJS {
         this.options = defaults;
 
         this.$el = document.querySelector('#' + this.options.id);
-        this.history = [];
 
         this.init();
     }
@@ -21,7 +21,7 @@ class AmiGridJS {
      * Initialize
      */
     init() {
-        this.onPopState();
+        this._onPopState();
         this.initComponent();
         this.initVueComponent();
     }
@@ -39,7 +39,6 @@ class AmiGridJS {
         this.newInstanceEvent('change', '#js_amiSelectCount', this.filterSubmitForm);
         this.newInstanceEvent('click', '.js_filterSearchPagination .pagination a', this.filterPagination);
         this.newInstanceEvent('click', '#js_filterSearchClearSubmit', this.filterSearchClearSubmit);
-        this.newInstanceEvent('click', '#js_filterButtonSubmitForm', this.filterSubmitForm);
         this.newInstanceEvent('change', '.js_adminSelectAll', this.filterSelectCheckedInput);
         this.newInstanceEvent('change', '.js_adminCheckboxRow', this.filterCheckboxArrow);
     }
@@ -234,18 +233,6 @@ class AmiGridJS {
     }
 
     /**
-     *  Поиск родительсткого элемента по tag
-     *
-     * @param {Object} el
-     * @param {String} tagName
-     * @returns {*}
-     */
-    findParentTag(el, tagName) {
-        while ((el = el.parentElement) && !(el.tagName === tagName.toUpperCase())) ;
-        return el;
-    }
-
-    /**
      *
      * @param {string} url
      * @param {string} data
@@ -268,32 +255,60 @@ class AmiGridJS {
             data = data ? '?' + data : '';
         }
 
-        this.loadingShow();
-        return new Promise((resolve, reject) => {
-            clearTimeout(this.options.timer);
-            this.options.timer = setTimeout(() => {
-                axios.get(url + data)
-                    .then((response) => {
-                        this.history.push({url: response.data.url, data: response.data});
-                        window.history.pushState(this.history, null, response.data.url);
-                        this.onSuccess(response.data);
-                        resolve(response.data);
-                    })
-                    .catch((error) => {
-                        this.onError(error);
-                        reject(error);
-                    });
-            }, this.options.milliSeconds);
-        });
+        if (this.options.ajax) {
+            this.loadingShow();
+            return new Promise((resolve, reject) => {
+                clearTimeout(this.options.timer);
+                this.options.timer = setTimeout(() => {
+                    let urlPath = url + data,
+                        windowPathResolve = ('url' + urlPath + 'resolve').replace(/[^a-zA-Z0-9]/g, ''),
+                        windowPathReject = ('url' + urlPath + 'reject').replace(/[^a-zA-Z0-9]/g, '');
+                    window[windowPathResolve] = resolve;
+                    window[windowPathReject] = reject;
+                    if(urlPath === window.location.search) {
+                        this._onLoadContent(urlPath);
+                    } else {
+                        History.pushState(null, null, urlPath);
+                    }
+                }, this.options.milliSeconds);
+            });
+        } else {
+            window.location = url + data;
+        }
+    }
+
+    /**
+     *
+     * @param {String} url
+     * @private
+     */
+    _onLoadContent(url) {
+        window.sessionStorage.setItem('amiGridAjax', true);
+        let windowPathResolve = ('url' + url + 'resolve').replace(/[^a-zA-Z0-9]/g, ''),
+            windowPathReject = ('url' + url + 'reject').replace(/[^a-zA-Z0-9]/g, '');
+        axios.get(url)
+            .then((response) => {
+                this._onSuccess(response.data);
+                if (window[windowPathResolve]) {
+                    window[windowPathResolve](response.data);
+                }
+            })
+            .catch((error) => {
+                this._onError(error);
+                if (window[windowPathReject]) {
+                    window[windowPathReject](error);
+                }
+            });
     }
 
     /**
      *
      * @param {Object} response
+     * @private
      */
-    onSuccess(response) {
+    _onSuccess(response) {
         this.loadingHide();
-        this.$el.innerHTML = response.data;
+        this.$el.innerHTML = response;
         setTimeout(() => {
             this.initComponent();
             this.initVueComponent();
@@ -303,39 +318,32 @@ class AmiGridJS {
     /**
      *
      * @param {Object} error
+     * @private
      */
-    onError(error) {
+    _onError(error) {
         console.info('could not be loaded.');
     }
 
     /**
-     * TODO
+     * @TODO
      *
      * Initialize
+     *
+     * @private
      */
-    onPopState() {
-        window.addEventListener('popstate', function (e) {
-            e.preventDefault();
+    _onPopState() {
+        if (this.options.ajax) {
+            History.Adapter.bind(window, 'statechange', function () {
+                var State = History.getState();
 
-            this.loadingShow();
-            if (this.history.length > 0) {
-                let historyCurrent = this.history.pop();
-                window.history.pushState(this.history, null, historyCurrent.url);
-                setTimeout(() => this.onSuccess(historyCurrent.data), 300);
-            } else {
-                let state = e.state,
-                    stateCheck = state ? state[0] : null;
-                if (stateCheck !== undefined) {
-                    setTimeout(() => this.loadingHide(), 300);
-                } else if (state == null) {
-                    setTimeout(() => this.loadingHide(), 300);
-                } else if (state.length === 0) {
-                    setTimeout(() => this.loadingHide(), 300);
+                this.loadingShow();
+                if (State && State.url) {
+                    this._onLoadContent(State.url);
                 } else {
-                    setTimeout(() => this.onSuccess(state), 300);
+                    this.loadingHide();
                 }
-            }
-        }.bind(this));
+            }.bind(this));
+        }
     }
 }
 
@@ -355,4 +363,5 @@ window.amiGridOnSend = function ($jsNameProperty) {
     }
 };
 
-export default AmiGridJS;
+// export default AmiGridJS;
+window.AmiGridJS = AmiGridJS;

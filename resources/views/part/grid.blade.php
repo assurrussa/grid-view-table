@@ -11,6 +11,8 @@
         @include('amiGrid::part.header')
         @include('amiGrid::part.table')
         @include('amiGrid::part.footer')
-        <input type="submit" id="js_filterButtonSubmitForm" style="display:none;">
     </div>
 </div>
+<script>
+    window.addEventListener('DOMContentLoaded',function(){if(!window.AmiGridJS && window.sessionStorage.getItem('amiGridAjax'))setTimeout(function(){window.location = window.location.href},100)});
+</script>

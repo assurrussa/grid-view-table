@@ -8,11 +8,11 @@ namespace Assurrussa\GridView\Helpers;
 use Assurrussa\GridView\Support\Button;
 use Assurrussa\GridView\Support\Column;
 use Assurrussa\GridView\Support\Input;
-use Illuminate\Pagination\LengthAwarePaginator;
 
 
 /**
  * @property string                                                                                       $id
+ * @property boolean                                                                                      $ajax
  * @property boolean                                                                                      $simple
  * @property string                                                                                       $location
  * @property string                                                                                       $formAction
@@ -56,13 +56,22 @@ class GridViewResult
     }
 
     /**
+     * @return bool
+     */
+    public function isAjax(): bool
+    {
+
+        return (bool)$this->ajax;
+    }
+
+    /**
      * @return array
      */
     public function toArray(): array
     {
         $array = (array)$this;
         foreach ($array as $key => $items) {
-            if ($items instanceof LengthAwarePaginator) {
+            if ($items instanceof \Illuminate\Pagination\LengthAwarePaginator) {
                 $array[$key] = $items->toArray();
             } elseif ($items instanceof \stdClass) {
                 $items = (array)$items;

@@ -3,6 +3,7 @@
      * @var \Assurrussa\GridView\Helpers\GridViewResult $data
      */
 $formElementBlockId = $data->getElementName();
+$isAjax = $data->isAjax();
 @endphp
 <form id="{{ $formElementBlockId }}" action="{{ $data->formAction }}" class="AmiTableBox">
     @include('amiGrid::part.grid', ['data' => $data])
@@ -16,8 +17,6 @@ $formElementBlockId = $data->getElementName();
 </form>
 @push('scripts')
     <script>
-        window['{{ $formElementBlockId }}'] = new AmiGridJS({
-            id: '{{ $formElementBlockId }}'
-        });
+        window['{{ $formElementBlockId }}'] = new AmiGridJS({id: '{{ $formElementBlockId }}', ajax: !!'{{ $isAjax ? 'true' : '' }}'});
     </script>
 @endpush

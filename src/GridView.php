@@ -50,6 +50,8 @@ class GridView implements GridInterface
 
     /** @var string */
     public $id;
+    /** @var boolean */
+    public $ajax = true;
     /** @var int */
     public $page;
     /** @var int */
@@ -228,15 +230,6 @@ class GridView implements GridInterface
     {
         if (request()->ajax() || request()->wantsJson()) {
             $path = $path === 'gridView' ? 'part.grid' : $path;
-            if ($requestParams = http_build_query($data['data']->requestParams)) {
-                $requestParams = '?' . $requestParams;
-            } else {
-                $requestParams = '';
-            }
-            return json_encode([
-                'url'  => $data['data']->location . $requestParams,
-                'data' => static::view($path, $data, $mergeData)->render(),
-            ]);
         }
 
         return static::view($path, $data, $mergeData)->render();
@@ -403,13 +396,25 @@ class GridView implements GridInterface
     }
 
     /**
-     * @param bool $visibleColumn
+     * @param bool $isStrict
      *
      * @return GridInterface
      */
     public function setStrictMode(bool $isStrict): GridInterface
     {
         $this->_isStrict = $isStrict;
+
+        return $this;
+    }
+
+    /**
+     * @param bool $isAjax
+     *
+     * @return GridInterface
+     */
+    public function setAjax(bool $isAjax): GridInterface
+    {
+        $this->ajax = $isAjax;
 
         return $this;
     }
@@ -541,7 +546,8 @@ class GridView implements GridInterface
 
         $gridViewResult = new \Assurrussa\GridView\Helpers\GridViewResult();
         $gridViewResult->id = $this->getId();
-        $gridViewResult->formAction = $this->formAction;
+        $gridViewResult->ajax = $this->ajax;
+        $gridViewResult->formAction = $this->getFormAction();
         $gridViewResult->location = $this->locationUrl;
         $gridViewResult->requestParams = $this->requestParams;
         $gridViewResult->headers = $this->columns->toArray();
