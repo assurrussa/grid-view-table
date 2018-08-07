@@ -56,10 +56,18 @@ interface ColumnInterface
         string $mode = null,
         array $selected = [],
         string $class = '',
-        string $style = ''
+        string $style = '',
+        string $placeholder = '',
+        string $url = ''
     ): ColumnInterface;
 
-    public function setFilterSelect(string $field, array $array, string $class = '', string $style = ''): ColumnInterface;
+    public function setFilterSelect(
+        string $field,
+        array $array,
+        string $class = '',
+        string $style = '',
+        string $placeholder = ''
+    ): ColumnInterface;
 
     public function setFilterSelectAjax(
         string $field,
@@ -67,7 +75,8 @@ interface ColumnInterface
         array $selected,
         string $url,
         string $class = '',
-        string $style = ''
+        string $style = '',
+        string $placeholder = ''
     ): ColumnInterface;
 
     public function setFilterSelectNotAjax(
@@ -76,10 +85,17 @@ interface ColumnInterface
         array $selected = [],
         string $url = '',
         string $class = '',
-        string $style = ''
+        string $style = '',
+        string $placeholder = ''
     ): ColumnInterface;
 
-    public function setFilterString(string $field, string $string = '', string $class = '', string $style = ''): ColumnInterface;
+    public function setFilterString(
+        string $field,
+        string $string = '',
+        string $class = '',
+        string $style = '',
+        string $placeholder = ''
+    ): ColumnInterface;
 
     public function setFilterDate(
         string $field,
@@ -87,7 +103,8 @@ interface ColumnInterface
         bool $active = true,
         string $format = null,
         string $class = '',
-        string $style = ''
+        string $style = '',
+        string $placeholder = ''
     ): ColumnInterface;
 
     public function setFilterDateRange(
@@ -96,7 +113,8 @@ interface ColumnInterface
         bool $active = true,
         string $format = null,
         string $class = '',
-        string $style = ''
+        string $style = '',
+        string $placeholder = ''
     ): ColumnInterface;
 
     public function setFilterFormat(string $format = 'DD MMM YY'): ColumnInterface;

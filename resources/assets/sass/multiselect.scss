@@ -3,6 +3,7 @@
 .multiselect {
   .multiselect-icon {
     position: absolute;
+    z-index: 1;
     width: 40px;
     height: 38px;
     right: 1px;
@@ -12,6 +13,12 @@
     transition: -webkit-transform .2s ease;
     transition: transform .2s ease;
     transition: transform .2s ease, -webkit-transform .2s ease;
+  }
+  .multiselect__spinner {
+    z-index: 1;
+  }
+  .multiselect__tags {
+    padding: 8px 8px 0 8px;
   }
 
   .multiselect__option--highlight {
@@ -40,6 +47,7 @@
 
   .multiselect__clear {
     position: absolute;
+    z-index: 1;
     width: 40px;
     height: 38px;
     right: 1px;
