@@ -102,15 +102,21 @@
         methods: {
             onDateSelected(daterange) {
                 let vm = this;
-                if (daterange.start) {
+                if (daterange.start && daterange.end) {
                     daterange.start = new Date(daterange.start.getFullYear(), daterange.start.getMonth(), daterange.start.getDate(), 0, 0);
                     daterange.end = new Date(daterange.end.getFullYear(), daterange.end.getMonth(), daterange.end.getDate(), 23, 59);
                     vm.selectedDate = daterange;
-                    this.model = daterange.start.toLocaleDateString() + '_' + daterange.end.toLocaleDateString();
+                    vm.model = daterange.start.toLocaleDateString() + '_' + daterange.end.toLocaleDateString();
+                    vm.onSend();
+                } else if(daterange.start && !daterange.end) {
                 } else {
                     vm.selectedDate = daterange;
-                    this.model = '';
+                    vm.model = '';
+                    vm.onSend();
                 }
+            },
+            onSend() {
+                let vm = this;
                 setTimeout(() => {
                     amiGridOnSend(vm.gridId)
                         .then((response) => {
