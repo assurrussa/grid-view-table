@@ -59,5 +59,5 @@
         @endforeach
         </tbody>
     </table>
-    <input type="submit" class="js_amiGridFilterTable"/>
+    <input type="submit" class="js_amiGridFilterTable" hidden/>
 </div>
