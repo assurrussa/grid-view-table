@@ -665,8 +665,8 @@ class GridView implements GridInterface
                 if (!empty($value) || $value === 0 || $value === '0') {
                     $value = (string)$value;
                     //checked scope method for model
-                    if (method_exists($this->_model, 'scope' . camel_case($scope))) {
-                        $this->_query->{camel_case($scope)}($value);
+                    if (method_exists($this->_model, 'scope' . \Illuminate\Support\Str::camel($scope))) {
+                        $this->_query->{\Illuminate\Support\Str::camel($scope)}($value);
                     } else {
                         $this->_filterSearch($scope, $value, $this->filter['operator'], $this->filter['beforeValue'],
                             $this->filter['afterValue']);
@@ -778,10 +778,10 @@ class GridView implements GridInterface
     {
         $count = $this->_request->has('count')
             ? $this->_request->pull('count')
-            : array_first($this->counts);
+            : \Illuminate\Support\Arr::first($this->counts);
 
         if (!isset($this->counts[$count])) {
-            $count = array_first($this->counts, null, 10);
+            $count = \Illuminate\Support\Arr::first($this->counts, null, 10);
         }
 
         return (int)$count;
@@ -820,7 +820,7 @@ class GridView implements GridInterface
         $this->columnActions(function ($data) {
             $buttons = [];
             if ($this->_getConfig('routes')) {
-                $pathNameForModel = strtolower(str_plural(camel_case(class_basename($data))));
+                $pathNameForModel = strtolower(\Illuminate\Support\Str::plural(\Illuminate\Support\Str::camel(class_basename($data))));
                 $buttons[] = $this->columnAction()
 //                    ->setActionDelete('amigrid.delete', [$pathNameForModel, $data->id])
                     ->setUrl('/' . $pathNameForModel . '/delete')
@@ -842,7 +842,7 @@ class GridView implements GridInterface
             return $buttons;
         });
         if ($this->_getConfig('routes')) {
-            $pathNameForModel = strtolower(str_plural(camel_case(class_basename($this->_model))));
+            $pathNameForModel = strtolower(\Illuminate\Support\Str::plural(\Illuminate\Support\Str::camel(class_basename($this->_model))));
             $this->button()->setButtonCreate('/' . $pathNameForModel . '/create');
         }
     }

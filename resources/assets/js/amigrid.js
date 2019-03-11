@@ -263,6 +263,8 @@ class AmiGridJS {
                     window[windowPathReject] = reject;
                     if(urlPath === window.location.search) {
                         this._onLoadContent(urlPath);
+                    } else if(urlPath === '/' && window.location.search === '') {
+                        this._onLoadContent(urlPath);
                     } else {
                         History.pushState(null, null, urlPath);
                     }

@@ -53,7 +53,7 @@ class ExportData
         $dataString = '';
         $fieldsString = '';
         $fields = $fields ? [$fields] : [$query->getModel()->getFillable()];
-        $fields = array_first($fields);
+        $fields = \Illuminate\Support\Arr::first($fields);
         array_walk($fields, function ($value, $key) use (&$fieldsString) {
             $fieldsString .= '"' . ($this->isInt($key) ? $value : $key) . '";';
         });

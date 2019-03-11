@@ -276,7 +276,7 @@ class Button implements ButtonInterface, Renderable, Arrayable
         if ($array = request()->except('export')) {
             $url .= '?' . http_build_query($array);
         }
-        $addUrl = str_is('*?*', $url) ? '&' . $addUrl : '?' . $addUrl;
+        $addUrl = \Illuminate\Support\Str::is('*?*', $url) ? '&' . $addUrl : '?' . $addUrl;
         $text = GridView::trans('grid.export');
 
         return $this->setActionCustom($url . $addUrl, $text, 'btn btn-default btn-outline-primary', 'fa fa-download')
