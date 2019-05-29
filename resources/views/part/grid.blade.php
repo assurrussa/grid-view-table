@@ -13,6 +13,8 @@
         @include('amiGrid::part.footer')
     </div>
 </div>
+@push('scripts')
 <script>
     window.addEventListener('DOMContentLoaded',function(){if(!window.AmiGridJS && window.sessionStorage.getItem('amiGridAjax'))setTimeout(function(){window.location = window.location.href},100)});
 </script>
+@endpush
