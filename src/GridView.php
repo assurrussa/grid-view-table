@@ -588,7 +588,7 @@ class GridView implements GridInterface
      * @throws ColumnsException
      * @throws QueryException
      */
-    private function _fetch()
+    private function _fetch(): GridInterface
     {
         if (!$this->_query) {
             throw new QueryException();
