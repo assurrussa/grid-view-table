@@ -38,6 +38,8 @@ class ExportData
      * @param int                                   $cacheSecond
      * @param string                                $format
      * @param string                                $contentType
+     *
+     * @return array
      */
     public function fetch(
         \Illuminate\Database\Eloquent\Builder $query,
@@ -46,7 +48,7 @@ class ExportData
         int $cacheSecond = 60,
         string $format = 'csv',
         string $contentType = 'text/csv'
-    ): bool {
+    ): array {
         $keyCache = class_basename($query->getModel());
         $pathCache = storage_path('app') . DIRECTORY_SEPARATOR . 'fetch';
 
@@ -90,14 +92,18 @@ class ExportData
             $filename = 'export' . $keyCache . '.' . $format;
         }
 
-        header('Content-Type: ' . $contentType);
-        header('Accept-Ranges: bytes');
-        header('Content-Length: ' . strlen($dataString));
-        header('Content-disposition: attachment; filename="' . $filename . '"');
+        $strLen = strlen($dataString);
 
-        echo $dataString;
+        unset($dataString);
 
-        return true;
+        return [
+            'path'                => $fileCache,
+            'filename'            => $filename,
+            'Content-Type'        => $contentType,
+            'Accept-Ranges'       => 'bytes',
+            'Content-Length'      => $strLen,
+            'Content-disposition' => 'attachment; filename="' . $filename . '"',
+        ];
     }
 
     /**

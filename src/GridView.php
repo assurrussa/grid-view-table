@@ -72,6 +72,8 @@ class GridView implements GridInterface
     public $filter;
     /** @var bool */
     public $export = false;
+    /** @var bool */
+    public $exportCurrent = false;
     /**  @var bool */
     public $visibleColumn;
     /** @var Columns */
@@ -292,6 +294,7 @@ class GridView implements GridInterface
     public function get(): \Assurrussa\GridView\Helpers\GridViewResult
     {
         $gridViewResult = $this->_getGridView();
+
         $gridViewResult->data = $this->pagination->get($this->page, $this->limit);
         $gridViewResult->pagination = $this->_getPaginationRender();
         $gridViewResult->simple = false;
@@ -504,7 +507,7 @@ class GridView implements GridInterface
      */
     public function isExport(): bool
     {
-        return $this->export;
+        return $this->export && $this->exportCurrent;
     }
 
     /**
@@ -560,6 +563,7 @@ class GridView implements GridInterface
         $gridViewResult->sortName = $this->sortName;
         $gridViewResult->counts = $this->counts;
         $gridViewResult->searchInput = $this->searchInput;
+        $gridViewResult->exportData = $this->_getExport();
 
         return $gridViewResult;
     }
@@ -584,7 +588,7 @@ class GridView implements GridInterface
      * @throws ColumnsException
      * @throws QueryException
      */
-    private function _fetch(): GridInterface
+    private function _fetch()
     {
         if (!$this->_query) {
             throw new QueryException();
@@ -607,7 +611,7 @@ class GridView implements GridInterface
         $this->search = $this->_request->pull('search', '');
         $this->limit = $this->_countItems();
         $this->sortName = $this->_request->pull('sort', $this->getSortName());
-        $export = (bool)$this->_request->pull('export', false);
+        $this->exportCurrent = (bool)$this->_request->pull('export', false);
 
         $this->_filterScopes();
         if ($this->isSearchInput()) {
@@ -615,19 +619,19 @@ class GridView implements GridInterface
         }
         $this->_filterOrderBy($this->sortName, $this->orderBy);
 
-        if ($this->isExport() && $export && $this->_getExport()) {
-            return $this;
-        }
-
         return $this;
     }
 
     /**
-     * @return bool
+     * @return array|null
      */
-    private function _getExport(): bool
+    private function _getExport(): ?array
     {
-        return (new ExportData())->fetch($this->_query, $this->columns->toFields());
+        if($this->isExport()) {
+            return (new ExportData())->fetch($this->_query, $this->columns->toFields());
+        }
+
+        return null;
     }
 
     /**

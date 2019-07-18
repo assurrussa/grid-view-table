@@ -31,6 +31,7 @@ use Assurrussa\GridView\Support\Input;
  * @property string                                                                                       $sortName
  * @property array                                                                                        $counts
  * @property bool                                                                                         $searchInput
+ * @property object|null                                                                                  $exportData
  *
  * Class GridViewResult
  */
@@ -82,6 +83,17 @@ class GridViewResult
         }
 
         return $array;
+    }
+
+    /**
+     * @return \Symfony\Component\HttpFoundation\BinaryFileResponse|null
+     */
+    public function getExport(): ?\Symfony\Component\HttpFoundation\BinaryFileResponse
+    {
+        if ($this->exportData !== null) {
+            return response()->download($this->exportData->path, $this->exportData->filename, []);
+        }
+        return null;
     }
 
     /**
