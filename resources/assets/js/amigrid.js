@@ -7,6 +7,7 @@ class AmiGridJS {
             id: 'js_amiGridList_amiGrid_1',
             ajax: true,
             timer: null,
+            trimLastSlashCrop: false,
             milliSeconds: 400,
         };
         Object.assign(defaults, opts || {});
@@ -234,14 +235,15 @@ class AmiGridJS {
 
     /**
      *
-     * @param {string} url
-     * @param {string} data
+     * @param {string|null} url
+     * @param {string|null} data
      * @returns {Promise<any>}
      */
     onSend(url = null, data = null) {
         let form = this.$el;
 
         url = url ? url : form.getAttribute('action');
+
         if (data === null) {
             let formData = FormSerialize(form, {hash: true}),
                 formDataString = FormSerialize(form, {hash: false});
@@ -262,17 +264,36 @@ class AmiGridJS {
                     window[windowPathResolve] = resolve;
                     window[windowPathReject] = reject;
                     if(urlPath === window.location.search) {
-                        this._onLoadContent(urlPath);
+                        this._onLoadContent(this.getUrlPath(urlPath));
                     } else if(window.location.search === '' && urlPath === window.location.pathname) {
-                        this._onLoadContent(urlPath);
+                        this._onLoadContent(this.getUrlPath(urlPath));
                     } else {
-                        History.pushState(null, null, urlPath);
+                        History.pushState(null, null, this.getUrlPath(urlPath));
                     }
                 }, this.options.milliSeconds);
             });
         } else {
             window.location = url + data;
         }
+    }
+
+    /**
+     *
+     */
+    getUrlPath(url) {
+        if(url.indexOf('http') === -1) {
+            url = window.location.origin + window.location.pathname + url;
+        }
+        if(this.options.trimLastSlashCrop) {
+            let urlPath = url.replace('/?', '?');
+            if(urlPath.slice(-1) === '/') {
+                return urlPath.slice(0, -1);
+            } else {
+                return urlPath;
+            }
+        }
+
+        return url;
     }
 
     /**
@@ -284,7 +305,8 @@ class AmiGridJS {
         window.sessionStorage.setItem('amiGridAjax', true);
         let windowPathResolve = ('url' + url + 'resolve').replace(/[^a-zA-Z0-9]/g, ''),
             windowPathReject = ('url' + url + 'reject').replace(/[^a-zA-Z0-9]/g, '');
-        axios.get(url)
+
+        window.axios.get(url)
             .then((response) => {
                 this._onSuccess(response.data);
                 if (window[windowPathResolve]) {
@@ -336,7 +358,7 @@ class AmiGridJS {
 
                 this.loadingShow();
                 if (State && State.url) {
-                    this._onLoadContent(State.url);
+                    this._onLoadContent(this.getUrlPath(State.url));
                 } else {
                     this.loadingHide();
                 }

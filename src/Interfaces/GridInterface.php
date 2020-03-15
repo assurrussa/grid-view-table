@@ -64,6 +64,8 @@ interface GridInterface
 
     public function setAjax(bool $isAjax): GridInterface;
 
+    public function setTrimLastSlash(bool $isTrimLastSlash): GridInterface;
+
     public function setSearchInput(bool $searchInput = false): GridInterface;
 
     public function setOrderByDesc(): GridInterface;

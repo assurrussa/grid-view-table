@@ -4,6 +4,7 @@
      */
 $formElementBlockId = $data->getElementName();
 $isAjax = $data->isAjax();
+$isTrim = $data->isTrimLastSlash();
 @endphp
 <form id="{{ $formElementBlockId }}" action="{{ $data->formAction }}" class="AmiTableBox">
     @include('amiGrid::part.grid', ['data' => $data])
@@ -17,6 +18,6 @@ $isAjax = $data->isAjax();
 </form>
 @push('scripts')
     <script>
-        window['{{ $formElementBlockId }}'] = new AmiGridJS({id: '{{ $formElementBlockId }}', ajax: !!'{{ $isAjax ? 'true' : '' }}'});
+        window['{{ $formElementBlockId }}'] = new AmiGridJS({id: '{{ $formElementBlockId }}', ajax: !!'{{ $isAjax ? 'true' : '' }}', trimLastSlashCrop: !!'{{ $isTrim ? 'true' : '' }}'});
     </script>
 @endpush

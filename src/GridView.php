@@ -50,6 +50,8 @@ class GridView implements GridInterface
     public $id;
     /** @var boolean */
     public $ajax = true;
+    /** @var boolean */
+    public $isTrimLastSlash = true;
     /** @var int */
     public $page;
     /** @var int */
@@ -421,6 +423,18 @@ class GridView implements GridInterface
     }
 
     /**
+     * @param bool $isTrimLastSlash
+     *
+     * @return GridInterface
+     */
+    public function setTrimLastSlash(bool $isTrimLastSlash): GridInterface
+    {
+        $this->isTrimLastSlash = $isTrimLastSlash;
+
+        return $this;
+    }
+
+    /**
      * @param bool $searchInput
      *
      * @return $this
@@ -548,6 +562,7 @@ class GridView implements GridInterface
         $gridViewResult = new \Assurrussa\GridView\Helpers\GridViewResult();
         $gridViewResult->id = $this->getId();
         $gridViewResult->ajax = $this->ajax;
+        $gridViewResult->isTrimLastSlash = $this->isTrimLastSlash;
         $gridViewResult->formAction = $this->getFormAction();
         $gridViewResult->requestParams = $this->requestParams;
         $gridViewResult->headers = $this->columns->toArray();

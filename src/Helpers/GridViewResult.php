@@ -13,6 +13,7 @@ use Assurrussa\GridView\Support\Input;
 /**
  * @property string                                                                                       $id
  * @property boolean                                                                                      $ajax
+ * @property boolean                                                                                      $isTrimLastSlash
  * @property boolean                                                                                      $simple
  * @property string                                                                                       $formAction
  * @property array                                                                                        $requestParams
@@ -62,6 +63,15 @@ class GridViewResult
     {
 
         return (bool)$this->ajax;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isTrimLastSlash(): bool
+    {
+
+        return (bool)$this->isTrimLastSlash;
     }
 
     /**
