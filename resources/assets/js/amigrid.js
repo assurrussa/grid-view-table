@@ -281,7 +281,9 @@ class AmiGridJS {
      *
      */
     getUrlPath(url) {
-        if(url.indexOf('http') === -1) {
+        if(url.substr(0, 2) === '/?') {
+            url = window.location.origin + window.location.pathname + url;
+        } else if(url.substr(0, 1) !== '/' && url.indexOf('http') === -1) {
             url = window.location.origin + window.location.pathname + url;
         }
         if(this.options.trimLastSlashCrop) {
