@@ -49,7 +49,7 @@ class ExportData
         string $format = 'csv',
         string $contentType = 'text/csv'
     ): array {
-        $keyCache = class_basename($query->getModel());
+        $keyCache = !empty($filename) ? $filename : class_basename($query->getModel());
         $pathCache = storage_path('app') . DIRECTORY_SEPARATOR . 'fetch';
 
         $dataString = '';
