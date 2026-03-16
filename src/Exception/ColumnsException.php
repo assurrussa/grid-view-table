@@ -17,7 +17,7 @@ namespace Assurrussa\GridView\Exception;
  */
 class ColumnsException extends GridViewException
 {
-    public function __construct(string $message = '', int $code = 0, \Exception $previous = null)
+    public function __construct(string $message = '', int $code = 0, ?\Exception $previous = null)
     {
         parent::__construct('Not set columns. Columns is null', $code, $previous);
     }

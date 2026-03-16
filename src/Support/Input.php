@@ -114,7 +114,7 @@ class Input implements InputInterface, Renderable, Arrayable
      *
      * @return InputInterface
      */
-    public function setName(string $text = null): InputInterface
+    public function setName(?string $text = null): InputInterface
     {
         $this->name = $text;
 
@@ -126,7 +126,7 @@ class Input implements InputInterface, Renderable, Arrayable
      *
      * @return InputInterface
      */
-    public function setId(string $id = null): InputInterface
+    public function setId(?string $id = null): InputInterface
     {
         $this->id = $id;
 
@@ -138,7 +138,7 @@ class Input implements InputInterface, Renderable, Arrayable
      *
      * @return InputInterface
      */
-    public function setClass(string $class = null): InputInterface
+    public function setClass(?string $class = null): InputInterface
     {
         $this->class = $class;
 

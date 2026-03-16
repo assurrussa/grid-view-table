@@ -167,7 +167,7 @@ class GridView implements GridInterface
      *
      * @return Column
      */
-    public function column(string $name = null, string $title = null): Column
+    public function column(?string $name = null, ?string $title = null): Column
     {
         $column = new Column();
         $this->columns->setColumn($column);
@@ -199,7 +199,7 @@ class GridView implements GridInterface
      *
      * @return ColumnInterface
      */
-    public function columnActions(Callable $action, string $value = null): ColumnInterface
+    public function columnActions(Callable $action, ?string $value = null): ColumnInterface
     {
         return $this->column(Column::ACTION_NAME, $value)->setActions($action);
     }
@@ -267,7 +267,7 @@ class GridView implements GridInterface
      *
      * @return Renderable
      */
-    public static function view(string $view = null, array $data = [], array $mergeData = []): Renderable
+    public static function view(?string $view = null, array $data = [], array $mergeData = []): Renderable
     {
         return view(self::NAME . '::' . $view, $data, $mergeData);
     }
@@ -281,7 +281,7 @@ class GridView implements GridInterface
      *
      * @return string
      */
-    public static function trans(string $id = null, array $parameters = [], string $locale = null): string
+    public static function trans(?string $id = null, array $parameters = [], ?string $locale = null): string
     {
         return (string)trans(self::NAME . '::' . $id, $parameters, $locale);
     }
@@ -708,8 +708,8 @@ class GridView implements GridInterface
      * @param string          $afterValue  Last sign after value
      */
     private function _filterSearch(
-        string $search = null,
-        string $value = null,
+        ?string $search = null,
+        ?string $value = null,
         string $operator = '=',
         string $beforeValue = '',
         string $afterValue = ''

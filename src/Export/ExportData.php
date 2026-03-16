@@ -43,8 +43,8 @@ class ExportData
      */
     public function fetch(
         \Illuminate\Database\Eloquent\Builder $query,
-        array $fields = null,
-        string $filename = null,
+        ?array $fields = null,
+        ?string $filename = null,
         int $cacheSecond = 60,
         string $format = 'csv',
         string $contentType = 'text/csv'

@@ -17,7 +17,7 @@ namespace Assurrussa\GridView\Exception;
  */
 class QueryException extends GridViewException
 {
-    public function __construct(string $message = '', int $code = 0, \Exception $previous = null)
+    public function __construct(string $message = '', int $code = 0, ?\Exception $previous = null)
     {
         parent::__construct('Not set Query Builder. Query Builder is null', $code, $previous);
     }

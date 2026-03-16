@@ -13,9 +13,9 @@ namespace Assurrussa\GridView\Interfaces;
 interface GridInterface
 {
 
-    public static function view(string $view = null, array $data = [], array $mergeData = []): \Illuminate\Contracts\Support\Renderable;
+    public static function view(?string $view = null, array $data = [], array $mergeData = []): \Illuminate\Contracts\Support\Renderable;
 
-    public static function trans(string $id = null, array $parameters = [], string $locale = null): string;
+    public static function trans(?string $id = null, array $parameters = [], ?string $locale = null): string;
 
     public function setQuery(\Illuminate\Database\Eloquent\Builder $query): GridInterface;
 
@@ -36,11 +36,11 @@ interface GridInterface
 
     public function button(): \Assurrussa\GridView\Support\Button;
 
-    public function column(string $name = null, string $title = null): \Assurrussa\GridView\Support\Column;
+    public function column(?string $name = null, ?string $title = null): \Assurrussa\GridView\Support\Column;
 
     public function input(): \Assurrussa\GridView\Support\Input;
 
-    public function columnActions(Callable $action, string $value = null): ColumnInterface;
+    public function columnActions(Callable $action, ?string $value = null): ColumnInterface;
 
     public function columnAction(): \Assurrussa\GridView\Support\Button;
 

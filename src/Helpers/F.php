@@ -26,7 +26,7 @@ class F
      * @return boolean result of mkdir
      * @see mkdir
      */
-    public static function createDirectory(string $dst, int $mode = null, bool $recursive = false): bool
+    public static function createDirectory(string $dst, ?int $mode = null, bool $recursive = false): bool
     {
         if ($mode === null) {
             $mode = 0777;

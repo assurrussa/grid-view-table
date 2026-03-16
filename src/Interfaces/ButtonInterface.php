@@ -14,33 +14,33 @@ interface ButtonInterface
 {
     public function setVisible(bool $var = true): ButtonInterface;
 
-    public function setId(string $id = null): ButtonInterface;
+    public function setId(?string $id = null): ButtonInterface;
 
-    public function setClass(string $class = null): ButtonInterface;
+    public function setClass(?string $class = null): ButtonInterface;
 
-    public function setJsClass(string $class = null): ButtonInterface;
+    public function setJsClass(?string $class = null): ButtonInterface;
 
     public function setMethod(string $method = 'POST'): ButtonInterface;
 
     public function setAction(string $action = ''): ButtonInterface;
 
-    public function setLabel(string $label = null): ButtonInterface;
+    public function setLabel(?string $label = null): ButtonInterface;
 
-    public function setIcon(string $icon = null): ButtonInterface;
+    public function setIcon(?string $icon = null): ButtonInterface;
 
-    public function setTitle(string $text = null): ButtonInterface;
+    public function setTitle(?string $text = null): ButtonInterface;
 
     public function setConfirmText(
-        string $text = null,
-        string $colorOk = null,
-        string $colorCancel = null,
-        string $textOk = null,
-        string $textCancel = null
+        ?string $text = null,
+        ?string $colorOk = null,
+        ?string $colorCancel = null,
+        ?string $textOk = null,
+        ?string $textCancel = null
     ): ButtonInterface;
 
     public function setUrl(string $url = '#'): ButtonInterface;
 
-    public function setRoute(string $route = null, array $params = []): ButtonInterface;
+    public function setRoute(?string $route = null, array $params = []): ButtonInterface;
 
     public function setType(string $type): ButtonInterface;
 
@@ -109,7 +109,7 @@ interface ButtonInterface
      *
      * @return bool
      */
-    public function getValues(\Illuminate\Database\Eloquent\Model $instance = null): bool;
+    public function getValues(?\Illuminate\Database\Eloquent\Model $instance = null): bool;
 
     public function getInstance(): ?\Illuminate\Database\Eloquent\Model;
 

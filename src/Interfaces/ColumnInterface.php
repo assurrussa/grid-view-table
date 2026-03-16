@@ -24,7 +24,7 @@ interface ColumnInterface
 
     public function getHandler();
 
-    public function getValues(\Illuminate\Database\Eloquent\Model $instance = null);
+    public function getValues(?\Illuminate\Database\Eloquent\Model $instance = null);
 
     public function getValueColumn($instance, string $name);
 
@@ -53,7 +53,7 @@ interface ColumnInterface
     public function setFilter(
         string $field,
         $data,
-        string $mode = null,
+        ?string $mode = null,
         array $selected = [],
         string $class = '',
         string $style = '',
@@ -101,7 +101,7 @@ interface ColumnInterface
         string $field,
         string $string = '',
         bool $active = true,
-        string $format = null,
+        ?string $format = null,
         string $class = '',
         string $style = '',
         string $placeholder = ''
@@ -111,7 +111,7 @@ interface ColumnInterface
         string $field,
         string $string = '',
         bool $active = true,
-        string $format = null,
+        ?string $format = null,
         string $class = '',
         string $style = '',
         string $placeholder = ''
@@ -125,7 +125,7 @@ interface ColumnInterface
 
     public function setDateActive(bool $bool = false): ColumnInterface;
 
-    public function setActions(Callable $action, string $value = null): ColumnInterface;
+    public function setActions(Callable $action, ?string $value = null): ColumnInterface;
 
     public function setInstance(\Illuminate\Database\Eloquent\Model $instance): ColumnInterface;
 
@@ -142,7 +142,7 @@ interface ColumnInterface
 
     /**
      * If you need your own handler for each row in the table.
-     * Exanple:
+     * Example:
      *   ->setClassForString(function ($data) {})
      *
      * @param callable $handler

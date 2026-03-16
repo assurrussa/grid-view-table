@@ -31,11 +31,11 @@ interface InputInterface
 
     public function setOptions(array $array = []): InputInterface;
 
-    public function setName(string $text = null): InputInterface;
+    public function setName(?string $text = null): InputInterface;
 
-    public function setId(string $id = null): InputInterface;
+    public function setId(?string $id = null): InputInterface;
 
-    public function setClass(string $class = null): InputInterface;
+    public function setClass(?string $class = null): InputInterface;
 
     public function setType(string $type = self::TYPE_HIDDEN): InputInterface;
 

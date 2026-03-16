@@ -67,10 +67,11 @@ class ButtonItemTest extends TestCase
     {
         $button = new Button();
         $button->setActionEdit();
+        $confirmText = \Assurrussa\GridView\GridView::trans('grid.clickDelete');
         $this->assertEquals('<a href="#"
        class=" btn btn-default btn-sm flat"
        id=""
-       data-confirm="Are you sure you want to delete this post?"
+       data-confirm="' . $confirmText . '"
        data-btn-ok-text="ok"
        data-btn-ok-color="btn-primary"
        data-btn-cancel-text="cancel"

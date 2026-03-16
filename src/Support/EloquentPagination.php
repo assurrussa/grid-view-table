@@ -134,7 +134,7 @@ class EloquentPagination implements PaginationInterface
      *
      * @return string
      */
-    public function render(string $view = null, array $data = [], string $formAction = ''): string
+    public function render(?string $view = null, array $data = [], string $formAction = ''): string
     {
         if (!$this->_data) {
             return '';

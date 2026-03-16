@@ -45,7 +45,7 @@ class GridViewResult
      *
      * @return string
      */
-    public function getElementName(string $text = null): string
+    public function getElementName(?string $text = null): string
     {
         if ($text) {
             $text = str_replace('.', '_', $text);

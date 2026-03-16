@@ -132,7 +132,7 @@ class Button implements ButtonInterface, Renderable, Arrayable
      * @return ButtonInterface
      */
     public function setActionDelete(
-        string $route = null,
+        ?string $route = null,
         array $params = [],
         string $label = '',
         string $title = 'Deleted',
@@ -161,7 +161,7 @@ class Button implements ButtonInterface, Renderable, Arrayable
      * @return ButtonInterface
      */
     public function setActionRestore(
-        string $route = null,
+        ?string $route = null,
         array $params = [],
         string $label = '',
         string $title = 'Restore',
@@ -191,7 +191,7 @@ class Button implements ButtonInterface, Renderable, Arrayable
      * @return ButtonInterface
      */
     public function setActionEdit(
-        string $route = null,
+        ?string $route = null,
         array $params = [],
         string $label = '',
         string $title = 'Edit',
@@ -219,7 +219,7 @@ class Button implements ButtonInterface, Renderable, Arrayable
      * @return ButtonInterface
      */
     public function setActionShow(
-        string $route = null,
+        ?string $route = null,
         array $params = [],
         string $label = '',
         string $title = 'Show',
@@ -245,7 +245,7 @@ class Button implements ButtonInterface, Renderable, Arrayable
      * @return ButtonInterface
      */
     public function setActionCustom(
-        string $url = null,
+        ?string $url = null,
         string $label = '',
         string $class = 'btn btn-primary btn-outline-primary btn-sm flat',
         string $icon = 'fa fa-paw'
@@ -267,7 +267,7 @@ class Button implements ButtonInterface, Renderable, Arrayable
      *
      * @return ButtonInterface
      */
-    public function setButtonExport(string $url = null): ButtonInterface
+    public function setButtonExport(?string $url = null): ButtonInterface
     {
         $addUrl = 'export=1';
         if (!$url) {
@@ -309,11 +309,11 @@ class Button implements ButtonInterface, Renderable, Arrayable
      * @return \Illuminate\Contracts\Support\Renderable
      */
     public function setButtonCheckboxAction(
-        string $url = null,
-        string $addPostUrl = null,
-        string $text = null,
-        string $confirmText = null,
-        string $class = null,
+        ?string $url = null,
+        ?string $addPostUrl = null,
+        ?string $text = null,
+        ?string $confirmText = null,
+        ?string $class = null,
         string $icon = ''
     ): ButtonInterface {
         $addPostUrl = $addPostUrl ?: '?deleted=';
@@ -387,7 +387,7 @@ class Button implements ButtonInterface, Renderable, Arrayable
      *
      * @return ButtonInterface
      */
-    public function setLabel(string $label = null): ButtonInterface
+    public function setLabel(?string $label = null): ButtonInterface
     {
         if ($this->isVisibility()) {
             $this->label = $label;
@@ -401,7 +401,7 @@ class Button implements ButtonInterface, Renderable, Arrayable
      *
      * @return ButtonInterface
      */
-    public function setIcon(string $icon = null): ButtonInterface
+    public function setIcon(?string $icon = null): ButtonInterface
     {
         if ($this->isVisibility()) {
             $this->icon = $icon;
@@ -415,7 +415,7 @@ class Button implements ButtonInterface, Renderable, Arrayable
      *
      * @return ButtonInterface
      */
-    public function setTitle(string $text = null): ButtonInterface
+    public function setTitle(?string $text = null): ButtonInterface
     {
         if ($this->isVisibility()) {
             $this->title = $text;
@@ -429,7 +429,7 @@ class Button implements ButtonInterface, Renderable, Arrayable
      *
      * @return ButtonInterface
      */
-    public function setId(string $id = null): ButtonInterface
+    public function setId(?string $id = null): ButtonInterface
     {
         if ($this->isVisibility()) {
             $this->id = $id;
@@ -443,7 +443,7 @@ class Button implements ButtonInterface, Renderable, Arrayable
      *
      * @return ButtonInterface
      */
-    public function setClass(string $class = null): ButtonInterface
+    public function setClass(?string $class = null): ButtonInterface
     {
         if ($this->isVisibility()) {
             $this->class = $class;
@@ -457,7 +457,7 @@ class Button implements ButtonInterface, Renderable, Arrayable
      *
      * @return ButtonInterface
      */
-    public function setJsClass(string $class = null): ButtonInterface
+    public function setJsClass(?string $class = null): ButtonInterface
     {
         if ($this->isVisibility()) {
             $this->jsClass = $class;
@@ -490,11 +490,11 @@ class Button implements ButtonInterface, Renderable, Arrayable
      * @return ButtonInterface
      */
     public function setConfirmText(
-        string $text = null,
-        string $colorOk = null,
-        string $colorCancel = null,
-        string $textOk = null,
-        string $textCancel = null
+        ?string $text = null,
+        ?string $colorOk = null,
+        ?string $colorCancel = null,
+        ?string $textOk = null,
+        ?string $textCancel = null
     ): ButtonInterface {
         if ($this->isVisibility()) {
             if ($text) {
@@ -544,7 +544,7 @@ class Button implements ButtonInterface, Renderable, Arrayable
      *
      * @return ButtonInterface
      */
-    public function setRoute(string $route = null, array $params = []): ButtonInterface
+    public function setRoute(?string $route = null, array $params = []): ButtonInterface
     {
         if ($this->isVisibility()) {
             if ($route === null) {
@@ -638,7 +638,7 @@ class Button implements ButtonInterface, Renderable, Arrayable
      *
      * @return bool
      */
-    public function getValues(\Illuminate\Database\Eloquent\Model $instance = null): bool
+    public function getValues(?\Illuminate\Database\Eloquent\Model $instance = null): bool
     {
         $this->_instance = $instance;
         if ($this->isHandler()) {
@@ -796,7 +796,7 @@ class Button implements ButtonInterface, Renderable, Arrayable
      *
      * @return Renderable
      */
-    public function render(string $view = null, array $params = null): \Illuminate\Contracts\Support\Renderable
+    public function render(?string $view = null, ?array $params = null): \Illuminate\Contracts\Support\Renderable
     {
         $view = $view ? $view : 'column.treeControl';
         $params = $params ? $params : $this->toArray();

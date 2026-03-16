@@ -37,7 +37,7 @@ class ColumnCeil
      * @return string
      * @throws \Throwable
      */
-    public function image(string $link, string $title = null, string $view = null): string
+    public function image(string $link, ?string $title = null, ?string $view = null): string
     {
         $view = $view ?: 'column.linkImage';
 
@@ -61,12 +61,12 @@ class ColumnCeil
      */
     public function listToString(
         $data,
-        string $title = null,
-        string $titleAddition = null,
-        string $class = null,
-        string $delimiter = null,
-        string $delimiterAddition = null,
-        string $view = null
+        ?string $title = null,
+        ?string $titleAddition = null,
+        ?string $class = null,
+        ?string $delimiter = null,
+        ?string $delimiterAddition = null,
+        ?string $view = null
     ): string {
         $view = $view ?: 'column.listToString';
 
@@ -95,11 +95,11 @@ class ColumnCeil
     public function filterButton(
         string $name,
         string $id,
-        string $class = null,
-        string $icon = null,
-        string $title = null,
-        string $originTitle = null,
-        string $view = null
+        ?string $class = null,
+        ?string $icon = null,
+        ?string $title = null,
+        ?string $originTitle = null,
+        ?string $view = null
     ): string {
         $icon = $icon ? $icon : 'fa fa-filter';
         $class = $class ? $class : 'btn btn-xs btn-default';
@@ -145,7 +145,7 @@ class ColumnCeil
      *
      * @return string
      */
-    public function editable(array $options = [], string $view = null): string
+    public function editable(array $options = [], ?string $view = null): string
     {
         $view = $view ?: 'column.editableClick';
         $initJsEvent = isset($options['initJsEvent']) ? $options['initJsEvent'] : 'ready change';

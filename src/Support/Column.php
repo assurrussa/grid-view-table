@@ -202,7 +202,7 @@ class Column implements ColumnInterface
      *
      * @return mixed|null
      */
-    public function getValues(\Illuminate\Database\Eloquent\Model $instance = null)
+    public function getValues(?\Illuminate\Database\Eloquent\Model $instance = null)
     {
         if ($instance) {
             $this->setInstance($instance);
@@ -342,7 +342,7 @@ class Column implements ColumnInterface
     public function setFilter(
         string $field,
         $data,
-        string $mode = null,
+        ?string $mode = null,
         array $selected = [],
         string $class = '',
         string $style = '',
@@ -487,7 +487,7 @@ class Column implements ColumnInterface
         string $field,
         string $string = '',
         bool $active = true,
-        string $format = null,
+        ?string $format = null,
         string $class = '',
         string $style = '',
         string $placeholder = ''
@@ -515,7 +515,7 @@ class Column implements ColumnInterface
         string $field,
         string $string = '',
         bool $active = true,
-        string $format = null,
+        ?string $format = null,
         string $class = '',
         string $style = '',
         string $placeholder = ''
@@ -558,7 +558,7 @@ class Column implements ColumnInterface
      *
      * @return ColumnInterface
      */
-    public function setActions(Callable $action, string $value = null): ColumnInterface
+    public function setActions(Callable $action, ?string $value = null): ColumnInterface
     {
         $this->setKeyAction();
         $this->actions = $action;
