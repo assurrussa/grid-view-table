@@ -1,9 +1,11 @@
+
+
 # Mini grid view table for Laravel >= 5.5 #
 
 ## Install packages ##
 1) `composer require assurrussa/grid-view-table`
 
-3) If necessary, run the command `composer dump-autoload`
+2) If necessary, run the command `composer dump-autoload`
 ```
     php artisan vendor:publish --provider=Assurrussa\GridView\GridViewServiceProvider
 ```
